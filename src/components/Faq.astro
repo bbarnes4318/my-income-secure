@@ -1,0 +1,115 @@
+---
+interface FaqItem {
+  q: string;
+  a: string;
+  /** Optional contextual nudge rendered under the answer. */
+  cta?: { href: string; label: string };
+}
+
+interface Props {
+  items: FaqItem[];
+  /** Renders on the pale/alt ground rather than white. */
+  variant?: 'default' | 'onAlt';
+}
+
+const { items, variant = 'default' } = Astro.props;
+---
+
+<div class:list={['faq', variant === 'onAlt' && 'faq--on-alt']}>
+  {
+    items.map((item) => (
+      <details class="faq__item">
+        <summary class="faq__q">
+          <span>{item.q}</span>
+          <span class="faq__mark" aria-hidden="true" />
+        </summary>
+        <div class="faq__a">
+          <p set:html={item.a} />
+          {item.cta && (
+            <p class="faq__cta">
+              <a href={item.cta.href}>{item.cta.label} &rarr;</a>
+            </p>
+          )}
+        </div>
+      </details>
+    ))
+  }
+</div>
+
+<style>
+  .faq {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .faq__item {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+  }
+
+  .faq--on-alt .faq__item {
+    background: var(--paper);
+  }
+
+  .faq__q {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    min-height: var(--tap);
+    padding: var(--space-4);
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-base);
+    color: var(--navy);
+    list-style: none;
+  }
+
+  .faq__q::-webkit-details-marker {
+    display: none;
+  }
+
+  /* A plus that becomes a minus, drawn rather than typed so it stays centred. */
+  .faq__mark {
+    position: relative;
+    flex: none;
+    inline-size: 16px;
+    block-size: 16px;
+  }
+
+  .faq__mark::before,
+  .faq__mark::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 0;
+    inline-size: 16px;
+    block-size: 2px;
+    background: var(--blue-ink);
+    translate: 0 -50%;
+  }
+
+  .faq__mark::after {
+    rotate: 90deg;
+    transition: rotate 0.18s ease;
+  }
+
+  .faq__item[open] .faq__mark::after {
+    rotate: 0deg;
+  }
+
+  .faq__a {
+    padding: 0 var(--space-4) var(--space-4);
+    color: var(--ink-muted);
+    max-width: var(--measure);
+  }
+
+  .faq__cta {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+</style>

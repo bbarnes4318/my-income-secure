@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.astro/
+
+# Deployment
+.vercel/
+
+# Environment — never commit. STRIPE_SECRET_KEY lives in Vercel project
+# settings, not in this repository.
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,182 @@
+---
+import Wordmark from './Wordmark.astro';
+import { SITE, DISCLAIMER, ROUTES, DISCLOSURES } from '../config/site.js';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="shell">
+    <div class="footer__top">
+      <div>
+        <Wordmark tone="invert" class="footer__brand" />
+        <p class="footer__entity">Operated by {SITE.entity}</p>
+      </div>
+      <nav aria-label="Footer">
+        <ul class="footer__links">
+          <li><a href={ROUTES.calculator}>Benefit estimator</a></li>
+          <li><a href={ROUTES.plans}>Plans</a></li>
+          <li><a href={ROUTES.guide}>Filing guide</a></li>
+          <li><a href={ROUTES.privacy}>Privacy policy</a></li>
+          <li><a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    {/* Legally load-bearing. Present on every page. Do not reword. */}
+    <p class="footer__disclaimer">{DISCLAIMER}</p>
+
+    {/* Supplied facts only. Each renders when present and is absent otherwise
+        — never a frame with nothing in it. */}
+    {
+      DISCLOSURES.underwriting && (
+        <div class="footer__disclosure">
+          <p class="structure">{DISCLOSURES.underwriting.structure}</p>
+          <dl class="entities">
+            {DISCLOSURES.underwriting.entities.map((e) => (
+              <div class="entities__row">
+                <dt>
+                  {e.name}
+                  {e.license && <span class="entities__lic">{e.license}</span>}
+                </dt>
+                <dd>{e.role}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      )
+    }
+
+    {
+      DISCLOSURES.floridaLicense && (
+        <p class="footer__disclosure">
+          {DISCLOSURES.floridaLicense.legalName}. Licence
+          {' '}{DISCLOSURES.floridaLicense.licenseNumber}
+          {' '}({DISCLOSURES.floridaLicense.licenseState}).
+          {' '}{DISCLOSURES.floridaLicense.address}.
+        </p>
+      )
+    }
+
+    <p class="footer__copy">&copy; {year} {SITE.entity}. All rights reserved.</p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--navy-deep);
+    color: #b6c6df;
+    padding-block: var(--space-7) var(--space-6);
+    margin-top: auto;
+  }
+
+  .footer__top {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+    justify-content: space-between;
+    padding-bottom: var(--space-5);
+  }
+
+  /* Typography lives in Wordmark. */
+  .footer__brand {
+    margin-bottom: var(--space-1);
+  }
+
+  .footer__entity {
+    font-size: var(--text-sm);
+    margin-top: var(--space-1);
+  }
+
+  .footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .footer__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    color: #dbe5f4;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .footer__links a:hover {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .footer__disclaimer {
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+    padding-top: var(--space-5);
+    font-size: var(--text-xs);
+    line-height: 1.7;
+    color: #9fb3d1;
+    max-width: 78ch;
+  }
+
+  .footer__disclosure {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    line-height: 1.7;
+    color: #8fa6c6;
+    max-width: 78ch;
+  }
+
+  /* The bridge between the disclaimer above and the entity detail below.
+     Set a step stronger than the fine print on either side so it reads as the
+     structural summary rather than a lead-in to the list. */
+  .structure {
+    color: #cbd8ec;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    padding-top: var(--space-4);
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+  }
+
+  .entities {
+    margin: var(--space-5) 0 0;
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .entities__row {
+    display: grid;
+    gap: var(--space-1);
+    padding-left: var(--space-4);
+    border-left: 2px solid rgba(255, 255, 255, 0.16);
+  }
+
+  .entities dt {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: #dbe5f4;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-3);
+  }
+
+  .entities__lic {
+    font-weight: 400;
+    color: #7d93b5;
+  }
+
+  .entities dd {
+    margin: 0;
+    color: #8fa6c6;
+  }
+
+  .footer__copy {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: #7d93b5;
+  }
+</style>

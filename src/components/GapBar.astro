@@ -1,0 +1,186 @@
+---
+// The signature element. Appears exactly twice: the homepage worked example and
+// the calculator result. Same grammar both times, so the homepage teaches the
+// reader how to read their own number before they have one.
+//
+// Values are painted by lib/gap-bar.js — this is structure only.
+
+interface Props {
+  id: string;
+  eyebrow: string;
+  /** Rendered under the figure, e.g. "short every month". */
+  unit?: string;
+  coveredLabel?: string;
+  uncoveredLabel?: string;
+}
+
+const {
+  id,
+  eyebrow,
+  unit = 'short every month',
+  coveredLabel = 'State benefit covers',
+  uncoveredLabel = "You're short",
+} = Astro.props;
+---
+
+<figure class="gap" id={id} data-gap>
+  <figcaption class="gap__eyebrow">{eyebrow}</figcaption>
+
+  <div class="gap__figure">
+    <span class="gap__currency" aria-hidden="true">$</span>
+    <span class="gap__number" data-gap-number>0</span>
+  </div>
+  <p class="gap__unit">{unit}</p>
+
+  <div class="gap__bar" role="img" aria-label="" data-gap-bar>
+    <div class="gap__seg gap__seg--covered" data-gap-covered></div>
+    <div class="gap__seg gap__seg--uncovered" data-gap-uncovered></div>
+  </div>
+
+  <div class="gap__legend">
+    <div class="gap__key gap__key--covered">
+      <span class="gap__key-label" data-gap-covered-label>{coveredLabel}</span>
+      <span class="gap__key-value" data-gap-covered-value>—</span>
+    </div>
+    <div class="gap__key gap__key--uncovered">
+      <span class="gap__key-label" data-gap-uncovered-label>{uncoveredLabel}</span>
+      <span class="gap__key-value" data-gap-uncovered-value>—</span>
+    </div>
+  </div>
+</figure>
+
+<style>
+  .gap {
+    margin: 0;
+  }
+
+  .gap__eyebrow {
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    font-stretch: var(--widest);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--uncovered);
+    margin-bottom: var(--space-3);
+  }
+
+  /* The loudest moment on the site. Nothing else uses --text-gap, weight 900,
+     or the widest width axis. */
+  .gap__figure {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.06em;
+    color: var(--uncovered);
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-stretch: var(--widest);
+    font-size: var(--text-gap);
+    line-height: 0.85;
+    letter-spacing: -0.03em;
+    /* Tabular figures keep the count-up from reflowing the line. */
+    font-variant-numeric: tabular-nums;
+  }
+
+  .gap__currency {
+    font-size: 0.42em;
+    line-height: 1;
+    margin-top: 0.12em;
+    font-stretch: 100%;
+    opacity: 0.75;
+  }
+
+  .gap__unit {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    font-stretch: var(--wide);
+    color: #dbe5f4;
+    margin-top: var(--space-3);
+  }
+
+  .gap__bar {
+    display: flex;
+    inline-size: 100%;
+    block-size: 56px;
+    margin-top: var(--space-5);
+    border-radius: 6px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .gap__seg {
+    inline-size: 50%;
+    transition: inline-size 850ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Covered recedes: low chroma, and it sits behind a scrim of the ground. */
+  .gap__seg--covered {
+    background: var(--covered);
+  }
+
+  /* Uncovered dominates: full chroma, flat, unmissable. */
+  .gap__seg--uncovered {
+    background: var(--uncovered);
+  }
+
+  .gap__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4) var(--space-6);
+    margin-top: var(--space-4);
+  }
+
+  .gap__key {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-left: var(--space-3);
+    border-left: 3px solid transparent;
+  }
+
+  .gap__key--covered {
+    border-left-color: var(--covered);
+  }
+
+  .gap__key--uncovered {
+    border-left-color: var(--uncovered);
+  }
+
+  .gap__key-label {
+    font-size: var(--text-xs);
+    letter-spacing: 0.02em;
+    color: #9fb3d1;
+  }
+
+  .gap__key-value {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .gap__key--covered .gap__key-value {
+    color: var(--covered-soft);
+  }
+
+  .gap__key--uncovered .gap__key-value {
+    color: var(--uncovered);
+  }
+
+  /* When the benefit actually covers the costs, the amber alarm is wrong. */
+  .gap[data-state='covered'] .gap__figure,
+  .gap[data-state='covered'] .gap__eyebrow {
+    color: var(--covered-soft);
+  }
+
+  @media (max-width: 400px) {
+    .gap__figure {
+      /* Six characters at the widest axis will not fit a 375px viewport. */
+      font-stretch: 108%;
+    }
+    .gap__bar {
+      block-size: 44px;
+    }
+  }
+</style>

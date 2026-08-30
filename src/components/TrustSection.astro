@@ -1,0 +1,152 @@
+---
+// Trust built only from what is actually verifiable.
+//
+// No testimonials, ratings, customer counts, press logos, or approval-time
+// figures appear here, and none may be added without real sourced content —
+// see OPEN-ITEMS.md. What is here instead is the transparency that IS
+// available: who operates the program, a plain statement of what it is and is
+// not, the cancellation and refund terms, and the government source behind
+// the numbers.
+//
+// The proof slot below stays empty on purpose. An empty, honest section beats
+// a populated, invented one.
+
+import ImageSlot from './ImageSlot.astro';
+import Icon from './Icon.astro';
+import { SITE } from '../config/site.js';
+import { PROGRAM_TERMS } from '../config/plans.js';
+import { DOL_SOURCE_URL, DOL_SOURCE_LABEL } from '../lib/states.js';
+---
+
+<section class="section section--sunken" id="trust">
+  <div class="shell trust__shell">
+    <div class="trust__intro">
+      <p class="eyebrow">Straight answers</p>
+      <h2>What we can tell you plainly</h2>
+      <p class="lead">
+        There is a lot of vague language in this category. Here is the part we
+        can state without qualification.
+      </p>
+      <div class="trust__figure">
+        <ImageSlot name="trust-operator" ratio="1 / 1" radius="md" />
+      </div>
+    </div>
+
+    <div class="trust__grid">
+      <div class="trust__item">
+        <span class="trust__icon"><Icon name="attest" size={22} /></span>
+        <h3>Who runs it</h3>
+        <p>
+          The {SITE.program} is operated by {SITE.entity}. That is the entity you
+          are contracting with, and the one you reach at
+          <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
+        </p>
+      </div>
+
+      <div class="trust__item">
+        <h3>What it is, and what it is not</h3>
+        <p>
+          It is a membership benefit program that pays a fixed benefit in
+          {PROGRAM_TERMS.installments} installments if you lose your job — not an
+          income that continues until you find work. It is not insurance, not a
+          policy, and not a contract of indemnity.
+        </p>
+      </div>
+
+      <div class="trust__item">
+        <span class="trust__icon"><Icon name="calculator" size={22} /></span>
+        <h3>Where our numbers come from</h3>
+        <p>
+          Every state benefit figure on this site is calculated from the U.S.
+          Department of Labor's published state provisions —
+          <a href={DOL_SOURCE_URL} target="_blank" rel="noopener">
+            {DOL_SOURCE_LABEL}</a>. You can check our arithmetic against the
+          source.
+        </p>
+      </div>
+
+      <div class="trust__item">
+        <span class="trust__icon"><Icon name="refund" size={22} /></span>
+        <h3>Cancelling and refunds</h3>
+        <p>
+          A full refund is available within {PROGRAM_TERMS.refundWindowHours}
+          hours of purchase, provided no benefits have been used. After that
+          window there is no refund. The price is annual and billed monthly, so
+          cancelling or claiming before the year is paid up can mean the unpaid
+          balance is deducted from a benefit payment.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .trust__shell {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-7);
+    align-items: start;
+  }
+
+  .trust__figure {
+    display: none;
+  }
+
+  .trust__icon {
+    display: grid;
+    place-items: center;
+    inline-size: 38px;
+    block-size: 38px;
+    border-radius: var(--radius-sm);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    color: var(--blue-ink);
+    margin-bottom: var(--space-4);
+  }
+
+  .trust__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+
+  .trust__item {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-flat);
+    padding: var(--space-5);
+  }
+
+  .trust__item h3 {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: var(--space-2);
+  }
+
+  .trust__item p {
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+
+
+  @media (min-width: 720px) {
+    .trust__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (min-width: 1000px) {
+    .trust__shell {
+      grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+      gap: var(--space-9);
+    }
+
+    .trust__figure {
+      display: block;
+      margin-top: var(--space-6);
+      max-width: 15rem;
+    }
+  }
+</style>

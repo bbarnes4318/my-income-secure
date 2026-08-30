@@ -1,0 +1,1055 @@
+---
+import Page from '../layouts/Page.astro';
+import GapBar from '../components/GapBar.astro';
+import Icon from '../components/Icon.astro';
+import PlanWindow from '../components/PlanWindow.astro';
+import { STATES, DOL_SOURCE_URL, DOL_SOURCE_LABEL } from '../lib/states.js';
+import { ELIGIBILITY_CRITERIA, PROGRAM_TERMS } from '../config/plans.js';
+import {
+  ROUTES,
+  ESTIMATE_DISCLAIMER,
+  URGENCY,
+  STATE_FILING_REQUIREMENT,
+} from '../config/site.js';
+
+const steps = [
+  { key: 'state', label: 'State' },
+  { key: 'income', label: 'Income' },
+  { key: 'expenses', label: 'Expenses' },
+  { key: 'eligibility', label: 'Eligibility' },
+];
+---
+
+<Page
+  title="What would your state actually pay you? — My Income Secure"
+  description="Estimate your state unemployment benefit from your state's own published formula, then see the monthly gap against what you actually spend."
+>
+  <div class="calc" data-calc>
+    {/* ---- The four questions ---- */}
+    <section class="section section--tight" data-calc-form>
+      <div class="shell calc__shell">
+        <div class="calc__main">
+        <p class="eyebrow">Benefit estimator</p>
+        <h1 class="calc__title">What would your state actually pay you?</h1>
+
+        <div class="progress" data-progress>
+          <ol class="progress__list">
+            {
+              steps.map((s, i) => (
+                <li class="progress__item" data-progress-step={i}>
+                  <span class="visually-hidden">{s.label}</span>
+                </li>
+              ))
+            }
+          </ol>
+          <p class="progress__label">
+            Step <span data-progress-current>1</span> of {steps.length}
+            <span class="progress__name" data-progress-name>State</span>
+          </p>
+        </div>
+
+        <form class="calc__form" data-calc-steps novalidate>
+          {/* Step 1 — auto-advances. Nobody taps "next" after picking a state. */}
+          <fieldset class="step" data-step="0">
+            <legend class="step__q">Which state do you work in?</legend>
+            <p class="step__help">
+              File where you worked, not where you live — that is the state that
+              collected your employer's unemployment tax.
+            </p>
+            <label class="visually-hidden" for="calc-state">Your state</label>
+            <select id="calc-state" name="state" data-field="state">
+              <option value="" selected disabled>Choose your state…</option>
+              {STATES.map((s) => <option value={s.code}>{s.name}</option>)}
+            </select>
+          </fieldset>
+
+          {/* Step 2 — dependants appear only for the 9 states whose formula
+              actually has an allowance. */}
+          <fieldset class="step" data-step="1" hidden>
+            <legend class="step__q">Roughly what do you earn a year?</legend>
+            <p class="step__help">
+              Gross, before tax. States calculate from the wages your employer
+              reports, not your take-home.
+            </p>
+            <div class="field">
+              <label for="calc-income">Annual income</label>
+              <div class="input-money">
+                <span aria-hidden="true">$</span>
+                <input
+                  type="number"
+                  id="calc-income"
+                  name="income"
+                  data-field="income"
+                  inputmode="numeric"
+                  min="0"
+                  step="1000"
+                  placeholder="52,000"
+                  autocomplete="off"
+                />
+              </div>
+            </div>
+            <div class="field" data-deps-field hidden>
+              <label for="calc-deps">Number of dependants</label>
+              <input
+                type="number"
+                id="calc-deps"
+                name="deps"
+                data-field="deps"
+                inputmode="numeric"
+                min="0"
+                max="10"
+                value="0"
+              />
+              <p class="hint" data-deps-hint>
+                This state adds a per-dependant allowance to the weekly benefit.
+              </p>
+            </div>
+          </fieldset>
+
+          {/* Step 3 — three fields, one screen. */}
+          <fieldset class="step" data-step="2" hidden>
+            <legend class="step__q">What does your month cost?</legend>
+            <p class="step__help">
+              The bills that arrive whether or not you are working. Estimates are
+              fine — round numbers are enough to see the shape of it.
+            </p>
+            <div class="field">
+              <label for="calc-housing">Housing</label>
+              <div class="input-money">
+                <span aria-hidden="true">$</span>
+                <input
+                  type="number"
+                  id="calc-housing"
+                  data-field="housing"
+                  data-expense
+                  inputmode="numeric"
+                  min="0"
+                  step="50"
+                  placeholder="1,400"
+                  autocomplete="off"
+                />
+              </div>
+              <p class="hint">Rent or mortgage, plus utilities.</p>
+            </div>
+            <div class="field">
+              <label for="calc-vehicle">Vehicle</label>
+              <div class="input-money">
+                <span aria-hidden="true">$</span>
+                <input
+                  type="number"
+                  id="calc-vehicle"
+                  data-field="vehicle"
+                  data-expense
+                  inputmode="numeric"
+                  min="0"
+                  step="25"
+                  placeholder="450"
+                  autocomplete="off"
+                />
+              </div>
+              <p class="hint">Payment, fuel, insurance.</p>
+            </div>
+            <div class="field">
+              <label for="calc-other">Everything else</label>
+              <div class="input-money">
+                <span aria-hidden="true">$</span>
+                <input
+                  type="number"
+                  id="calc-other"
+                  data-field="other"
+                  data-expense
+                  inputmode="numeric"
+                  min="0"
+                  step="50"
+                  placeholder="750"
+                  autocomplete="off"
+                />
+              </div>
+              <p class="hint">Food, phone, childcare, medical, debt payments.</p>
+            </div>
+            <p class="running-total" data-expense-total hidden></p>
+          </fieldset>
+
+          {/* Step 4 */}
+          <fieldset class="step" data-step="3" hidden>
+            <legend class="step__q">Last thing — what has to be true of you.</legend>
+            <p class="step__help">
+              These are the attestations you make at enrollment. They are
+              statements about you, not boxes to click past, and the certificate
+              can be cancelled if one of them turns out not to hold.
+            </p>
+            {
+              ELIGIBILITY_CRITERIA.map((c) => (
+                <label class="check">
+                  <input
+                    type="checkbox"
+                    data-eligibility={c.id}
+                    data-required={c.required ? 'true' : 'false'}
+                  />
+                  <span>
+                    {c.label}
+                    {c.detail && <span class="check__detail">{c.detail}</span>}
+                  </span>
+                </label>
+              ))
+            }
+            <p class="step__note">
+              If any of these is not true, you can still see your gap — you just
+              cannot enrol.
+            </p>
+          </fieldset>
+
+          <div class="calc__actions">
+            <button type="button" class="btn btn--secondary" data-back hidden>
+              &larr; Back
+            </button>
+            <button type="button" class="btn btn--primary" data-next>
+              Continue
+            </button>
+          </div>
+          <p class="calc__error" data-error role="alert" hidden></p>
+        </form>
+
+        <p class="calc__resume" data-resume hidden>
+          You worked this out before.
+          <button type="button" class="linkish" data-resume-go>
+            Jump back to your result
+          </button>
+        </p>
+        </div>
+
+        {/* The first step used to be a lone dropdown in an empty viewport.
+            This panel gives it a screen: what the four questions are, and what
+            comes out the other end. It is orientation, not decoration. */}
+        <aside class="calc__aside" aria-label="What this does">
+          <div class="brief">
+            <p class="brief__eyebrow">What you get</p>
+            <p class="brief__lead">
+              Your state's own benefit formula, run against what your month
+              actually costs. No sign-up, no email.
+            </p>
+            <ol class="brief__steps">
+              {
+                steps.map((st, i) => (
+                  <li data-brief-step={i}>
+                    <span class="brief__n">{i + 1}</span>
+                    <span class="brief__label">{st.label}</span>
+                  </li>
+                ))
+              }
+            </ol>
+            <p class="brief__note">
+              <Icon name="calculator" size={20} />
+              <span>
+                Figures come from the U.S. Department of Labor's published state
+                provisions — you can check the arithmetic.
+              </span>
+            </p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    {/* ---- The result. The emotional peak; everything above feeds it. ---- */}
+    <div data-calc-result hidden>
+      <section class="section section--deep section--generous">
+        <div class="shell">
+          <div class="result">
+            <GapBar
+              id="calc-gap"
+              eyebrow="Your monthly shortfall"
+              unit="short every month"
+              coveredLabel="Your state pays"
+              uncoveredLabel="You cover this yourself"
+            />
+
+            <div class="result__facts">
+              <div class="fact">
+                <span class="fact__label">Estimated weekly benefit</span>
+                <span class="fact__value" data-out="weekly">—</span>
+              </div>
+              <div class="fact">
+                <span class="fact__label">Estimated monthly benefit</span>
+                <span class="fact__value" data-out="monthly">—</span>
+              </div>
+              <div class="fact">
+                <span class="fact__label">How long it lasts</span>
+                <span class="fact__value" data-out="duration">—</span>
+              </div>
+              <div class="fact">
+                <span class="fact__label">Where you land in the state band</span>
+                <span class="fact__value" data-out="position">—</span>
+              </div>
+            </div>
+
+            <p class="result__formula" data-out="formula"></p>
+            <p class="result__approx" data-out="approx" hidden></p>
+          </div>
+        </div>
+      </section>
+
+      {/* No interstitial between seeing the problem and seeing the fix. */}
+      <section class="section">
+        <div class="shell">
+          <p class="eyebrow">Closing it</p>
+          <h2 data-plans-heading>The tier that covers your shortfall</h2>
+          <p class="lead" data-plans-lead></p>
+          <div class="result__plans">
+            <PlanWindow placement="result" />
+          </div>
+
+          <div class="urgency">
+            <p>{URGENCY}</p>
+            <p class="urgency__filing">
+              {STATE_FILING_REQUIREMENT}{' '}
+              <a href={ROUTES.guide}>See how to file in your state &rarr;</a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section--tight section--alt">
+        <div class="shell shell--text">
+          <div class="disclaimer">
+            <strong>This is an estimate, not an official determination.</strong>
+            <p>{ESTIMATE_DISCLAIMER}</p>
+          </div>
+          <p class="source">
+            State minimums, maximums, durations, and formulas from the U.S.
+            Department of Labor, Employment &amp; Training Administration —
+            <a href={DOL_SOURCE_URL} target="_blank" rel="noopener">
+              {DOL_SOURCE_LABEL}</a>. Monthly figures are the weekly amount
+            &times; 52 &divide; 12, since no state pays on a monthly basis.
+          </p>
+          <p class="source">
+            Filing for unemployment as well?
+            <a href={ROUTES.guide}>The step-by-step guide</a> has your state's
+            agency, phone number, and waiting-week rule.
+          </p>
+        </div>
+      </section>
+    </div>
+  </div>
+</Page>
+
+<script>
+  import {
+    STATES,
+    findState,
+    hasDependentAllowance,
+    computeWeeklyBenefit,
+    incomeForWeeklyBenefit,
+    toMonthly,
+    benefitPosition,
+    durationLabel,
+  } from '../lib/states.js';
+  import { recommendPlan } from '../config/plans.js';
+  import { renderGap } from '../lib/gap-bar.js';
+  import { money } from '../lib/format.js';
+  import { saveCalcResult, loadCalcResult } from '../lib/storage.js';
+  import { track, EVENTS, CALC_STEPS } from '../lib/analytics.js';
+
+  const root = document.querySelector('[data-calc]');
+  const formSection = root.querySelector('[data-calc-form]');
+  const resultSection = root.querySelector('[data-calc-result]');
+  const stepEls = [...root.querySelectorAll('[data-step]')];
+  const backBtn = root.querySelector('[data-back]');
+  const nextBtn = root.querySelector('[data-next]');
+  const errorEl = root.querySelector('[data-error]');
+
+  const stateSel = root.querySelector('[data-field="state"]');
+  const incomeInput = root.querySelector('[data-field="income"]');
+  const depsField = root.querySelector('[data-deps-field]');
+  const depsInput = root.querySelector('[data-field="deps"]');
+  const depsHint = root.querySelector('[data-deps-hint]');
+  const expenseInputs = [...root.querySelectorAll('[data-expense]')];
+  const totalEl = root.querySelector('[data-expense-total]');
+  const eligibilityBoxes = [...root.querySelectorAll('[data-eligibility]')];
+
+  const STEP_NAMES = ['State', 'Income', 'Expenses', 'Eligibility'];
+  let step = 0;
+
+  // ---- Prefill: from the homepage example, the guide, or a previous visit ----
+  const params = new URLSearchParams(window.location.search);
+  const prefillState = params.get('state');
+  const prefillExpenses = params.get('expenses');
+
+  if (prefillState && findState(prefillState)) {
+    stateSel.value = prefillState;
+    syncDepsField();
+  }
+  if (prefillExpenses && Number(prefillExpenses) > 0) {
+    // Arrives as a single monthly figure; seed it as "everything else" so the
+    // reader can split it out rather than having it silently attributed.
+    root.querySelector('[data-field="other"]').value = String(
+      Math.round(Number(prefillExpenses))
+    );
+    updateTotal();
+  }
+
+  const saved = loadCalcResult();
+  if (saved && !prefillState) {
+    root.querySelector('[data-resume]').hidden = false;
+    root.querySelector('[data-resume-go]').addEventListener('click', () => {
+      restore(saved);
+    });
+  }
+
+  track(EVENTS.CALC_START, {});
+
+  // ---- Step machinery ----
+  function showStep(n, { focus = true } = {}) {
+    step = n;
+    stepEls.forEach((el, i) => {
+      el.hidden = i !== n;
+    });
+    backBtn.hidden = n === 0;
+    nextBtn.textContent = n === stepEls.length - 1 ? 'See my gap' : 'Continue';
+    // Step 1 auto-advances, so its button would only ever be a dead end.
+    nextBtn.hidden = n === 0;
+    errorEl.hidden = true;
+
+    root.querySelector('[data-progress-current]').textContent = String(n + 1);
+    root.querySelector('[data-progress-name]').textContent = STEP_NAMES[n];
+    root.querySelectorAll('[data-progress-step]').forEach((el, i) => {
+      el.dataset.state = i < n ? 'done' : i === n ? 'current' : 'todo';
+    });
+    // The orientation panel tracks the same position, so the two never
+    // disagree about which step you are on.
+    root.querySelectorAll('[data-brief-step]').forEach((el, i) => {
+      el.dataset.briefState = i < n ? 'done' : i === n ? 'current' : 'todo';
+    });
+
+    if (focus) {
+      const first = stepEls[n].querySelector('select, input');
+      if (first) first.focus({ preventScroll: true });
+    }
+  }
+
+  function fail(message) {
+    errorEl.textContent = message;
+    errorEl.hidden = false;
+  }
+
+  function validate(n) {
+    if (n === 0) {
+      if (!stateSel.value) return 'Choose your state to continue.';
+    }
+    if (n === 1) {
+      const v = parseFloat(incomeInput.value);
+      if (!v || v <= 0) return 'Enter your approximate annual income.';
+    }
+    if (n === 2) {
+      if (expenseTotal() <= 0) return 'Enter at least one monthly cost.';
+    }
+    return null;
+  }
+
+  function advance() {
+    const problem = validate(step);
+    if (problem) {
+      fail(problem);
+      return;
+    }
+    track(EVENTS.CALC_STEP_COMPLETE, { step: step + 1, stepName: CALC_STEPS[step] });
+    if (step === stepEls.length - 1) calculate();
+    else showStep(step + 1);
+  }
+
+  nextBtn.addEventListener('click', advance);
+  backBtn.addEventListener('click', () => showStep(Math.max(0, step - 1)));
+
+  // Values live in the DOM, so going back never loses anything.
+  root.querySelector('[data-calc-steps]').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+      e.preventDefault();
+      advance();
+    }
+  });
+
+  // ---- Step 1: auto-advance ----
+  stateSel.addEventListener('change', () => {
+    syncDepsField();
+    if (stateSel.value) {
+      track(EVENTS.CALC_STEP_COMPLETE, { step: 1, stepName: 'state' });
+      showStep(1);
+    }
+  });
+
+  function syncDepsField() {
+    const s = findState(stateSel.value);
+    const has = hasDependentAllowance(s);
+    depsField.hidden = !has;
+    if (has) {
+      depsHint.textContent = `${s.name} adds ${money(s.dep)} a week per dependant, up to ${s.depCap}.`;
+    }
+  }
+
+  // ---- Step 3: running total ----
+  function expenseTotal() {
+    return expenseInputs.reduce((sum, el) => sum + (parseFloat(el.value) || 0), 0);
+  }
+
+  function updateTotal() {
+    const total = expenseTotal();
+    totalEl.hidden = total <= 0;
+    totalEl.textContent = `${money(total)} a month`;
+  }
+
+  expenseInputs.forEach((el) => el.addEventListener('input', updateTotal));
+
+  // ---- The calculation ----
+  function calculate() {
+    const s = findState(stateSel.value);
+    const income = parseFloat(incomeInput.value) || 0;
+    const deps = parseInt(depsInput.value, 10) || 0;
+    const monthlyExpenses = expenseTotal();
+
+    const weekly = computeWeeklyBenefit(s, income, deps);
+    const monthlyBenefit = toMonthly(weekly);
+    const monthlyGap = Math.max(0, monthlyExpenses - monthlyBenefit);
+
+    const result = {
+      stateCode: s.code,
+      stateName: s.name,
+      income,
+      deps,
+      monthlyExpenses,
+      weekly: Math.round(weekly),
+      monthlyBenefit: Math.round(monthlyBenefit),
+      monthlyGap: Math.round(monthlyGap),
+    };
+
+    paint(result, s, { weekly, monthlyBenefit, monthlyExpenses, monthlyGap });
+    saveCalcResult(result);
+
+    track(EVENTS.GAP_REVEAL, {
+      placement: 'calculator',
+      state: s.code,
+      monthlyGap: result.monthlyGap,
+      monthlyBenefit: result.monthlyBenefit,
+    });
+  }
+
+  function paint(result, s, raw) {
+    formSection.hidden = true;
+    resultSection.hidden = false;
+
+    renderGap(document.getElementById('calc-gap'), {
+      covered: Math.min(raw.monthlyBenefit, raw.monthlyExpenses),
+      uncovered: raw.monthlyGap,
+      coveredLabel: `${s.name} pays`,
+      uncoveredLabel: 'You cover this yourself',
+    });
+
+    const out = (key) => root.querySelector(`[data-out="${key}"]`);
+    out('weekly').textContent = `${money(raw.weekly)}/wk`;
+    out('monthly').textContent = `${money(raw.monthlyBenefit)}/mo`;
+    out('duration').textContent = durationLabel(s);
+
+    const position = benefitPosition(s, raw.weekly);
+    if (position === 'at-max') {
+      out('position').textContent = `At ${s.name}'s ceiling of ${money(s.max)}/wk`;
+    } else if (position === 'at-min') {
+      out('position').textContent = `At ${s.name}'s floor of ${money(s.min)}/wk`;
+    } else {
+      const capIncome = incomeForWeeklyBenefit(s, s.max, result.deps);
+      out('position').textContent = `Between the floor and the ${money(s.max)}/wk ceiling, which starts at ${money(capIncome)} of income`;
+    }
+
+    out('formula').innerHTML =
+      `<strong>${s.name}'s formula:</strong> ${s.formula} &nbsp;·&nbsp; ` +
+      `statutory range ${money(s.min)}–${money(s.max)} a week.`;
+
+    if (s.approx) {
+      const el = out('approx');
+      el.hidden = false;
+      el.textContent = s.approxNote;
+    }
+
+    paintPlans(raw.monthlyGap, s);
+
+    resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('calc-gap').setAttribute('tabindex', '-1');
+    document.getElementById('calc-gap').focus({ preventScroll: true });
+  }
+
+  // ---- Recommendation, tied to their own number ----
+  // Card painting belongs to PlanWindow, which owns the tier ladder. This only
+  // writes the framing above it and hands the gap over.
+  function paintPlans(monthlyGap, s) {
+    const heading = root.querySelector('[data-plans-heading]');
+    const lead = root.querySelector('[data-plans-lead]');
+
+    document.dispatchEvent(
+      new CustomEvent('mis:gap', { detail: { monthlyGap } })
+    );
+
+    if (monthlyGap <= 0) {
+      heading.textContent = 'Your state benefit would cover a month at this level';
+      lead.textContent =
+        `That is unusual, and it only holds while ${s.name} is still paying you — ` +
+        `benefits run out after ${durationLabel(s)}.`;
+      return;
+    }
+
+    const { plan, closesGap } = recommendPlan(monthlyGap);
+
+    if (!plan) {
+      heading.textContent = 'Closing your shortfall';
+      lead.textContent =
+        `You are ${money(monthlyGap)} short every month. Plan pricing is not ` +
+        `published yet — once it is, the tier that closes that gap will be ` +
+        `marked here.`;
+      return;
+    }
+
+    if (closesGap) {
+      heading.textContent = 'The tier that covers your shortfall';
+      lead.textContent =
+        `You are ${money(monthlyGap)} short a month. ${plan.name} pays ` +
+        `${money(plan.totalLimit)}, as ${plan.installments} payments of ` +
+        `${money(plan.monthlyBenefit)} — enough to cover that shortfall for ` +
+        `${plan.installments} months. It is the smallest tier that does, and ` +
+        `buying above it buys you nothing you need.`;
+    } else {
+      // Nothing on the ladder answers this. Say that, rather than dressing the
+      // top tier up as the answer.
+      heading.textContent = 'No tier covers a shortfall this size';
+      lead.textContent =
+        `You are ${money(monthlyGap)} short a month, and the largest tier, ` +
+        `${plan.name}, pays ${money(plan.totalLimit)} as ${plan.installments} ` +
+        `payments of ${money(plan.monthlyBenefit)}. That covers part of the ` +
+        `shortfall and leaves ${money(monthlyGap - plan.monthlyBenefit)} a ` +
+        `month still on you. It is the top of the range — there is nothing ` +
+        `larger to move up to — so this is worth knowing before you decide ` +
+        `rather than a reason to spend more.`;
+    }
+  }
+
+  // ---- Returning visitor ----
+  function restore(data) {
+    const s = findState(data.stateCode);
+    if (!s) return;
+    stateSel.value = data.stateCode;
+    incomeInput.value = data.income || '';
+    depsInput.value = data.deps || 0;
+    syncDepsField();
+    root.querySelector('[data-field="other"]').value = data.monthlyExpenses || '';
+    updateTotal();
+
+    const weekly = data.weekly;
+    const monthlyBenefit = data.monthlyBenefit;
+    paint(data, s, {
+      weekly,
+      monthlyBenefit,
+      monthlyExpenses: data.monthlyExpenses,
+      monthlyGap: data.monthlyGap,
+    });
+  }
+
+  showStep(0, { focus: false });
+</script>
+
+<style>
+  .calc__title {
+    margin-bottom: var(--space-5);
+  }
+
+  /* --- Progress --- */
+  .progress {
+    margin-bottom: var(--space-6);
+  }
+
+  .progress__list {
+    display: flex;
+    gap: 6px;
+    list-style: none;
+    margin: 0 0 var(--space-2);
+    padding: 0;
+  }
+
+  .progress__item {
+    flex: 1;
+    block-size: 5px;
+    border-radius: 3px;
+    background: var(--line);
+    transition: background-color 0.25s ease;
+  }
+
+  .progress__item[data-state='done'] {
+    background: var(--covered-ink);
+  }
+
+  .progress__item[data-state='current'] {
+    background: var(--navy);
+  }
+
+  .progress__label {
+    font-size: var(--text-xs);
+    color: var(--ink-muted);
+    letter-spacing: 0.02em;
+  }
+
+  .progress__name {
+    margin-left: var(--space-2);
+    padding-left: var(--space-2);
+    border-left: 1px solid var(--line-strong);
+    font-weight: 600;
+    color: var(--navy);
+  }
+
+  /* --- Steps --- */
+  .step {
+    border: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .step__q {
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    font-stretch: var(--wide);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--navy);
+    padding: 0;
+    margin-bottom: var(--space-3);
+  }
+
+  .step__help {
+    color: var(--ink-muted);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-5);
+    max-width: 52ch;
+  }
+
+  .step__note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--ink-muted);
+  }
+
+  /* A $ that sits inside the field rather than floating beside it. */
+  .input-money {
+    display: flex;
+    align-items: stretch;
+  }
+
+  .input-money > span {
+    display: flex;
+    align-items: center;
+    padding-inline: 0.75rem;
+    border: 1.5px solid var(--line-strong);
+    border-right: 0;
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    background: var(--paper-alt);
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+
+  .input-money input {
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  }
+
+  .running-total {
+    margin-top: var(--space-2);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--navy);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .check {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    min-height: var(--tap);
+    padding: var(--space-3);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-base);
+    font-weight: 500;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .check:has(input:checked) {
+    border-color: var(--navy);
+    background: var(--blue-pale);
+  }
+
+  .check + .check {
+    margin-top: var(--space-3);
+  }
+
+  /* The detail line is part of what is being attested to, so it sits inside
+     the label rather than beside it — it must not be readable as a footnote
+     the visitor can skip. */
+  .check__detail {
+    display: block;
+    margin-top: var(--space-1);
+    font-size: var(--text-xs);
+    font-weight: 400;
+    color: var(--ink-muted);
+  }
+
+  .check input {
+    inline-size: 20px;
+    block-size: 20px;
+    margin-top: 2px;
+    flex: none;
+    accent-color: var(--navy);
+  }
+
+  .calc__shell {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-7);
+    align-items: start;
+  }
+
+  .calc__main {
+    max-width: var(--width-form);
+    width: 100%;
+  }
+
+  .calc__aside {
+    display: none;
+  }
+
+  .brief {
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-raised);
+  }
+
+  .brief__eyebrow {
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    font-stretch: var(--widest);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--blue-ink);
+  }
+
+  .brief__lead {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+
+  .brief__steps {
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .brief__steps li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    border-radius: var(--radius-sm);
+    color: var(--ink-muted);
+    font-size: var(--text-sm);
+  }
+
+  /* The panel tracks the form: the step you are on is lit. */
+  .brief__steps li[data-brief-state='current'] {
+    background: var(--blue-pale);
+    color: var(--navy);
+    font-weight: 600;
+  }
+
+  .brief__steps li[data-brief-state='done'] {
+    color: var(--covered-ink);
+  }
+
+  .brief__n {
+    display: grid;
+    place-items: center;
+    inline-size: 26px;
+    block-size: 26px;
+    flex: none;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 700;
+  }
+
+  li[data-brief-state='current'] .brief__n {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: #fff;
+  }
+
+  .brief__note {
+    display: flex;
+    gap: var(--space-3);
+    margin-top: var(--space-5);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--line);
+    font-size: var(--text-xs);
+    color: var(--ink-muted);
+  }
+
+  .brief__note :global(svg) {
+    color: var(--blue-ink);
+    margin-top: 1px;
+  }
+
+  @media (min-width: 940px) {
+    .calc__shell {
+      grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
+      gap: var(--space-8);
+    }
+
+    .calc__aside {
+      display: block;
+      position: sticky;
+      top: var(--space-6);
+    }
+  }
+
+  .calc__actions {
+    display: flex;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+
+  .calc__actions .btn--primary {
+    flex: 1;
+  }
+
+  .calc__error {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: #a3231b;
+  }
+
+  .calc__resume {
+    margin-top: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--line);
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+
+  .linkish {
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    font-weight: 600;
+    color: var(--blue-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  /* --- Result --- */
+  .result__facts {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+  }
+
+  .fact {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .fact__label {
+    font-size: var(--text-xs);
+    color: #8ea6c8;
+  }
+
+  .fact__value {
+    font-family: var(--font-display);
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .result__formula,
+  .result__approx {
+    margin-top: var(--space-5);
+    font-size: var(--text-xs);
+    line-height: 1.7;
+    color: #9fb3d1;
+    max-width: 76ch;
+  }
+
+  .result__approx {
+    border-left: 3px solid var(--uncovered);
+    padding-left: var(--space-3);
+    color: #cbd8ec;
+  }
+
+  .result__plans {
+    margin-top: var(--space-6);
+  }
+
+  .urgency {
+    margin-top: var(--space-6);
+    padding: var(--space-5);
+    background: var(--uncovered-wash);
+    border: 1px solid var(--uncovered-line);
+    border-radius: var(--radius);
+    color: var(--uncovered-ink);
+    font-size: var(--text-sm);
+    max-width: 72ch;
+  }
+
+  .urgency p + p {
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--uncovered-line);
+  }
+
+  .urgency__filing a {
+    color: inherit;
+    font-weight: 600;
+  }
+
+  .disclaimer strong {
+    display: block;
+    font-family: var(--font-display);
+    color: var(--navy);
+    margin-bottom: var(--space-2);
+  }
+
+  .disclaimer p {
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+
+  .source {
+    margin-top: var(--space-5);
+    font-size: var(--text-xs);
+    line-height: 1.7;
+    color: var(--ink-muted);
+  }
+
+  @media (min-width: 640px) {
+    .result__facts {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-5) var(--space-6);
+    }
+  }
+</style>

@@ -1,0 +1,142 @@
+/* ---------------------------------------------------------------------------
+   Design tokens — the single source for color, type, and spacing.
+   Nothing in components/ or pages/ should hard-code a hex value or a font size.
+
+   Typography: hierarchy is carried by the WIDTH axis, not only by size, and
+   the two faces split by ROLE rather than by importance.
+
+     Archivo (wdth 62-125, wght 100-900) — display, figures, and the whole UI
+       voice: headlines, the gap number, buttons, labels, tabular data. Expanded
+       and heavy for magnitude.
+     Literata (wght 200-900) — the reading voice: body copy, leads, answers,
+       long-form guide prose.
+
+   A serif for prose against a wide grotesque for data is the register of
+   financial writing rather than of a government form, which matters on a site
+   whose entire argument is that it is being straight with you.
+
+   No italic file is shipped. One 53KB face for incidental emphasis is not worth
+   it; use weight or colour instead.
+
+   Color: amber and green encode the gap and nothing else. If you are reaching
+   for either one outside a covered/uncovered split, reach for navy instead.
+--------------------------------------------------------------------------- */
+
+@font-face {
+  font-family: 'Archivo';
+  src: url('/fonts/archivo-var.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Literata';
+  src: url('/fonts/literata-var.woff2') format('woff2-variations');
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* --- Families ------------------------------------------------------ */
+  --font-display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --font-body: 'Literata', Georgia, 'Times New Roman', serif;
+  /* Data and UI chrome ride the display face, so tables and forms do not read
+     in the same voice as the prose around them. */
+  --font-ui: var(--font-display);
+
+  /* --- Ink and surface ----------------------------------------------- */
+  --paper: #ffffff;
+  --paper-alt: #f5f8fc;
+  --blue-pale: #eaf2fa;
+  --ink: #14203a;
+  --ink-muted: #55617a;
+  --line: #dce3ec;
+  --line-strong: #c3cedd;
+
+  /* --- Navy: the anchor ----------------------------------------------- */
+  --navy: #1b3a6b;
+  --navy-mid: #24497f;
+  --navy-deep: #0e2143; /* ground for the gap reveal only */
+
+  /* --- Blue: links and secondary, deliberately demoted ---------------- */
+  --blue: #2e7fc4;
+  --blue-ink: #1b6cae; /* 5.5:1 on paper — use for link text */
+
+  /* --- The gap encoding. Reserved. ------------------------------------ */
+  --covered: #5c8a76; /* what the state pays — quiet, recessive */
+  --covered-soft: #8fb3a2; /* covered labels on navy-deep — 6.9:1 */
+  --covered-ink: #1e7a4c; /* covered text on paper — 5.3:1 */
+  --uncovered: #f5a524; /* the shortfall — loud. 7.8:1 on navy-deep */
+  --uncovered-ink: #8a5a00; /* shortfall text on paper — 5.9:1 */
+  --uncovered-wash: #fff6e5;
+  --uncovered-line: #f0d999;
+  --covered-wash: #eef6f1;
+  --covered-line: #bcd8c8;
+
+  /* --- Type scale. Fluid, mobile-first. ------------------------------- */
+  --text-xs: 0.8125rem; /* 13px — captions, legal */
+  --text-sm: 0.9375rem; /* 15px — secondary */
+  --text-base: 1.0625rem; /* 17px — body */
+  --text-lg: 1.1875rem; /* 19px — lead */
+  --text-xl: clamp(1.375rem, 1.2rem + 0.9vw, 1.75rem);
+  --text-2xl: clamp(1.625rem, 1.3rem + 1.6vw, 2.25rem);
+  --text-3xl: clamp(2rem, 1.5rem + 2.4vw, 3rem);
+  /* The gap number. Nothing else on the site uses this step. */
+  --text-gap: clamp(3.5rem, 1.5rem + 14vw, 8.5rem);
+
+  /* --- Width axis ------------------------------------------------------ */
+  --wide: 118%;
+  --widest: 125%;
+
+  /* --- Spacing. Section density varies deliberately; see --pad-*. ------ */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+
+  /* Tight where tension builds, generous where a moment should land. */
+  --pad-tight: clamp(2.5rem, 1.5rem + 4vw, 3.5rem);
+  --pad-normal: clamp(3.5rem, 2rem + 6vw, 5rem);
+  --pad-generous: clamp(4.5rem, 2.5rem + 9vw, 7.5rem);
+
+  /* --- Measure --------------------------------------------------------- */
+  --measure: 62ch;
+  --width-page: 1240px;
+  /* Wide compositions that intentionally outrun the reading column. */
+  --width-broad: 1400px;
+  --width-text: 720px;
+  --width-form: 560px;
+
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 18px;
+
+  /* --- Elevation ------------------------------------------------------
+     Four steps, used to say how far something sits off the page. Everything
+     was previously a 1px border on white, which is why the site read flat.
+     Pick by meaning: raised = interactive surface, lifted = the one thing
+     that matters on screen, floating = breaks out of its container. */
+  --shadow-flat: 0 1px 2px rgba(20, 32, 58, 0.05);
+  --shadow-card: 0 1px 2px rgba(20, 32, 58, 0.04), 0 8px 24px rgba(20, 32, 58, 0.06);
+  --shadow-raised: 0 2px 4px rgba(20, 32, 58, 0.05), 0 12px 28px rgba(20, 32, 58, 0.09);
+  --shadow-lift: 0 2px 4px rgba(20, 32, 58, 0.06), 0 18px 44px rgba(20, 32, 58, 0.14);
+  --shadow-float: 0 4px 10px rgba(20, 32, 58, 0.08), 0 30px 70px rgba(20, 32, 58, 0.20);
+
+  /* --- Surface ladder --------------------------------------------------
+     Backgrounds get progressively deeper as sections layer. Never two
+     adjacent sections on the same surface. */
+  --surface-sunken: #eef3f9;
+  --surface-base: #ffffff;
+  --surface-warm: #f8f6f2; /* paper-warm, for long-form reading stretches */
+
+  /* Minimum tap target. Every interactive element honours this. */
+  --tap: 44px;
+}

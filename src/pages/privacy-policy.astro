@@ -1,0 +1,57 @@
+---
+import Page from '../layouts/Page.astro';
+// The policy body is imported verbatim rather than retyped. It is legal text
+// pending counsel's review, so nothing here rewords it — this page only puts it
+// into the shared layout. Sections that no longer match what checkout collects
+// are listed in OPEN-ITEMS.md.
+import policy from '../html/privacy-policy.html?raw';
+---
+
+<Page
+  title="Privacy policy — My Income Secure"
+  description="What information My Income Secure collects through this site and how it is used."
+>
+  <section class="section section--tight">
+    <div class="shell shell--text">
+      <p class="eyebrow">Legal</p>
+      <h1>Privacy policy</h1>
+      <div class="policy" set:html={policy} />
+    </div>
+  </section>
+</Page>
+
+<style>
+  .policy {
+    margin-top: var(--space-6);
+  }
+
+  .policy :global(h2) {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    font-stretch: 100%;
+    margin-top: var(--space-7);
+    margin-bottom: var(--space-3);
+  }
+
+  .policy :global(p) {
+    margin-bottom: var(--space-4);
+    color: var(--ink-muted);
+    max-width: var(--measure);
+  }
+
+  .policy :global(ul) {
+    margin: 0 0 var(--space-4);
+    padding-left: 1.25rem;
+    color: var(--ink-muted);
+    max-width: var(--measure);
+  }
+
+  .policy :global(li) {
+    margin-bottom: var(--space-2);
+  }
+
+  .policy :global(em) {
+    color: var(--ink-muted);
+    font-size: var(--text-sm);
+  }
+</style>

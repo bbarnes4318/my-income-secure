@@ -1,0 +1,386 @@
+---
+// The product's central argument, made concrete before anything is asked for.
+//
+// The FACT on display is each state's STATUTORY MAXIMUM weekly amount from the
+// DOL dataset — the most anyone in that state can receive. No national average
+// is used anywhere here and none is implied: framing it as the ceiling is both
+// honest and the stronger argument, because the gap survives the best case.
+//
+// The spending figure is a SLIDER POSITION, not a claim. It arrives populated
+// so the band renders complete on first paint — this is the signature element
+// and an empty dark box was the worst first impression on the site — but a
+// handle you can see is unmistakably a thing you are meant to move, in a way
+// that a number sitting in a text field is not. Nothing here calls that figure
+// typical, average, or representative, because we have no source for what
+// anyone spends. The starting value is set once below and is listed in
+// OPEN-ITEMS.md for review.
+
+import GapBar from './GapBar.astro';
+import { STATES, DOL_SOURCE_URL, DOL_SOURCE_LABEL } from '../lib/states.js';
+import { ROUTES } from '../config/site.js';
+
+// Only what this component needs, to keep the homepage payload small.
+const slim = STATES.map((s) => ({ c: s.code, n: s.name, max: s.max }));
+
+const DEFAULT_STATE = 'FL';
+/** Where the handle starts. A round number, not a researched figure. */
+const START_SPEND = 3000;
+const SPEND_MIN = 1000;
+const SPEND_MAX = 8000;
+const SPEND_STEP = 100;
+---
+
+<section class="section section--deep section--generous" id="gap-example">
+  <div class="shell">
+    <div class="example__intro">
+      <p class="eyebrow">The gap</p>
+      <h2>
+        State unemployment was never built to cover your bills. It was built to
+        slow the bleeding.
+      </h2>
+      <p class="lead">
+        Set the slider to what your month actually costs. We hold it against the
+        most your state pays anyone — its statutory maximum, not an average.
+      </p>
+    </div>
+
+    <div class="example__panel">
+      <div class="example__controls">
+        <div class="ctl">
+          <label for="ex-state">Your state</label>
+          <select id="ex-state">
+            {
+              slim.map((s) => (
+                <option value={s.c} selected={s.c === DEFAULT_STATE}>
+                  {s.n}
+                </option>
+              ))
+            }
+          </select>
+        </div>
+
+        <div class="ctl">
+          <label for="ex-spend">
+            <span>Drag to your monthly costs</span>
+            <span class="ctl__value" data-spend-display>&nbsp;</span>
+          </label>
+          <input
+            type="range"
+            id="ex-spend"
+            min={SPEND_MIN}
+            max={SPEND_MAX}
+            step={SPEND_STEP}
+            value={START_SPEND}
+          />
+          <div class="ctl__scale" aria-hidden="true">
+            <span>$1k</span>
+            <span>$8k</span>
+          </div>
+          <p class="ctl__hint">
+            Rent or mortgage, utilities, car, food, insurance. This one is yours
+            to set — we have not assumed a figure for you.
+          </p>
+        </div>
+      </div>
+
+      <div class="example__result">
+        <GapBar
+          id="home-gap"
+          eyebrow="The monthly shortfall"
+          unit="short every month, at best"
+          coveredLabel="Best case, state pays"
+          uncoveredLabel="You cover this yourself"
+        />
+        <p class="example__note" data-example-note></p>
+      </div>
+    </div>
+
+    <div class="example__act">
+      <a class="btn btn--primary" href={ROUTES.calculator} data-example-cta>
+        Get my real number &rarr;
+      </a>
+      <p class="example__sub">
+        Four questions. Your state's maximum is only the ceiling — your own
+        income decides where you actually land, and it is usually lower.
+      </p>
+    </div>
+
+    <p class="example__source">
+      Statutory weekly maximums from the U.S. Department of Labor,
+      Employment &amp; Training Administration —
+      <a href={DOL_SOURCE_URL} target="_blank" rel="noopener">{DOL_SOURCE_LABEL}</a>.
+      Monthly figures are the weekly amount &times; 52 &divide; 12. The spending
+      figure is whatever you set it to; we make no claim about what a month costs
+      anyone. Illustration only, not a guarantee of eligibility or payment.
+    </p>
+  </div>
+</section>
+
+<script type="application/json" id="ex-states" set:html={JSON.stringify(slim)}></script>
+
+<script>
+  import { renderGap } from '../lib/gap-bar.js';
+  import { money } from '../lib/format.js';
+  import { track, EVENTS } from '../lib/analytics.js';
+
+  const WEEKS_PER_MONTH = 52 / 12;
+  const CALCULATOR = '/what-would-state-unemployment-actually-pay-you/';
+
+  const states = JSON.parse(document.getElementById('ex-states').textContent);
+  const stateSel = document.getElementById('ex-state');
+  const spendInput = document.getElementById('ex-spend');
+  const spendOut = document.querySelector('[data-spend-display]');
+  const note = document.querySelector('[data-example-note]');
+  const cta = document.querySelector('[data-example-cta]');
+  const gapRoot = document.getElementById('home-gap');
+
+  // True until the visitor moves something. Only decides whether the count-up
+  // runs on scroll-in; the figures are real either way.
+  let untouched = true;
+  let engagementTracked = false;
+
+  function update({ animate = true } = {}) {
+    const spend = Number(spendInput.value);
+    const state = states.find((s) => s.c === stateSel.value);
+    if (!state) return;
+
+    spendOut.textContent = `${money(spend)} a month`;
+
+    const maxMonthly = state.max * WEEKS_PER_MONTH;
+    const covered = Math.min(maxMonthly, spend);
+    const uncovered = Math.max(0, spend - maxMonthly);
+
+    renderGap(gapRoot, {
+      covered,
+      uncovered,
+      coveredLabel: `Best case, ${state.n} pays`,
+      uncoveredLabel: 'You cover this yourself',
+      animate,
+    });
+
+    note.textContent =
+      uncovered > 0
+        ? `${state.n} caps its weekly benefit at ${money(state.max)}. Even if you ` +
+          `qualified for every dollar of it, ${money(uncovered)} of your month ` +
+          `would still be yours to find.`
+        : `${state.n}'s maximum would cover a month at this level — but only if ` +
+          `you qualified for the full amount, which depends on your income.`;
+
+    const url = new URL(CALCULATOR, window.location.origin);
+    url.searchParams.set('state', state.c);
+    url.searchParams.set('expenses', String(Math.round(spend)));
+    cta.href = url.pathname + url.search;
+  }
+
+  function onInput() {
+    untouched = false;
+    update();
+    if (!engagementTracked) {
+      engagementTracked = true;
+      track(EVENTS.GAP_REVEAL, {
+        placement: 'homepage_example',
+        state: stateSel.value,
+        monthlyGap: Math.round(
+          Math.max(
+            0,
+            Number(spendInput.value) -
+              (states.find((s) => s.c === stateSel.value)?.max ?? 0) *
+                WEEKS_PER_MONTH
+          )
+        ),
+      });
+    }
+  }
+
+  stateSel.addEventListener('change', onInput);
+  spendInput.addEventListener('input', onInput);
+
+  // Paint immediately and without motion, so the band is complete on arrival
+  // even when it is already in view. The count-up is then armed to run once
+  // when it scrolls into frame, which is where the moment actually lands.
+  update({ animate: false });
+
+  if (typeof IntersectionObserver !== 'undefined') {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          io.disconnect();
+          if (untouched) update({ animate: true });
+        }
+      },
+      { threshold: 0.35 }
+    );
+    io.observe(gapRoot);
+  }
+</script>
+
+<style>
+  .example__intro {
+    max-width: 44rem;
+  }
+
+  /* One raised surface holding controls and result together, so the slider
+     reads as attached to the number it drives rather than floating near it. */
+  .example__panel {
+    margin-top: var(--space-7);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  }
+
+  .example__controls {
+    display: grid;
+    gap: var(--space-6);
+    align-content: start;
+  }
+
+  .ctl label {
+    color: #cbd8ec;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+  }
+
+  .ctl__value {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-stretch: var(--wide);
+    font-variant-numeric: tabular-nums;
+    color: #ffffff;
+    font-size: var(--text-lg);
+  }
+
+  .ctl__hint {
+    font-size: var(--text-xs);
+    color: #8ea6c8;
+    margin-top: var(--space-3);
+    max-width: 42ch;
+  }
+
+  .ctl__scale {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    color: #7d93b5;
+  }
+
+  /* --- The slider. A deliberately large handle: it has to read as grabbable
+         at a glance, because that is what keeps the figure from reading as a
+         claim about what anyone spends. --- */
+  input[type='range'] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: var(--tap);
+    background: transparent;
+    cursor: grab;
+    margin: 0;
+    display: block;
+  }
+
+  input[type='range']:active {
+    cursor: grabbing;
+  }
+
+  input[type='range']::-webkit-slider-runnable-track {
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  input[type='range']::-moz-range-track {
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 30px;
+    height: 30px;
+    margin-top: -11px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 3px solid var(--navy-deep);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
+  }
+
+  input[type='range']::-moz-range-thumb {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 3px solid var(--navy-deep);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
+  }
+
+  input[type='range']:focus-visible {
+    outline: none;
+  }
+
+  input[type='range']:focus-visible::-webkit-slider-thumb {
+    box-shadow: 0 0 0 4px var(--blue);
+  }
+
+  input[type='range']:focus-visible::-moz-range-thumb {
+    box-shadow: 0 0 0 4px var(--blue);
+  }
+
+  .example__note {
+    margin-top: var(--space-5);
+    max-width: 52ch;
+    color: #cbd8ec;
+  }
+
+  .example__act {
+    margin-top: var(--space-7);
+  }
+
+  .example__sub {
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+    color: #8ea6c8;
+    max-width: 46ch;
+  }
+
+  .example__source {
+    margin-top: var(--space-8);
+    font-size: var(--text-xs);
+    line-height: 1.7;
+    color: #7d93b5;
+    max-width: 76ch;
+  }
+
+  .example__source a {
+    color: #a9c4e4;
+  }
+
+  @media (min-width: 900px) {
+    .example__panel {
+      grid-template-columns: minmax(17rem, 21rem) 1fr;
+      gap: var(--space-8);
+      padding: var(--space-7);
+      align-items: start;
+    }
+
+    .example__act {
+      display: flex;
+      align-items: center;
+      gap: var(--space-6);
+    }
+
+    .example__sub {
+      margin-top: 0;
+    }
+  }
+</style>

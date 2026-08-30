@@ -1,0 +1,113 @@
+---
+// ---------------------------------------------------------------------------
+// A sized, reserved place for photography that does not exist yet.
+//
+// The point is that dropping a photo in later is a config change, not a
+// redesign: the aspect ratio, the crop behaviour, the rounding and the
+// elevation are all decided here and now. Set `src` in config/images.js and
+// every slot using that key fills in.
+//
+// Until then it renders a composed placeholder — a layered navy field with a
+// radial falloff and the monogram at low opacity. Deliberately NOT a grey box
+// with a camera glyph: it should read as a designed surface that happens to be
+// abstract, so the page looks finished rather than pending.
+// ---------------------------------------------------------------------------
+import Wordmark from './Wordmark.astro';
+import { IMAGES } from '../config/images.js';
+
+interface Props {
+  /** Key in config/images.js. Also names what the photograph must show. */
+  name: string;
+  /** Aspect ratio as a CSS value, e.g. "4 / 5". */
+  ratio?: string;
+  /** Corner treatment. */
+  radius?: 'md' | 'lg';
+  class?: string;
+}
+
+const { name, ratio = '4 / 5', radius = 'lg', class: className } = Astro.props;
+
+const image = IMAGES[name] ?? null;
+---
+
+<div
+  class:list={['slot', `slot--${radius}`, !image && 'slot--empty', className]}
+  style={`--slot-ratio: ${ratio}`}
+  data-image-slot={name}
+>
+  {
+    image ? (
+      <img
+        src={image.src}
+        alt={image.alt}
+        width={image.width}
+        height={image.height}
+        loading={image.eager ? 'eager' : 'lazy'}
+        decoding="async"
+      />
+    ) : (
+      <div class="slot__placeholder" aria-hidden="true">
+        <Wordmark variant="monogram" tone="invert" class="slot__mono" />
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .slot {
+    position: relative;
+    aspect-ratio: var(--slot-ratio);
+    overflow: hidden;
+    background: var(--navy-deep);
+    box-shadow: var(--shadow-float);
+  }
+
+  .slot--md {
+    border-radius: var(--radius);
+  }
+
+  .slot--lg {
+    border-radius: var(--radius-lg);
+  }
+
+  .slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Two layered radial falloffs plus a fine diagonal grain. Reads as a
+     deliberate surface at any size, and costs nothing to ship. */
+  .slot__placeholder {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(
+        120% 90% at 22% 12%,
+        rgba(46, 127, 196, 0.42) 0%,
+        rgba(46, 127, 196, 0) 58%
+      ),
+      radial-gradient(
+        100% 80% at 88% 96%,
+        rgba(27, 58, 107, 0.9) 0%,
+        rgba(14, 33, 67, 0) 62%
+      ),
+      repeating-linear-gradient(
+        128deg,
+        rgba(255, 255, 255, 0.035) 0px,
+        rgba(255, 255, 255, 0.035) 1px,
+        transparent 1px,
+        transparent 7px
+      ),
+      var(--navy-deep);
+  }
+
+  .slot__placeholder :global(.slot__mono) {
+    font-size: clamp(3rem, 1rem + 9vw, 6rem);
+    opacity: 0.16;
+    user-select: none;
+  }
+</style>

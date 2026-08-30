@@ -1,0 +1,177 @@
+---
+// Bottom bar for the filing guide. Deliberately not shown on arrival — it waits
+// until the reader is into the steps, which is where the guide starts making
+// the problem feel real. Dismissible, and the dismissal sticks for the session.
+
+interface Props {
+  /** CSS selector for the element that, once passed, arms the bar. */
+  triggerSelector: string;
+  href: string;
+}
+
+const { triggerSelector, href } = Astro.props;
+---
+
+<div
+  class="sticky"
+  data-sticky
+  data-trigger={triggerSelector}
+  hidden
+  role="region"
+  aria-label="Estimate your coverage gap"
+>
+  <div class="sticky__inner">
+    <p class="sticky__copy">
+      <strong>Filing is the easy part.</strong>
+      <span>Most people find their state pays far less than their month costs.</span>
+    </p>
+    <a class="btn btn--primary sticky__cta" href={href} data-sticky-cta>
+      See your gap &rarr;
+    </a>
+    <button type="button" class="sticky__close" data-sticky-close aria-label="Dismiss">
+      <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+        <path
+          d="M2 2l12 12M14 2L2 14"
+          stroke="currentColor"
+          stroke-width="2"
+          fill="none"
+          stroke-linecap="round"></path>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  const KEY = 'mis.guideBar.dismissed';
+  const bar = document.querySelector('[data-sticky]');
+
+  function dismissed() {
+    try {
+      return sessionStorage.getItem(KEY) === '1';
+    } catch {
+      return false;
+    }
+  }
+
+  if (bar && !dismissed()) {
+    const trigger = document.querySelector(bar.dataset.trigger);
+
+    const arm = () => {
+      bar.hidden = false;
+      requestAnimationFrame(() => bar.classList.add('sticky--in'));
+    };
+
+    if (trigger) {
+      // Deliberately a position check rather than an IntersectionObserver: with
+      // threshold 0 the ratio never changes when the trigger goes from below the
+      // viewport to above it, so an anchor jump or a fast scroll would silently
+      // skip the bar forever.
+      let armed = false;
+      let ticking = false;
+
+      const check = () => {
+        if (armed) return;
+        if (trigger.getBoundingClientRect().top < 0) {
+          armed = true;
+          window.removeEventListener('scroll', onScroll);
+          arm();
+        }
+      };
+
+      const onScroll = () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          ticking = false;
+          check();
+        });
+      };
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      check(); // Covers arriving with a #hash already past the trigger.
+    }
+
+    bar.querySelector('[data-sticky-close]').addEventListener('click', () => {
+      bar.classList.remove('sticky--in');
+      bar.hidden = true;
+      try {
+        sessionStorage.setItem(KEY, '1');
+      } catch {
+        /* dismissal simply will not persist */
+      }
+    });
+  }
+</script>
+
+<style>
+  .sticky {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: 40;
+    background: var(--navy-deep);
+    border-top: 3px solid var(--uncovered);
+    padding: var(--space-3) 0 calc(var(--space-3) + env(safe-area-inset-bottom));
+    translate: 0 100%;
+    transition: translate 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .sticky--in {
+    translate: 0 0;
+  }
+
+  .sticky__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    max-width: var(--width-page);
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 0.75rem + 2vw, 2.5rem);
+  }
+
+  .sticky__copy {
+    flex: 1;
+    min-width: 0;
+    font-size: var(--text-xs);
+    line-height: 1.45;
+    color: #b6c6df;
+  }
+
+  .sticky__copy strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    color: #fff;
+  }
+
+  .sticky__cta {
+    flex: none;
+    font-size: var(--text-sm);
+    padding: 0.75rem 1.125rem;
+  }
+
+  .sticky__close {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--tap);
+    block-size: var(--tap);
+    background: none;
+    border: 0;
+    border-radius: var(--radius-sm);
+    color: #8ea6c8;
+    cursor: pointer;
+  }
+
+  .sticky__close:hover {
+    color: #fff;
+  }
+
+  /* Below 560px the supporting line costs more room than it earns. */
+  @media (max-width: 560px) {
+    .sticky__copy span {
+      display: none;
+    }
+  }
+</style>

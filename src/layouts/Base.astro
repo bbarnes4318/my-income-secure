@@ -1,0 +1,75 @@
+---
+import '../styles/tokens.css';
+import '../styles/base.css';
+import { SITE } from '../config/site.js';
+
+interface Props {
+  title: string;
+  description?: string;
+  bodyClass?: string;
+}
+
+const { title, description, bodyClass } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="canonical" href={canonical} />
+
+    {/* Both faces are needed for first paint, so both are preloaded. */}
+    <link
+      rel="preload"
+      href="/fonts/archivo-var.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/literata-var.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta name="theme-color" content="#1B3A6B" />
+  </head>
+  <body class={bodyClass}>
+    <a href="#main" class="skip">Skip to content</a>
+    <slot />
+
+    <script>
+      // Attribution must be captured on every entry page, not just the funnel.
+      import { captureUtms } from '../lib/storage.js';
+      captureUtms();
+    </script>
+  </body>
+</html>
+
+<style>
+  .skip {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 100;
+    background: var(--navy);
+    color: #fff;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0 0 var(--radius-sm) 0;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .skip:focus {
+    left: 0;
+  }
+</style>

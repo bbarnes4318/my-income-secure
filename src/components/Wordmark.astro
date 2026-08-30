@@ -1,0 +1,130 @@
+---
+// ---------------------------------------------------------------------------
+// Typographic wordmark. Deliberately NOT a logo mark.
+//
+// There is no invented symbol here. A brand mark is a design commission, and a
+// mediocre invented one is harder to remove later than none at all — so this
+// is a considered setting of the name, which is a real asset either way.
+//
+// The device is the site's own idea: the name is set in Archivo with the width
+// axis doing the work, and "Secure" carries a baseline rule in the covered
+// green — the same green that means "what is covered" everywhere else. The
+// mark is therefore the thesis, not decoration.
+// ---------------------------------------------------------------------------
+
+interface Props {
+  /** "full" for the name, "monogram" for the MIS lockup. */
+  variant?: 'full' | 'monogram';
+  /** Inverts for dark grounds (footer, hero placeholder). */
+  tone?: 'ink' | 'invert';
+  /** Rendered as a link when href is given. */
+  href?: string;
+  class?: string;
+}
+
+const {
+  variant = 'full',
+  tone = 'ink',
+  href,
+  class: className,
+} = Astro.props;
+
+const Tag = href ? 'a' : 'span';
+---
+
+<Tag
+  class:list={['wm', `wm--${tone}`, `wm--${variant}`, className]}
+  {...href ? { href, 'aria-label': 'My Income Secure — home' } : {}}
+>
+  {
+    variant === 'full' ? (
+      <>
+        <span class="wm__my">My</span>
+        <span class="wm__income">Income</span>
+        <span class="wm__secure">Secure</span>
+      </>
+    ) : (
+      <span class="wm__mono" aria-hidden="true">MIS</span>
+    )
+  }
+</Tag>
+
+<style>
+  .wm {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.22em;
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  /* "My" is the quiet part — narrow and light, so the eye lands on the two
+     words that carry the promise. */
+  .wm__my {
+    font-weight: 400;
+    font-stretch: 88%;
+    opacity: 0.75;
+  }
+
+  .wm__income {
+    font-weight: 800;
+    font-stretch: var(--wide);
+  }
+
+  /* The rule under "Secure" is the covered green. It is the only place the
+     gap palette appears outside a covered/uncovered split, and it earns that
+     by meaning the same thing: this part is covered. */
+  .wm__secure {
+    position: relative;
+    font-weight: 800;
+    font-stretch: var(--wide);
+    padding-bottom: 0.14em;
+  }
+
+  .wm__secure::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 0.11em;
+    border-radius: 1px;
+    background: var(--covered);
+  }
+
+  .wm--ink {
+    color: var(--navy);
+  }
+
+  .wm--invert {
+    color: #ffffff;
+  }
+
+  .wm--invert .wm__secure::after {
+    background: var(--covered-soft);
+  }
+
+  .wm--monogram {
+    gap: 0;
+  }
+
+  .wm__mono {
+    font-weight: 900;
+    font-stretch: var(--widest);
+    letter-spacing: -0.03em;
+  }
+
+  a.wm:hover .wm__income,
+  a.wm:hover .wm__secure {
+    color: var(--navy-mid);
+  }
+
+  .wm--invert:hover .wm__income,
+  .wm--invert:hover .wm__secure {
+    color: var(--blue-pale);
+  }
+</style>

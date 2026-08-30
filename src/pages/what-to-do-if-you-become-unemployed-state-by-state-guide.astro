@@ -1,0 +1,578 @@
+---
+import Page from '../layouts/Page.astro';
+import Faq from '../components/Faq.astro';
+import StickyCta from '../components/StickyCta.astro';
+import ImageSlot from '../components/ImageSlot.astro';
+import { STATE_AGENCIES, WAITING_WEEK_WAIVED } from '../lib/state-agencies.js';
+import { STATES } from '../lib/states.js';
+import { ROUTES } from '../config/site.js';
+
+// The waived-state list is derived from the table rather than typed out beside
+// it. The pre-rebuild page named five states in prose while the table marked
+// six — see OPEN-ITEMS.md.
+const waivedSentence = WAITING_WEEK_WAIVED.slice(0, -1).join(', ') +
+  ', and ' + WAITING_WEEK_WAIVED[WAITING_WEEK_WAIVED.length - 1];
+
+// Map table rows to calculator state codes so a search can prefill the flow.
+const codeByName = new Map(STATES.map((s) => [s.name.toLowerCase(), s.code]));
+const agencies = STATE_AGENCIES.map((a) => ({
+  ...a,
+  code:
+    codeByName.get(a.state.toLowerCase()) ??
+    codeByName.get(a.state.replace(/^U\.S\. /, '').toLowerCase()) ??
+    null,
+}));
+
+const steps = [
+  {
+    title: 'File your claim right away — the same week you lose your job.',
+    body:
+      'Benefits are not retroactive to your last day worked; most states start counting your benefit week from the week you actually file, so waiting costs you money.',
+  },
+  {
+    title: 'File with the state where you worked, not where you live.',
+    body:
+      "If you worked in one state and live in another, file with the state that collected your employer's unemployment tax — usually the state of the job itself.",
+  },
+  {
+    title: 'Have your information ready before you start.',
+    body:
+      'Social Security number, driver’s license or state ID, complete employer information (name, address, dates of employment) for your last 18 months of work, your reason for separation, and recent pay stubs or W-2s.',
+  },
+  {
+    title: "File online if it's offered — it's faster than the phone line.",
+    body:
+      'Every state now takes claims online 24/7; phone lines are the slower option almost everywhere, especially during high call volume.',
+  },
+  {
+    title: 'Expect a 1-week unpaid waiting period, with a few exceptions.',
+    body: `Most states don't pay benefits for your first eligible week. ${waivedSentence} currently waive it — see the table below.`,
+  },
+  {
+    title: 'File your weekly (or biweekly) certification on time, every time.',
+    body:
+      "Approval isn't a one-time event — nearly every state requires you to confirm each week that you're able, available, and actively searching for work. Missing a certification is the most common reason payments stop.",
+  },
+  {
+    title: 'Know your appeal rights.',
+    body:
+      'If your claim is denied, every state has a formal appeal process with a deadline — typically 10-30 days from the determination letter. Don’t assume a denial is final.',
+  },
+];
+
+// Two of these answers end on a problem. Those two get a way forward.
+const faqs = [
+  {
+    q: 'How soon after losing my job should I file?',
+    a: "Immediately — the same day or same week if possible. Your claim's effective date is generally the week you file, not your last day of work, so delaying the filing delays your benefits and can cost you an entire week of pay.",
+  },
+  {
+    q: 'Can I file if I was fired, or only if I was laid off?',
+    a: 'You can file either way — the state decides eligibility based on the reason for separation. Layoffs and reductions in force are almost always eligible. Being fired for misconduct usually disqualifies you; being fired for performance or "not a good fit" often does not. Quitting voluntarily is only eligible if you had "good cause" the state recognizes (e.g., unsafe working conditions, a documented medical reason). When in doubt, file anyway and let the state make the determination — you can’t be penalized for applying.',
+  },
+  {
+    q: 'How long does it take to get my first payment?',
+    a: 'Typically 2-3 weeks after filing if there are no issues with your claim, plus the unpaid waiting week in states that have one. Any wrinkle — a disputed separation reason, identity verification, missing wage records from an employer — extends that timeline.',
+    cta: {
+      href: ROUTES.calculator,
+      label: 'See what those weeks cost you, and what the payment actually covers',
+    },
+  },
+  {
+    q: 'Do I have to keep looking for work while receiving benefits?',
+    a: 'Yes, in nearly every state. Most require a set number of documented work-search activities (applications, job fairs, employer contacts) each week, reported when you file your weekly certification. Requirements and the exact count vary by state and change periodically — check your state’s site for the current number.',
+  },
+  {
+    q: 'What if my claim gets denied?',
+    a: 'You have the right to appeal. States send a written determination with the reason for denial and an appeal deadline, commonly 10-30 days. Missing that deadline usually forfeits the appeal, so read the determination letter as soon as it arrives.',
+    cta: {
+      href: ROUTES.calculator,
+      label: 'See what a denial would leave you covering yourself',
+    },
+  },
+  {
+    q: 'Which state do I file with if I worked remotely or in multiple states?',
+    a: 'Generally, you file where your employer paid unemployment tax on your wages — often the state where the work was physically performed, or your employer’s registered state for remote roles. If you worked in more than one state in the past 18 months, most states offer a "combined wage claim" that pulls in wages from all of them. Call the state you believe is correct — they will redirect you if it isn’t.',
+  },
+  {
+    q: 'I hold a My Income Secure membership. Do I still have to file?',
+    a: 'Yes, and the membership does not pay without it. A claim requires you to be eligible for and approved to receive state unemployment benefits for the period you are out of work, so filing with your state is the step that makes your benefit payable. File first, then claim.',
+    cta: { href: ROUTES.plans, label: 'How the membership benefit works' },
+  },
+  {
+    q: 'Is there a fee to file for unemployment?',
+    a: 'No. Filing directly with your state’s unemployment agency is always free. Be cautious of third-party sites that charge a fee to "help" you file — they are not the state agency and are not required to get your claim processed any faster.',
+  },
+];
+---
+
+<Page
+  title="What to do if you become unemployed — state-by-state guide"
+  description="A step-by-step guide to filing for unemployment, plus direct phone numbers and filing links for every state."
+>
+  <section class="guide-hero">
+    <div class="shell guide-hero__shell">
+      <div class="guide-hero__text">
+        <p class="eyebrow">Filing guide</p>
+        <h1>What to do if you become unemployed</h1>
+        <p class="lead guide-hero__lead">
+          A step-by-step guide to filing for unemployment benefits, plus direct
+          phone numbers and filing links for every state. Free, and no account
+          needed.
+        </p>
+      </div>
+      <div class="guide-hero__figure">
+        <ImageSlot name="guide-header" ratio="16 / 10" radius="md" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight section--warm">
+    <div class="shell shell--text">
+      <h2 id="steps">Step by step: what to do first</h2>
+      <ol class="steps">
+        {
+          steps.map((s, i) => (
+            <li class="gstep">
+              <span class="gstep__n" aria-hidden="true">{i + 1}</span>
+              <div>
+                <strong>{s.title}</strong>
+                <p>{s.body}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+
+      {/* Highest-intent moment on the page: they have just read how slow,
+          partial, and conditional the process is. */}
+      <aside class="inline-cta">
+        <p class="inline-cta__eyebrow">And once it is approved?</p>
+        <p class="inline-cta__headline">
+          It replaces a fraction of what you earned, for a limited number of
+          weeks, and your bills do not shrink to match.
+        </p>
+        <p class="inline-cta__body">
+          Work out what your state would actually pay you against what your month
+          actually costs. It takes about a minute and uses your state's own
+          published formula.
+        </p>
+        <a class="btn btn--primary" href={ROUTES.calculator}>
+          See your gap &rarr;
+        </a>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section section--tight section--alt">
+    <div class="shell shell--text">
+      <h2>Frequently asked questions</h2>
+      <div class="guide-faq">
+        <Faq items={faqs} variant="onAlt" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="shell">
+      <h2 id="states">State by state: who to call and how to file</h2>
+      <p class="lead states__lead">
+        Search or scroll to find your state. "Waiting week" shows whether that
+        state pays your first eligible week or holds it unpaid.
+      </p>
+
+      <div class="states__search">
+        <label class="visually-hidden" for="state-search">Search for your state</label>
+        <input
+          type="search"
+          id="state-search"
+          placeholder="Search for your state…"
+          autocomplete="off"
+          data-state-search
+        />
+      </div>
+
+      {/* Surfaced when a search narrows to a single state — carries the state
+          into the calculator so it is never typed twice. */}
+      <p class="states__jump" data-state-jump hidden>
+        <a href={ROUTES.calculator} data-state-jump-link></a>
+      </p>
+
+      <p class="states__empty" data-state-empty hidden>
+        No state matches that. Check the spelling, or clear the search.
+      </p>
+
+      {/* One dataset, two presentations: cards on a phone, table from 900px. */}
+      <ul class="state-cards" data-state-list>
+        {
+          agencies.map((a) => (
+            <li
+              class="state-card"
+              data-state-row
+              data-state-name={a.state.toLowerCase()}
+              data-state-code={a.code ?? ''}
+            >
+              <div class="state-card__head">
+                <h3 class="state-card__name">{a.state}</h3>
+                <span
+                  class:list={[
+                    'wait',
+                    a.waitingWeek === 'none' ? 'wait--none' : 'wait--yes',
+                  ]}
+                >
+                  {a.waitingWeek === 'none' ? 'No waiting week' : '1-week wait'}
+                </span>
+              </div>
+              <dl class="state-card__rows">
+                <div>
+                  <dt>Agency</dt>
+                  <dd>{a.agency}</dd>
+                </div>
+                <div>
+                  <dt>How to file</dt>
+                  <dd>{a.howToFile}</dd>
+                </div>
+                <div>
+                  <dt>Phone</dt>
+                  <dd>{a.phone}</dd>
+                </div>
+                <div>
+                  <dt>Website</dt>
+                  <dd class="state-card__site">{a.site}</dd>
+                </div>
+              </dl>
+            </li>
+          ))
+        }
+      </ul>
+
+      <p class="states__source">
+        <strong>Sources:</strong> compiled from the U.S. Department of Labor
+        (dol.gov), individual state unemployment insurance agency websites, and
+        AARP.org. State filing procedures, phone numbers, and waiting-week rules
+        change periodically — always confirm current details directly on your
+        state's official unemployment website before filing. Cross-checked and
+        updated August 6, 2026.
+      </p>
+    </div>
+  </section>
+
+  <StickyCta triggerSelector="#steps" href={ROUTES.calculator} />
+</Page>
+
+<script>
+  const search = document.querySelector('[data-state-search]');
+  const rows = [...document.querySelectorAll('[data-state-row]')];
+  const jump = document.querySelector('[data-state-jump]');
+  const jumpLink = document.querySelector('[data-state-jump-link]');
+  const empty = document.querySelector('[data-state-empty]');
+  const CALCULATOR = '/what-would-state-unemployment-actually-pay-you/';
+
+  function filter() {
+    const q = search.value.trim().toLowerCase();
+    let visible = [];
+
+    rows.forEach((row) => {
+      const match = !q || row.dataset.stateName.includes(q);
+      row.hidden = !match;
+      if (match) visible.push(row);
+    });
+
+    empty.hidden = visible.length > 0;
+
+    // Once the search resolves to one state, offer the calculator prefilled to
+    // it rather than making them pick it again.
+    if (q && visible.length === 1 && visible[0].dataset.stateCode) {
+      const row = visible[0];
+      const name = row.querySelector('.state-card__name').textContent;
+      jump.hidden = false;
+      jumpLink.href = `${CALCULATOR}?state=${row.dataset.stateCode}`;
+      jumpLink.textContent = `See what ${name} would actually pay you →`;
+    } else {
+      jump.hidden = true;
+    }
+  }
+
+  search.addEventListener('input', filter);
+</script>
+
+<style>
+  .guide-hero {
+    background:
+      radial-gradient(
+        80% 120% at 85% 0%,
+        rgba(46, 127, 196, 0.28) 0%,
+        rgba(46, 127, 196, 0) 60%
+      ),
+      var(--navy-deep);
+    color: #dbe5f4;
+    padding-block: var(--pad-normal);
+  }
+
+  .guide-hero__shell {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    align-items: center;
+  }
+
+  .guide-hero__figure {
+    display: none;
+  }
+
+  @media (min-width: 900px) {
+    .guide-hero__shell {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: var(--space-8);
+    }
+
+    .guide-hero__figure {
+      display: block;
+    }
+  }
+
+  .guide-hero h1 {
+    color: #fff;
+    font-weight: 900;
+    font-stretch: var(--wide);
+  }
+
+  .guide-hero .eyebrow {
+    color: var(--uncovered);
+  }
+
+  .guide-hero__lead {
+    margin-top: var(--space-4);
+    color: #b6c6df;
+  }
+
+  /* --- Steps --- */
+  .steps {
+    list-style: none;
+    margin: var(--space-6) 0 0;
+    padding: 0;
+    counter-reset: step;
+  }
+
+  .gstep {
+    display: flex;
+    gap: var(--space-4);
+    padding-block: var(--space-5);
+    border-top: 1px solid var(--line);
+  }
+
+  .gstep__n {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 32px;
+    block-size: 32px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .gstep strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--text-base);
+    color: var(--navy);
+    margin-bottom: var(--space-2);
+  }
+
+  .gstep p {
+    color: var(--ink-muted);
+    font-size: var(--text-sm);
+  }
+
+  /* --- Inline CTA after step 7 --- */
+  .inline-cta {
+    margin-top: var(--space-7);
+    padding: var(--space-6);
+    background: var(--navy-deep);
+    border-radius: var(--radius-lg);
+    color: #b6c6df;
+  }
+
+  .inline-cta__eyebrow {
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    font-stretch: var(--widest);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--uncovered);
+    margin-bottom: var(--space-3);
+  }
+
+  .inline-cta__headline {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 800;
+    font-stretch: var(--wide);
+    line-height: 1.2;
+    color: #fff;
+    margin-bottom: var(--space-3);
+    max-width: 34ch;
+  }
+
+  .inline-cta__body {
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-5);
+    max-width: 52ch;
+  }
+
+  .inline-cta .btn--primary {
+    background: #fff;
+    border-color: #fff;
+    color: var(--navy-deep);
+  }
+
+  .inline-cta .btn--primary:hover {
+    background: var(--blue-pale);
+    border-color: var(--blue-pale);
+  }
+
+  .guide-faq {
+    margin-top: var(--space-5);
+  }
+
+  /* --- States --- */
+  .states__lead {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+  }
+
+  .states__search {
+    margin-top: var(--space-5);
+    max-width: 26rem;
+  }
+
+  .states__jump {
+    margin-top: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background: var(--uncovered-wash);
+    border: 1px solid var(--uncovered-line);
+    border-radius: var(--radius-sm);
+  }
+
+  .states__jump a {
+    color: var(--uncovered-ink);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .states__jump a:hover {
+    text-decoration: underline;
+  }
+
+  .states__empty {
+    margin-top: var(--space-5);
+    color: var(--ink-muted);
+    font-size: var(--text-sm);
+  }
+
+  .state-cards {
+    list-style: none;
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .state-card {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: var(--space-4);
+    background: var(--paper);
+  }
+
+  .state-card__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-3);
+  }
+
+  .state-card__name {
+    font-size: var(--text-base);
+    font-weight: 800;
+    font-stretch: var(--wide);
+    color: var(--navy);
+  }
+
+  .wait {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    padding: 0.25rem 0.5rem;
+    border-radius: 999px;
+  }
+
+  .wait--none {
+    background: #e7f4ed;
+    color: var(--covered-ink);
+  }
+
+  .wait--yes {
+    background: var(--paper-alt);
+    color: var(--ink-muted);
+  }
+
+  .state-card__rows {
+    margin: 0;
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .state-card__rows > div {
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+  }
+
+  .state-card__rows dt {
+    color: var(--ink-muted);
+    font-size: var(--text-xs);
+  }
+
+  .state-card__rows dd {
+    margin: 0;
+  }
+
+  .state-card__site {
+    overflow-wrap: anywhere;
+    color: var(--blue-ink);
+  }
+
+  .states__source {
+    margin-top: var(--space-6);
+    padding: var(--space-4);
+    background: var(--uncovered-wash);
+    border: 1px solid var(--uncovered-line);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    line-height: 1.7;
+    color: var(--uncovered-ink);
+  }
+
+  /* Narrow phones: stack the label above the value rather than squeezing. */
+  @media (max-width: 460px) {
+    .state-card__rows > div {
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
+  }
+
+  /* The sticky bar must not cover the end of the page. */
+  :global(body) {
+    scroll-padding-bottom: 6rem;
+  }
+</style>

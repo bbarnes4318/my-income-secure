@@ -1,0 +1,380 @@
+---
+import Page from '../layouts/Page.astro';
+import PlanWindow from '../components/PlanWindow.astro';
+import PlanCard from '../components/PlanCard.astro';
+import Faq from '../components/Faq.astro';
+import Icon from '../components/Icon.astro';
+import ImageSlot from '../components/ImageSlot.astro';
+import {
+  ROUTES,
+  URGENCY,
+  SITE,
+  STATE_FILING_REQUIREMENT,
+} from '../config/site.js';
+import { PROGRAM_TERMS, ESSENTIALS, PLANS } from '../config/plans.js';
+import { money } from '../lib/format.js';
+
+const T = PROGRAM_TERMS;
+const cheapest = PLANS[0];
+const largest = PLANS[PLANS.length - 1];
+
+const faqs = [
+  {
+    q: 'What decides which tier I need?',
+    a:
+      'The size of your monthly shortfall — what your state would pay you set ' +
+      'against what your month actually costs. Tiers differ by the total they ' +
+      'pay out, so the right one is the smallest one whose monthly installment ' +
+      'covers the difference. There is no advantage to buying above that.',
+    cta: { href: ROUTES.calculator, label: 'Work out your shortfall' },
+  },
+  {
+    q: 'Is this insurance?',
+    a:
+      `No. The ${SITE.program} is a membership benefit program, not an ` +
+      'insurance policy. You are not indemnified against a loss; you hold a ' +
+      'membership that pays a fixed benefit if you lose your job.',
+  },
+  {
+    q: 'How long does the benefit run?',
+    a:
+      `It does not run until you find work. Each tier pays a fixed total in ` +
+      `${T.installments} installments, ${T.installmentIntervalDays} days apart. ` +
+      `The first arrives ${T.firstInstallmentDays} days after the job loss, and ` +
+      'each one after that is paid only if you are still unemployed. If you are ' +
+      'back at work before all of them are paid, the rest are forfeited.',
+  },
+  {
+    q: 'Do I still have to file for state unemployment?',
+    a:
+      'Yes, and it is not optional. A claim requires you to be eligible for and ' +
+      'approved to receive state unemployment benefits for the same period. If ' +
+      'you never file with your state, there is nothing for this to pay on.',
+    cta: { href: ROUTES.guide, label: 'How to file, state by state' },
+  },
+  {
+    q: 'How do I cancel, and can I get a refund?',
+    a:
+      `You can cancel at any time. A full refund is available only within ` +
+      `${T.refundWindowHours} hours of purchase, and only if no benefits have ` +
+      'been used — after that window there is no refund. Note that this is ' +
+      'priced annually and billed monthly for convenience, not as a rolling ' +
+      'month-to-month arrangement: if you cancel or claim before the year is ' +
+      'paid up, the unpaid balance of the annual price can be deducted from a ' +
+      'benefit payment.',
+  },
+];
+---
+
+<Page
+  title="Plans — My Income Secure"
+  description={`${PLANS.length} tiers of job-loss income protection, priced by what each one pays out. Work out your shortfall and take the tier that closes it.`}
+>
+  <section class="section section--tight">
+    <div class="shell">
+      <p class="eyebrow">Plans</p>
+      <h1>Priced by what it pays you, not by a feature list.</h1>
+      <p class="lead plans__lead">
+        {PLANS.length} tiers, from {money(cheapest.totalLimit)} to {money(largest.totalLimit)}.
+        Each pays its total in {T.installments} installments if you lose your
+        job. The only question worth answering is how big the hole is that your
+        state benefit leaves — so answer that first, and the tier follows.
+      </p>
+
+      {/* The primary action on this page is the calculator, not a tier. A
+          visitor without a number cannot pick well, and any tier we put in
+          front of them would be a guess we dressed up as a suggestion. */}
+      <div class="plans__lede-cta">
+        <a class="btn btn--primary" href={ROUTES.calculator}>
+          Work out my shortfall &rarr;
+        </a>
+        <p class="plans__cta-note">
+          Four questions. It uses your state's own benefit formula, then marks
+          the tier that closes the gap it finds.
+        </p>
+      </div>
+
+      <p class="plans__hint" data-gap-hint hidden></p>
+
+      <div class="plans__grid">
+        <PlanWindow placement="plans" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt section--tight">
+    <div class="shell">
+      <h2 class="plans__base-head">If you only want the base membership.</h2>
+      <p class="plans__base-note">
+        Essentials is the entry option. It carries no income protection — it
+        pays nothing if you lose your job — so it is not an answer to a
+        shortfall, and it is never recommended as one.
+      </p>
+      <div class="plans__base">
+        <PlanCard
+          plan={ESSENTIALS}
+          ctaHref={`${ROUTES.checkout}?plan=${ESSENTIALS.id}`}
+        />
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="shell terms__shell">
+      <div class="terms__aside">
+        <p class="eyebrow">Terms worth knowing</p>
+        <h2>Before you pick a tier.</h2>
+        <p class="terms__intro">
+          None of this is buried. The rules that decide whether a claim gets
+          paid are the rules worth reading before you buy, not after.
+        </p>
+        <div class="terms__figure">
+          <ImageSlot name="plans-terms" ratio="3 / 4" radius="md" />
+        </div>
+      </div>
+
+      <div class="terms__main">
+
+      <ul class="terms">
+        <li>
+          <span class="terms__icon"><Icon name="shield" size={22} /></span>
+          <strong>It has to be in place first.</strong>
+          <span>{URGENCY}</span>
+        </li>
+        <li>
+          <span class="terms__icon"><Icon name="filing" size={22} /></span>
+          <strong>You must file with your state.</strong>
+          <span>
+            {STATE_FILING_REQUIREMENT}{' '}
+            <a href={ROUTES.guide}>The filing guide walks through it.</a>
+          </span>
+        </li>
+        <li>
+          <span class="terms__icon"><Icon name="calendar" size={22} /></span>
+          <strong>A claim opens after {T.claimThresholdDays} days.</strong>
+          <span>
+            A claim becomes admissible once you have been unemployed for
+            {' '}{T.claimThresholdDays} consecutive days. The first installment
+            is paid {T.firstInstallmentDays} days after the qualifying job loss.
+          </span>
+        </li>
+        <li>
+          <span class="terms__icon"><Icon name="installments" size={22} /></span>
+          <strong>{T.installments} payments, then it stops.</strong>
+          <span>
+            Installments are paid {T.installmentIntervalDays} days apart, and
+            each one after the first only if you are still out of work. Back at
+            work early and the remaining installments are forfeited. This is not
+            an income that runs until you find a job.
+          </span>
+        </li>
+        <li>
+          <span class="terms__icon"><Icon name="attest" size={22} /></span>
+          <strong>What you attest to at enrollment.</strong>
+          <span>
+            That you are a full-time W-2 employee, that your employer has been
+            incorporated at least 3 years, that you are not a founder, owner,
+            controlling shareholder, board member, or C-suite executive, and
+            that you know of no pending layoffs affecting you. A certificate can
+            be cancelled within {T.certificateCancellationDays} days if public
+            information shows your employer was already conducting layoffs.
+          </span>
+        </li>
+        <li>
+          <span class="terms__icon"><Icon name="calendar" size={22} /></span>
+          <strong>Waiting period</strong>
+          {
+            T.waitingPeriodDays ? (
+              <span>
+                A job loss qualifies once your membership has been active for
+                {' '}{T.waitingPeriodDays} days.
+              </span>
+            ) : (
+              <span class="terms__pending">
+                Not published here yet. See the program terms.
+              </span>
+            )
+          }
+        </li>
+        <li>
+          <span class="terms__icon"><Icon name="refund" size={22} /></span>
+          <strong>Cancelling and refunds</strong>
+          <span>
+            Full refund within {T.refundWindowHours} hours of purchase if no
+            benefits have been used; no refund after that. Because the price is
+            annual and billed monthly, cancelling or claiming early can mean the
+            unpaid balance is deducted from a benefit payment.
+          </span>
+        </li>
+      </ul>
+
+        <div class="plans__faq">
+          <Faq items={faqs} />
+        </div>
+      </div>
+    </div>
+  </section>
+</Page>
+
+<script>
+  // If they already ran the calculator, say so above the window. The window
+  // itself reads the same saved result and opens on the right tier.
+  import { loadCalcResult } from '../lib/storage.js';
+  import { recommendPlan } from '../config/plans.js';
+  import { money } from '../lib/format.js';
+
+  const saved = loadCalcResult();
+  if (saved && saved.monthlyGap > 0) {
+    const hint = document.querySelector('[data-gap-hint]');
+    const { plan, closesGap } = recommendPlan(saved.monthlyGap);
+    const lead = `Based on the estimate you ran for ${saved.stateName}, you are ${money(saved.monthlyGap)} short a month.`;
+
+    hint.textContent = plan
+      ? closesGap
+        ? `${lead} ${plan.name} covers it — marked below.`
+        : `${lead} No tier covers that in full; the largest, ${plan.name}, pays ${money(plan.monthlyBenefit)} of it.`
+      : lead;
+    hint.hidden = false;
+  }
+</script>
+
+<style>
+  .plans__lead {
+    margin-top: var(--space-4);
+  }
+
+  .plans__lede-cta {
+    margin-top: var(--space-6);
+  }
+
+  .plans__grid {
+    margin-top: var(--space-7);
+  }
+
+  .plans__hint {
+    margin-top: var(--space-6);
+    padding: var(--space-3) var(--space-4);
+    background: var(--uncovered-wash);
+    border: 1px solid var(--uncovered-line);
+    border-radius: var(--radius-sm);
+    color: var(--uncovered-ink);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+
+  .plans__cta-note {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+    max-width: 46ch;
+  }
+
+  .plans__base-head {
+    font-size: var(--text-lg);
+  }
+
+  .plans__base-note {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+    max-width: var(--measure);
+  }
+
+  .plans__base {
+    margin-top: var(--space-5);
+    max-width: 24rem;
+  }
+
+  .terms__shell {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-7);
+    align-items: start;
+  }
+
+  .terms__intro {
+    margin-top: var(--space-4);
+    color: var(--ink-muted);
+    max-width: 40ch;
+  }
+
+  .terms__figure {
+    display: none;
+  }
+
+  .terms {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  /* Icon in its own column so the text block stays a clean reading measure
+     and the rules line up down the left edge. */
+  .terms li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      'icon title'
+      '.    body';
+    column-gap: var(--space-4);
+    row-gap: var(--space-1);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .terms__icon {
+    grid-area: icon;
+    display: grid;
+    place-items: center;
+    inline-size: 38px;
+    block-size: 38px;
+    border-radius: var(--radius-sm);
+    background: var(--blue-pale);
+    color: var(--blue-ink);
+  }
+
+  .terms strong {
+    grid-area: title;
+    align-self: center;
+    font-family: var(--font-display);
+    font-size: var(--text-base);
+    color: var(--navy);
+  }
+
+  .terms span:not(.terms__icon) {
+    grid-area: body;
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+
+  .terms__pending {
+    color: var(--line-strong);
+    font-style: italic;
+  }
+
+  .plans__faq {
+    margin-top: var(--space-7);
+  }
+
+  /* Desktop: the framing sits in a sticky left column while the terms and FAQ
+     scroll past it, so the width is used rather than left empty. */
+  @media (min-width: 960px) {
+    .terms__shell {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: var(--space-9);
+    }
+
+    .terms__aside {
+      position: sticky;
+      top: var(--space-6);
+    }
+
+    .terms__figure {
+      display: block;
+      margin-top: var(--space-7);
+      max-width: 20rem;
+    }
+  }
+</style>
