@@ -60,20 +60,55 @@ public/fonts/ two self-hosted variable woff2 faces (Archivo, Literata)
 
 The four original URLs are unchanged, trailing slashes included.
 
-## Deployment
+## Deployment — Vercel
 
-Every page is prerendered static. `src/pages/api/checkout.js` is the only
-server-rendered route — it sets `prerender = false`, which is why the build uses
-`@astrojs/node` in standalone mode. Runs as a container on Coolify.
+Every page is prerendered to a static file and served from the CDN.
+`src/pages/api/checkout.js` is the only server-rendered route — it sets
+`prerender = false`, and under `@astrojs/vercel` it becomes a single serverless
+function. Nothing else runs on a server.
 
-Needs `STRIPE_SECRET_KEY` in the environment. Without it, checkout falls back to
-Stripe Payment Links if those are set in `plans.js`, and reports itself
-unavailable if they are not.
+`npm run build` produces `.vercel/output/`: six static pages plus one function.
 
-`/api/checkout` also refuses to sell income protection unless the surplus lines
-notice has been acknowledged, whenever `DISCLOSURES.surplusLines` is populated.
-That check is server-side on purpose: the form enforces it too, but the form is
-the half an attacker skips.
+### Environment variables
+
+Set in **Vercel → Project → Settings → Environment Variables**, for the
+Production environment (and Preview, if previews should be able to take
+payments):
+
+| Name | Value |
+|---|---|
+| `STRIPE_SECRET_KEY` | Your Stripe secret key (`sk_live_…` / `sk_test_…`) |
+
+Add it as a **Sensitive** variable so it cannot be read back from the
+dashboard. Redeploy after adding it — environment variables are baked in at
+build/deploy time, so an existing deployment will not pick it up on its own.
+
+It is read at request time via `process.env`, never bundled into client code,
+and must never appear in this repository. `.env` is gitignored.
+
+**Without it**, `POST /api/checkout/` returns `503` with
+`{"error":"Checkout is not configured. STRIPE_SECRET_KEY is not set."}`, and
+`lib/checkout.js` falls back to Stripe Payment Links if those are set in
+`plans.js`. Verified against the built function.
+
+### The trailing slash
+
+`trailingSlash: 'always'` applies to API routes as well as pages, so the
+endpoint is **`/api/checkout/`** with the slash, and `CHECKOUT_ENDPOINT` in
+`lib/checkout.js` matches. The generated `.vercel/output/config.json` binds the
+function to `^/api/checkout/$`, and a request to `/api/checkout` gets a `308` to
+the slashed form — `308` preserves the POST method and body, so either path
+works, but the client posts to the slashed one directly and skips the redirect.
+
+This has broken once before. Do not change one end without the other.
+
+### Gates on selling
+
+`/api/checkout` refuses to sell income protection unless
+`DISCLOSURES.surplusLinesApproved` is `true` — draft notice text existing is
+deliberately *not* enough. It also refuses any plan `isPlanSellable()` rejects.
+These checks are server-side on purpose: the form enforces them too, but the
+form is the half an attacker skips.
 
 ## Conventions worth knowing
 

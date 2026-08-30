@@ -78,7 +78,9 @@ the reader how to read their own number before they have one.
 - All four original URLs are byte-identical, trailing slashes included.
 - `/plans/` and `/checkout/` are new.
 - Every page is prerendered. `/api/checkout` is the only SSR route, which is why
-  `@astrojs/node` is in the build.
+  there is an adapter in the build at all. Originally `@astrojs/node` in
+  standalone mode for a container host; now `@astrojs/vercel`, where that one
+  route becomes a serverless function. See README for deployment.
 - Funnel events are declared in `src/lib/analytics.js` and push to
   `window.dataLayer`. No provider is connected yet.
 
