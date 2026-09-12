@@ -22,17 +22,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     {description && <meta name="description" content={description} />}
     <link rel="canonical" href={canonical} />
 
-    {/* Both faces are needed for first paint, so both are preloaded. */}
     <link
       rel="preload"
-      href="/fonts/archivo-var.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link
-      rel="preload"
-      href="/fonts/literata-var.woff2"
+      href="/fonts/inter-var.woff2"
       as="font"
       type="font/woff2"
       crossorigin

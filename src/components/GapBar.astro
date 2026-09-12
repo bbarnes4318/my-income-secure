@@ -58,15 +58,13 @@ const {
     font-family: var(--font-display);
     font-size: var(--text-xs);
     font-weight: 700;
-    font-stretch: var(--widest);
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--uncovered);
     margin-bottom: var(--space-3);
   }
 
-  /* The loudest moment on the site. Nothing else uses --text-gap, weight 900,
-     or the widest width axis. */
+  /* The loudest moment on the site. Nothing else uses --text-gap or weight 900. */
   .gap__figure {
     display: flex;
     align-items: flex-start;
@@ -74,19 +72,18 @@ const {
     color: var(--uncovered);
     font-family: var(--font-display);
     font-weight: 900;
-    font-stretch: var(--widest);
     font-size: var(--text-gap);
     line-height: 0.85;
     letter-spacing: -0.03em;
     /* Tabular figures keep the count-up from reflowing the line. */
     font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 60px rgba(245, 165, 36, 0.35);
   }
 
   .gap__currency {
     font-size: 0.42em;
     line-height: 1;
     margin-top: 0.12em;
-    font-stretch: 100%;
     opacity: 0.75;
   }
 
@@ -94,7 +91,6 @@ const {
     font-family: var(--font-display);
     font-size: var(--text-lg);
     font-weight: 600;
-    font-stretch: var(--wide);
     color: #dbe5f4;
     margin-top: var(--space-3);
   }
@@ -104,24 +100,30 @@ const {
     inline-size: 100%;
     block-size: 56px;
     margin-top: var(--space-5);
-    border-radius: 6px;
+    border-radius: var(--radius);
     overflow: hidden;
     background: rgba(255, 255, 255, 0.06);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
+    padding: 4px;
+    gap: 4px;
   }
 
   .gap__seg {
     inline-size: 50%;
+    border-radius: calc(var(--radius) - 4px);
     transition: inline-size 850ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   /* Covered recedes: low chroma, and it sits behind a scrim of the ground. */
   .gap__seg--covered {
-    background: var(--covered);
+    background: linear-gradient(180deg, var(--covered-soft) 0%, var(--covered) 100%);
   }
 
-  /* Uncovered dominates: full chroma, flat, unmissable. */
+  /* Uncovered dominates: full chroma, and now with a little life to it rather
+     than a flat fill — this is the one moment on the site allowed to glow. */
   .gap__seg--uncovered {
-    background: var(--uncovered);
+    background: linear-gradient(180deg, #ffc466 0%, var(--uncovered) 100%);
+    box-shadow: 0 0 24px rgba(245, 165, 36, 0.45);
   }
 
   .gap__legend {
@@ -175,10 +177,6 @@ const {
   }
 
   @media (max-width: 400px) {
-    .gap__figure {
-      /* Six characters at the widest axis will not fit a 375px viewport. */
-      font-stretch: 108%;
-    }
     .gap__bar {
       block-size: 44px;
     }

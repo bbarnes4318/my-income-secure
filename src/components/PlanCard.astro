@@ -5,6 +5,13 @@ import { money, price, coverageLine } from '../lib/format.js';
 interface Props {
   plan: any;
   recommended?: boolean;
+  /**
+   * Gives the card its larger, bordered treatment without the "Recommended
+   * for you" flag — for a marketing layout that wants one card to read as
+   * dominant by size and position only, with no claim behind it. Defaults to
+   * `recommended`, so existing callers are unaffected.
+   */
+  emphasize?: boolean;
   /** Why this tier was recommended, tied to the visitor's own number. */
   reason?: string;
   /** The monthly shortfall, when the calculator has produced one. */
@@ -16,6 +23,7 @@ interface Props {
 const {
   plan,
   recommended = false,
+  emphasize = recommended,
   reason,
   monthlyGap = null,
   ctaHref,
@@ -42,7 +50,7 @@ const closes =
 ---
 
 <article
-  class:list={['plan', recommended && 'plan--recommended', !protection && 'plan--base']}
+  class:list={['plan', emphasize && 'plan--recommended', !protection && 'plan--base']}
   data-plan-id={plan.id}
   data-monthly-benefit={plan.monthlyBenefit ?? ''}
 >
@@ -111,21 +119,29 @@ const closes =
 
 <style>
   .plan {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
     background: var(--paper);
     border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
     padding: var(--space-5);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
   }
 
   /* The recommendation is dominant, not merely badged. Nothing else on the
      ladder gets emphasis — no "most popular", no upward nudge. This treatment
-     appears only on the tier that answers the visitor's own number. */
+     appears only on the tier that answers the visitor's own number. A thin
+     gradient rule along the top is the one flourish — everything else is
+     scale and shadow, same as before. */
   .plan--recommended {
-    border: 2px solid var(--navy);
-    box-shadow: var(--shadow-lift);
+    border: 1px solid transparent;
+    background:
+      linear-gradient(var(--paper), var(--paper)) padding-box,
+      linear-gradient(120deg, var(--navy) 0%, var(--blue) 100%) border-box;
+    box-shadow: var(--shadow-glow-lg);
     padding: var(--space-6);
   }
 
@@ -135,16 +151,16 @@ const closes =
 
   .plan__flag {
     align-self: flex-start;
-    background: var(--navy);
+    background: var(--gradient-brand);
     color: #fff;
     font-family: var(--font-display);
     font-size: var(--text-xs);
     font-weight: 700;
-    font-stretch: var(--widest);
     letter-spacing: 0.1em;
     text-transform: uppercase;
     padding: 0.375rem 0.75rem;
-    border-radius: 999px;
+    border-radius: var(--radius-full);
+    box-shadow: 0 4px 10px -2px rgba(27, 58, 107, 0.4);
   }
 
   .plan__head {
@@ -168,7 +184,6 @@ const closes =
     font-family: var(--font-display);
     font-size: var(--text-2xl);
     font-weight: 900;
-    font-stretch: var(--wide);
     color: var(--navy);
     line-height: 1.05;
     font-variant-numeric: tabular-nums;
@@ -209,7 +224,7 @@ const closes =
     font-size: var(--text-sm);
     font-weight: 600;
     padding: 0.5rem 0.75rem;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-full);
   }
 
   /* Amber is the shortfall. A tier that leaves part of the gap open is still

@@ -28,7 +28,13 @@
 /** @type {Record<string, SiteImage|null>} */
 export const IMAGES = {
   /** Homepage hero, right column. Portrait 4:5. Above the fold — set eager. */
-  'home-hero': null,
+  'home-hero': {
+    src: '/img/home-hero.jpg',
+    alt: 'A woman carrying a box of her desk belongings out of an office building, visibly upset, with a coworker doing the same behind her.',
+    width: 1536,
+    height: 1024,
+    eager: true,
+  },
 
   /** Filing guide header. Landscape 16:9, sits full-bleed above the steps. */
   'guide-header': null,

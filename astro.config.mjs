@@ -14,4 +14,7 @@ export default defineConfig({
   trailingSlash: 'always',
   build: { format: 'directory' },
   adapter: vercel(),
+  // Off so it stops showing up in local screenshots — it's dev-only tooling
+  // and was never going to ship in the production build either way.
+  devToolbar: { enabled: false },
 });

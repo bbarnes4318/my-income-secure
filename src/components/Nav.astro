@@ -2,30 +2,54 @@
 import Wordmark from './Wordmark.astro';
 import { NAV_LINKS, ROUTES } from '../config/site.js';
 
+interface Props {
+  /** Wordmark only, no links, no CTA. For the funnel homepage — the only way
+   * forward there is the flow, not the nav. Every other page is unaffected. */
+  minimal?: boolean;
+}
+
+const { minimal = false } = Astro.props;
 const path = Astro.url.pathname;
+// Plans gets a persistent button rather than sitting in the text-link row —
+// it is the one destination the nav should always be pushing toward.
+const textLinks = NAV_LINKS.filter((link) => link.href !== ROUTES.plans);
 ---
 
-<header class="nav">
-  <div class="shell nav__inner">
-    <Wordmark href={ROUTES.home} class="nav__brand" />
-    <nav aria-label="Main">
-      <ul class="nav__links">
-        {
-          NAV_LINKS.map((link) => (
+{
+  minimal ? (
+    <header class="nav nav--minimal">
+      <div class="shell nav__inner">
+        <Wordmark class="nav__brand" />
+      </div>
+    </header>
+  ) : (
+    <header class="nav">
+      <div class="shell nav__inner">
+        <Wordmark href={ROUTES.home} class="nav__brand" />
+        <nav aria-label="Main">
+          <ul class="nav__links">
+            {textLinks.map((link) => (
+              <li>
+                <a href={link.href} aria-current={path === link.href ? 'page' : undefined}>
+                  {link.label}
+                </a>
+              </li>
+            ))}
             <li>
               <a
-                href={link.href}
-                aria-current={path === link.href ? 'page' : undefined}
+                class="btn btn--primary nav__cta"
+                href={ROUTES.plans}
+                aria-current={path === ROUTES.plans ? 'page' : undefined}
               >
-                {link.label}
+                See plans
               </a>
             </li>
-          ))
-        }
-      </ul>
-    </nav>
-  </div>
-</header>
+          </ul>
+        </nav>
+      </div>
+    </header>
+  )
+}
 
 <style>
   .nav {
@@ -75,12 +99,31 @@ const path = Astro.url.pathname;
     box-shadow: inset 0 -2px 0 var(--navy);
   }
 
+  .nav__cta {
+    min-height: 38px;
+    padding: 0.5rem 1.125rem;
+    font-size: var(--text-sm);
+    box-shadow: none;
+  }
+
+  .nav__cta[aria-current='page'] {
+    background: var(--navy-mid);
+    border-color: var(--navy-mid);
+  }
+
+  .nav--minimal .nav__inner {
+    justify-content: flex-start;
+  }
+
   @media (max-width: 420px) {
     .nav__links {
       gap: 0.625rem;
     }
     .nav__links a {
       font-size: var(--text-xs);
+    }
+    .nav__cta {
+      padding: 0.5rem 0.875rem;
     }
   }
 </style>

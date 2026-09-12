@@ -17,3 +17,9 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# Claude Code local settings — machine-specific, not shared
+.claude/settings.local.json
+
+# Reference-only source images — never served from the deployed site
+public/layoff/

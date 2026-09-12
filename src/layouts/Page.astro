@@ -7,18 +7,22 @@ interface Props {
   title: string;
   description?: string;
   bodyClass?: string;
+  /** Strips nav links and footer links, leaving only the wordmark and the
+   * legally required disclosures. For the funnel homepage only — every other
+   * page keeps its normal chrome. */
+  landing?: boolean;
 }
 
-const { title, description, bodyClass } = Astro.props;
+const { title, description, bodyClass, landing = false } = Astro.props;
 ---
 
 <Base title={title} description={description} bodyClass={bodyClass}>
   <div class="page">
-    <Nav />
+    <Nav minimal={landing} />
     <main id="main">
       <slot />
     </main>
-    <Footer />
+    <Footer minimal={landing} />
   </div>
 </Base>
 

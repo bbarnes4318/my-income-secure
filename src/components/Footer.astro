@@ -2,26 +2,42 @@
 import Wordmark from './Wordmark.astro';
 import { SITE, DISCLAIMER, ROUTES, DISCLOSURES } from '../config/site.js';
 
+interface Props {
+  /** Legal text only, no navigational links — for the funnel homepage, where
+   * every link is a potential exit. The disclosures themselves are unchanged
+   * and unabridged; only the link row above them is removed. */
+  minimal?: boolean;
+}
+
+const { minimal = false } = Astro.props;
 const year = new Date().getFullYear();
 ---
 
 <footer class="footer">
   <div class="shell">
-    <div class="footer__top">
-      <div>
-        <Wordmark tone="invert" class="footer__brand" />
-        <p class="footer__entity">Operated by {SITE.entity}</p>
-      </div>
-      <nav aria-label="Footer">
-        <ul class="footer__links">
-          <li><a href={ROUTES.calculator}>Benefit estimator</a></li>
-          <li><a href={ROUTES.plans}>Plans</a></li>
-          <li><a href={ROUTES.guide}>Filing guide</a></li>
-          <li><a href={ROUTES.privacy}>Privacy policy</a></li>
-          <li><a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
-        </ul>
-      </nav>
-    </div>
+    {
+      minimal ? (
+        <p class="footer__entity footer__entity--solo">
+          <Wordmark tone="invert" class="footer__brand" /> &mdash; operated by {SITE.entity}
+        </p>
+      ) : (
+        <div class="footer__top">
+          <div>
+            <Wordmark tone="invert" class="footer__brand" />
+            <p class="footer__entity">Operated by {SITE.entity}</p>
+          </div>
+          <nav aria-label="Footer">
+            <ul class="footer__links">
+              <li><a href={ROUTES.calculator}>Benefit estimator</a></li>
+              <li><a href={ROUTES.plans}>Plans</a></li>
+              <li><a href={ROUTES.guide}>Filing guide</a></li>
+              <li><a href={ROUTES.privacy}>Privacy policy</a></li>
+              <li><a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
+            </ul>
+          </nav>
+        </div>
+      )
+    }
 
     {/* Legally load-bearing. Present on every page. Do not reword. */}
     <p class="footer__disclaimer">{DISCLAIMER}</p>
@@ -86,6 +102,15 @@ const year = new Date().getFullYear();
   .footer__entity {
     font-size: var(--text-sm);
     margin-top: var(--space-1);
+  }
+
+  .footer__entity--solo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-5);
+    color: #b6c6df;
   }
 
   .footer__links {

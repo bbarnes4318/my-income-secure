@@ -2,49 +2,31 @@
    Design tokens — the single source for color, type, and spacing.
    Nothing in components/ or pages/ should hard-code a hex value or a font size.
 
-   Typography: hierarchy is carried by the WIDTH axis, not only by size, and
-   the two faces split by ROLE rather than by importance.
-
-     Archivo (wdth 62-125, wght 100-900) — display, figures, and the whole UI
-       voice: headlines, the gap number, buttons, labels, tabular data. Expanded
-       and heavy for magnitude.
-     Literata (wght 200-900) — the reading voice: body copy, leads, answers,
-       long-form guide prose.
-
-   A serif for prose against a wide grotesque for data is the register of
-   financial writing rather than of a government form, which matters on a site
-   whose entire argument is that it is being straight with you.
-
-   No italic file is shipped. One 53KB face for incidental emphasis is not worth
-   it; use weight or colour instead.
+   Typography: one family, the full weight range, no width-axis tricks.
+   Inter (wght 100-900) is used everywhere — headlines, body, UI, figures.
+   Hierarchy comes from size and weight alone: normal width throughout,
+   headlines at 700-800, body at 16-17px. Nothing about the face should draw
+   attention to itself, which is the point on a financial product.
 
    Color: amber and green encode the gap and nothing else. If you are reaching
    for either one outside a covered/uncovered split, reach for navy instead.
 --------------------------------------------------------------------------- */
 
 @font-face {
-  font-family: 'Archivo';
-  src: url('/fonts/archivo-var.woff2') format('woff2-variations');
+  font-family: 'Inter';
+  src: url('/fonts/inter-var.woff2') format('woff2-variations');
   font-weight: 100 900;
-  font-stretch: 62% 125%;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Literata';
-  src: url('/fonts/literata-var.woff2') format('woff2-variations');
-  font-weight: 200 900;
   font-style: normal;
   font-display: swap;
 }
 
 :root {
   /* --- Families ------------------------------------------------------ */
-  --font-display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
-  --font-body: 'Literata', Georgia, 'Times New Roman', serif;
-  /* Data and UI chrome ride the display face, so tables and forms do not read
-     in the same voice as the prose around them. */
+  /* One family for everything. Kept as three tokens rather than one so
+     components that reference a role (display/body/ui) do not need to
+     change if that ever splits again — today all three resolve the same. */
+  --font-display: 'Inter', -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-body: var(--font-display);
   --font-ui: var(--font-display);
 
   /* --- Ink and surface ----------------------------------------------- */
@@ -81,15 +63,11 @@
   --text-sm: 0.9375rem; /* 15px — secondary */
   --text-base: 1.0625rem; /* 17px — body */
   --text-lg: 1.1875rem; /* 19px — lead */
-  --text-xl: clamp(1.375rem, 1.2rem + 0.9vw, 1.75rem);
-  --text-2xl: clamp(1.625rem, 1.3rem + 1.6vw, 2.25rem);
-  --text-3xl: clamp(2rem, 1.5rem + 2.4vw, 3rem);
+  --text-xl: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem); /* 20-24px */
+  --text-2xl: clamp(1.5rem, 1.25rem + 1vw, 1.875rem); /* 24-30px */
+  --text-3xl: clamp(1.75rem, 1.4rem + 1.6vw, 2.25rem); /* 28-36px */
   /* The gap number. Nothing else on the site uses this step. */
   --text-gap: clamp(3.5rem, 1.5rem + 14vw, 8.5rem);
-
-  /* --- Width axis ------------------------------------------------------ */
-  --wide: 118%;
-  --widest: 125%;
 
   /* --- Spacing. Section density varies deliberately; see --pad-*. ------ */
   --space-1: 0.25rem;
@@ -102,10 +80,11 @@
   --space-8: 4rem;
   --space-9: 6rem;
 
-  /* Tight where tension builds, generous where a moment should land. */
-  --pad-tight: clamp(2.5rem, 1.5rem + 4vw, 3.5rem);
-  --pad-normal: clamp(3.5rem, 2rem + 6vw, 5rem);
-  --pad-generous: clamp(4.5rem, 2.5rem + 9vw, 7.5rem);
+  /* Tight where tension builds, generous where a moment should land. Pulled
+     in from the original spacing scale — the page read as stretched. */
+  --pad-tight: clamp(2rem, 1.25rem + 3vw, 2.75rem);
+  --pad-normal: clamp(2.75rem, 1.75rem + 4.5vw, 3.75rem);
+  --pad-generous: clamp(3.5rem, 2rem + 6vw, 5.5rem);
 
   /* --- Measure --------------------------------------------------------- */
   --measure: 62ch;
@@ -115,9 +94,10 @@
   --width-text: 720px;
   --width-form: 560px;
 
-  --radius: 12px;
-  --radius-sm: 8px;
-  --radius-lg: 18px;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-lg: 22px;
+  --radius-full: 999px;
 
   /* --- Elevation ------------------------------------------------------
      Four steps, used to say how far something sits off the page. Everything
@@ -129,6 +109,20 @@
   --shadow-raised: 0 2px 4px rgba(20, 32, 58, 0.05), 0 12px 28px rgba(20, 32, 58, 0.09);
   --shadow-lift: 0 2px 4px rgba(20, 32, 58, 0.06), 0 18px 44px rgba(20, 32, 58, 0.14);
   --shadow-float: 0 4px 10px rgba(20, 32, 58, 0.08), 0 30px 70px rgba(20, 32, 58, 0.20);
+  /* A tinted, soft glow rather than a neutral drop shadow — used under the
+     primary button and the recommended plan, the two places worth the extra
+     warmth. */
+  --shadow-glow: 0 1px 2px rgba(27, 58, 107, 0.12), 0 16px 32px -8px rgba(27, 58, 107, 0.38);
+  --shadow-glow-lg: 0 4px 8px rgba(27, 58, 107, 0.14), 0 28px 56px -12px rgba(27, 58, 107, 0.4);
+
+  /* --- Brand gradients --------------------------------------------------
+     Used sparingly: the primary button, the hero ground, the dark reveal.
+     Everywhere else stays flat navy — a gradient on every surface is how you
+     get a site that looks like a template instead of a considered one. */
+  --gradient-brand: linear-gradient(135deg, var(--navy-mid) 0%, var(--navy) 55%, var(--navy-deep) 100%);
+  --gradient-deep: radial-gradient(120% 140% at 12% -10%, #16305e 0%, transparent 55%),
+    radial-gradient(100% 120% at 100% 110%, #143054 0%, transparent 60%),
+    var(--navy-deep);
 
   /* --- Surface ladder --------------------------------------------------
      Backgrounds get progressively deeper as sections layer. Never two

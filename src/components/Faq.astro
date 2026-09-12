@@ -46,7 +46,13 @@ const { items, variant = 'default' } = Astro.props;
   .faq__item {
     background: var(--paper);
     border: 1px solid var(--line);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-flat);
+    transition: box-shadow 0.15s ease;
+  }
+
+  .faq__item[open] {
+    box-shadow: var(--shadow-card);
   }
 
   .faq--on-alt .faq__item {

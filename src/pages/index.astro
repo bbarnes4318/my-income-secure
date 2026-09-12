@@ -1,450 +1,363 @@
 ---
+// The homepage is a single-purpose funnel, not an informational page. One
+// offer, surfaced only after the visitor answers four questions about their
+// own situation. Everything that would compete with that — a plan grid, a
+// second calculator demo, site navigation — has been removed. The full plan
+// ladder, the standalone calculator, and the filing guide are untouched and
+// still reachable directly; they are just no longer links off this page.
 import Page from '../layouts/Page.astro';
-import HomeGapExample from '../components/HomeGapExample.astro';
-import PlanWindow from '../components/PlanWindow.astro';
+import CoverageFlow from '../components/CoverageFlow.astro';
 import Faq from '../components/Faq.astro';
 import ImageSlot from '../components/ImageSlot.astro';
-import Icon from '../components/Icon.astro';
-import TrustSection from '../components/TrustSection.astro';
-import { ROUTES, SITE, URGENCY, STATE_FILING_REQUIREMENT } from '../config/site.js';
+import { ROUTES, URGENCY } from '../config/site.js';
 import { PROGRAM_TERMS, PLANS } from '../config/plans.js';
-import { STATES } from '../lib/states.js';
-import { money } from '../lib/format.js';
+import { money, price } from '../lib/format.js';
 
 const T = PROGRAM_TERMS;
 const cheapest = PLANS[0];
 const largest = PLANS[PLANS.length - 1];
 
-// A real, sourced statutory figure for the hero's overlapping card. Florida
-// because it is the calculator's default; see OPEN-ITEMS.md.
-const HERO_STATE = STATES.find((s) => s.code === 'FL');
-
-// Answers are written from PROGRAM_TERMS rather than by hand, so the ones that
-// carry confirmed rules — installments, thresholds, forfeiture, refunds — cannot
-// drift out of step with the config. What is still unsupplied stays a reference
-// to the program terms; see OPEN-ITEMS.md.
+// Top four objections only — the ones that block a "yes" at this exact moment,
+// not the full reference list. The rest still lives nowhere else on the site
+// because it never did; these were always drawn from PROGRAM_TERMS.
 const faqs = [
   {
     q: 'How is this different from insurance?',
     a:
       'It is a membership benefit program, not an insurance product. You are not ' +
       'buying a policy and there is no insurer indemnifying a loss. You hold a ' +
-      'membership that pays a fixed benefit if you lose your job. That ' +
-      'distinction is legal, not cosmetic — the program is not regulated as ' +
-      'insurance and should never be described as it.',
-  },
-  {
-    q: 'What if I quit rather than getting laid off?',
-    a:
-      'The program exists for job loss you did not choose. Resigning voluntarily ' +
-      'is not the situation it is built to cover. The specific separation reasons ' +
-      'that do and do not qualify are set out in the program terms.',
-  },
-  {
-    q: 'When does my benefit start?',
-    a:
-      'Your membership has to be in place before the job loss happens. A ' +
-      'membership started after you are already out of work does not reach ' +
-      `backwards. A claim becomes admissible once you have been unemployed for ` +
-      `${T.claimThresholdDays} consecutive days, and the first payment arrives ` +
-      `${T.firstInstallmentDays} days after the qualifying job loss. The exact ` +
-      'interval between enrolling and becoming eligible to claim is set out in ' +
-      'the program terms.',
-  },
-  {
-    q: 'How long does it pay for?',
-    a:
-      `Not until you find work — this is a fixed total, not an income. Each ` +
-      `tier pays its total in ${T.installments} installments, ` +
-      `${T.installmentIntervalDays} days apart, and every installment after the ` +
-      'first is paid only if you are still unemployed. Back at work before all ' +
-      'of them are paid and the remaining ones are forfeited.',
+      'membership that pays a fixed benefit if you lose your job.',
   },
   {
     q: 'Do I still need to file for state unemployment?',
     a:
       'Yes. A claim requires you to be eligible for and approved to receive ' +
       'state unemployment benefits for the same period you are claiming. If you ' +
-      'never file with your state, there is nothing here to pay out on — which ' +
-      'is why the filing guide is part of the product rather than an extra.',
+      'never file with your state, there is nothing here to pay out on.',
     cta: { href: ROUTES.guide, label: 'Read the filing guide' },
   },
   {
     q: 'How do I cancel, and can I get a refund?',
     a:
-      `You can cancel at any time, but the refund window is narrow: a full ` +
-      `refund is available only within ${T.refundWindowHours} hours of ` +
-      'purchase and only if no benefits have been used. There is no refund ' +
-      'after that. It is also worth knowing that this is priced annually and ' +
-      'billed monthly for convenience rather than being a rolling ' +
-      'month-to-month membership — if you cancel or claim before the year is ' +
-      'paid up, the unpaid balance of the annual price can be deducted from a ' +
-      'benefit payment.',
+      `You can cancel at any time. A full refund is available within ` +
+      `${T.refundWindowHours} hours of purchase, provided no benefits have ` +
+      'been used. There is no refund after that window.',
   },
   {
-    q: 'How does the money actually reach me?',
+    q: 'What if I quit rather than getting laid off?',
     a:
-      `On an approved claim the program pays you directly, in ` +
-      `${T.installments} installments. It is a fixed amount set by the tier you ` +
-      'hold — not a percentage of your old salary, and not a reimbursement of ' +
-      'specific bills. It does not reduce or replace anything your state pays ' +
-      'you.',
-  },
-  {
-    q: 'What if I am already unemployed?',
-    a:
-      'Then this is not available to you, and anyone telling you otherwise is ' +
-      'selling you something that will not pay. The membership has to be in ' +
-      'place before the loss. The filing guide on this site is genuinely useful ' +
-      'right now, and it is free.',
-    cta: { href: ROUTES.guide, label: 'Read the filing guide' },
+      'The program exists for job loss you did not choose. Resigning ' +
+      'voluntarily is not the situation it is built to cover.',
   },
 ];
 ---
 
 <Page
-  title="My Income Secure — a monthly benefit if you lose your job"
-  description="State unemployment replaces a fraction of what you spend. See the gap for your state and income, then close it with a monthly job-loss benefit."
+  title="If you're laid off, get up to $6,000 while you find work — My Income Secure"
+  description="See what your state pays, then get one plan sized to close the gap — starting at $24.99/month."
+  landing
 >
-  {/* Hero — a two-column composition. The small card deliberately breaks the
-      column boundary: that single overlap is what makes this a composition
-      rather than two boxes side by side, and it carries a real sourced figure
-      rather than decoration. */}
   <section class="hero">
     <div class="shell hero__shell">
       <div class="hero__text">
-        <h1>Unemployment pays a fraction of what your month costs.</h1>
-        <p class="hero__sub">
-          Most states replace less than half your income, cap it well below what
-          you earn, and stop after a few months. The {SITE.program} pays you a
-          benefit if you lose your job — sized to the gap your state leaves
-          behind.
+        <p class="hero__eyebrow">Job-loss income protection</p>
+        <h1>If you're laid off, get up to {money(largest.totalLimit)} while you find work.</h1>
+        <p class="hero__specifics">
+          Plans start at {price(cheapest.priceMonthly)}/month, paid to you in
+          {T.installments} installments if you lose your job.
         </p>
-        <div class="hero__actions">
-          <a class="btn btn--primary" href={ROUTES.calculator}>
-            See your gap &rarr;
-          </a>
-          <a class="link-quiet" href={ROUTES.guide}>
-            Filing for unemployment right now? Read the guide
-          </a>
-        </div>
+        <p class="hero__objection">
+          <span>No spam calls.</span>
+          <span>No medical exam.</span>
+          <span>Cancel anytime.</span>
+        </p>
       </div>
-
       <div class="hero__figure">
         <ImageSlot name="home-hero" ratio="4 / 5" />
-        {
-          HERO_STATE && (
-            <figure class="hero__stat">
-              <span class="hero__stat-label">{HERO_STATE.name} pays at most</span>
-              <span class="hero__stat-value">${HERO_STATE.max}</span>
-              <span class="hero__stat-unit">a week &mdash; the statutory maximum</span>
-            </figure>
-          )
-        }
       </div>
     </div>
+
+    <CoverageFlow />
   </section>
 
-  {/* The argument, made concrete before anything is asked for. */}
-  <HomeGapExample />
-
-  {/* Compressed on purpose — this is connective tissue, not a moment. The
-      sunken ground is what gives the three step cards something to lift off. */}
-  <section class="section section--tight section--sunken">
+  {/* Tight, in order: how it pays out, terms, four-question FAQ, close. Once
+      a result exists, FAQ and close are cut entirely (repeats of content the
+      visitor already scrolled past) and "how it pays out" collapses to one
+      line — only the payout mechanics and the terms stay relevant. See
+      CoverageFlow's paint()/restart handlers, which toggle these. */}
+  <section class="section section--tight payout">
     <div class="shell">
-      <p class="eyebrow">How it works</p>
-      <h2>Three steps, and the first one is free.</h2>
-      <ol class="steps">
-        <li class="step">
-          <span class="step__mark">
-            <Icon name="calculator" size={26} />
-            <span class="step__n">1</span>
-          </span>
-          <h3>Find your number</h3>
-          <p>
-            Four questions gives you your state's benefit against your actual
-            monthly costs, using each state's own published formula.
-          </p>
-        </li>
-        <li class="step">
-          <span class="step__mark">
-            <Icon name="ladder" size={26} />
-            <span class="step__n">2</span>
-          </span>
-          <h3>Pick the tier that closes it</h3>
-          <p>
-            Tiers are sized by what they pay out. We point you at the smallest
-            one that covers your shortfall, never a larger one —
-            <a href={ROUTES.plans}>compare all {PLANS.length} tiers</a>.
-          </p>
-        </li>
-        <li class="step">
-          <span class="step__mark">
-            <Icon name="payout" size={26} />
-            <span class="step__n">3</span>
-          </span>
-          <h3>It pays out if the job goes</h3>
-          <p>
-            On an approved claim your tier's total is paid to you in {T.installments}
-            installments, {T.installmentIntervalDays} days apart, on top of
-            whatever your state pays. You must be approved for state
-            unemployment for the same period, so
-            <a href={ROUTES.guide}>filing is part of it</a>.
-          </p>
-        </li>
-      </ol>
-    </div>
-  </section>
-
-  {/* Price before engagement, for buyers who need the number first. */}
-  <section class="section" id="plans">
-    <div class="shell">
-      <p class="eyebrow">Plans</p>
-      <h2>Pick by the size of the hole, not by a feature list.</h2>
-      <p class="lead">
-        {PLANS.length} tiers, from {money(cheapest.totalLimit)} to {money(largest.totalLimit)}.
-        Each pays its total in {T.installments} installments if you lose your
-        job — a fixed sum that runs out, not an income that lasts until you find
-        work. The right tier is the smallest one whose installment closes your
-        gap.
-      </p>
-      <div class="plans-wrap">
-        <PlanWindow placement="homepage" />
+      <h2>How it pays out</h2>
+      <div class="payout__stats" data-payout-full>
+        <div class="payout__stat">
+          <span class="payout__value">{T.installments}</span>
+          <span class="payout__label">installments, {T.installmentIntervalDays} days apart</span>
+        </div>
+        <div class="payout__stat">
+          <span class="payout__value">{T.firstInstallmentDays} days</span>
+          <span class="payout__label">after you lose your job to the first payment</span>
+        </div>
+        <div class="payout__stat">
+          <span class="payout__value">Stops</span>
+          <span class="payout__label">the moment you're back at work</span>
+        </div>
       </div>
-      <p class="plans-note">
-        Not sure of your number yet?
-        <a href={ROUTES.calculator}>Work out your gap first</a> — it takes about
-        a minute, and the tier follows from it rather than from a guess.
+      <p class="payout__condensed" data-payout-condensed hidden>
+        Paid in {T.installments} installments, {T.installmentIntervalDays} days
+        apart &mdash; stops the moment you're back at work.
       </p>
     </div>
   </section>
 
-  <section class="section section--tight section--warm">
-    <div class="shell shell--text">
-      <p class="eyebrow">Before you buy</p>
-      <h2>The questions worth asking.</h2>
+  <section class="section section--tight section--alt terms">
+    <div class="shell">
+      <h2>The terms, plainly</h2>
+      <ul class="terms__list">
+        <li>
+          A claim becomes admissible after {T.claimThresholdDays} consecutive
+          days unemployed.
+        </li>
+        <li>
+          You must be eligible for and approved to receive state unemployment
+          benefits for the same period &mdash;
+          <a href={ROUTES.guide}>filing is part of it</a>.
+        </li>
+        <li>
+          Each installment after the first is paid only if you're still
+          unemployed; the rest are forfeited once you're re-employed.
+        </li>
+        <li>
+          A full refund is available within {T.refundWindowHours} hours of
+          purchase if no benefits have been used.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--tight section--warm" data-faq-section>
+    <div class="shell">
+      <h2>Before you buy</h2>
       <div class="faq-wrap">
         <Faq items={faqs} />
       </div>
     </div>
   </section>
 
-  <TrustSection />
-
-  {/* The one urgency claim on the site, and it is a real constraint. */}
-  <section class="section section--generous close">
-    <div class="shell shell--text">
-      <p class="eyebrow">Why now, honestly</p>
+  <section class="section close" data-close-section>
+    <div class="shell">
       <h2>You cannot buy this once the job is already gone.</h2>
       <p class="lead close__lead">{URGENCY}</p>
-      <p class="close__filing">
-        {STATE_FILING_REQUIREMENT}{' '}
-        <a href={ROUTES.guide}>The filing guide covers your state.</a>
-      </p>
-      <a class="btn btn--primary" href={ROUTES.calculator}>
-        See your gap &rarr;
-      </a>
+      <a class="btn btn--primary" href="#coverage-check">See what I'd get &rarr;</a>
     </div>
   </section>
 </Page>
 
 <style>
-  .close__filing {
-    margin-block: var(--space-4) var(--space-6);
-    font-size: var(--text-sm);
-    color: var(--ink-muted);
-    max-width: var(--measure);
-  }
-
-  /* A layered ground rather than a flat wash: a soft light source top-left,
-     and a hairline of navy along the bottom edge so the section has a real
-     boundary instead of a 1px grey line. */
   .hero {
     position: relative;
     background:
-      radial-gradient(
-        90% 120% at 8% 0%,
-        rgba(255, 255, 255, 0.95) 0%,
-        rgba(255, 255, 255, 0) 55%
-      ),
+      radial-gradient(120% 100% at 85% -10%, rgba(46, 127, 196, 0.16) 0%, transparent 55%),
+      radial-gradient(90% 90% at -5% 110%, rgba(92, 138, 118, 0.14) 0%, transparent 60%),
       linear-gradient(178deg, var(--blue-pale) 0%, var(--surface-sunken) 100%);
-    border-bottom: 1px solid var(--line);
-    padding-block: var(--pad-normal);
+    padding-block: var(--pad-tight) 0;
     overflow: hidden;
+    transition: padding-block 0.15s ease;
+  }
+
+  .hero__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: var(--paper);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-full);
+    padding: 0.375rem 0.875rem;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--navy);
+    box-shadow: var(--shadow-flat);
+    margin-bottom: var(--space-4);
+  }
+
+  .hero__eyebrow::before {
+    content: '';
+    inline-size: 7px;
+    block-size: 7px;
+    border-radius: 50%;
+    background: var(--covered);
+    flex: none;
+  }
+
+  /* Once the visitor has answered the first question, the full hero has done
+     its job — collapse it to a single compact line so the active step (which
+     only grows from here) has room to sit above the fold. */
+  .hero.hero--compact {
+    padding-block: var(--space-3) 0;
+  }
+
+  .hero.hero--compact .hero__eyebrow,
+  .hero.hero--compact .hero__specifics,
+  .hero.hero--compact .hero__objection,
+  .hero.hero--compact .hero__figure {
+    display: none;
+  }
+
+  .hero.hero--compact .hero__shell {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .hero.hero--compact h1 {
+    font-size: var(--text-base);
+    font-weight: 700;
+    max-width: none;
+    letter-spacing: normal;
   }
 
   .hero__shell {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--space-7);
+    gap: var(--space-6);
     align-items: center;
   }
 
   .hero h1 {
-    font-size: clamp(2.125rem, 1.5rem + 2.6vw, 3.375rem);
-    font-weight: 900;
-    font-stretch: var(--wide);
-    letter-spacing: -0.03em;
-    max-width: 18ch;
+    font-size: var(--text-3xl);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.08;
+    max-width: 20ch;
   }
 
-  .hero__sub {
-    max-width: 46ch;
-    margin-top: var(--space-5);
+  .hero__specifics {
+    max-width: 42ch;
+    margin-top: var(--space-4);
     font-size: var(--text-lg);
-    color: var(--ink-muted);
+    color: var(--ink);
   }
 
-  .hero__actions {
+  .hero__objection {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-3);
-    margin-top: var(--space-6);
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-3);
+    margin-top: var(--space-4);
+  }
+
+  .hero__objection span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--covered-ink);
+    background: var(--covered-wash);
+    border: 1px solid var(--covered-line);
+    border-radius: var(--radius-full);
+    padding: 0.3rem 0.75rem 0.3rem 0.6rem;
+  }
+
+  .hero__objection span::before {
+    content: '\2713';
+    font-size: 0.8em;
+    font-weight: 800;
   }
 
   .hero__figure {
-    position: relative;
-  }
-
-  /* Cap the portrait so the hero stays inside one screen on a laptop. */
-  .hero__figure :global(.slot) {
-    max-height: 30rem;
-    margin-inline: auto;
-  }
-
-  /* The overlap. Sits on the image's lower-left corner and pushes outside it,
-     which is the whole point — it ties the two columns together. */
-  .hero__stat {
-    margin: 0;
-    display: grid;
-    gap: 2px;
-    padding: var(--space-4) var(--space-5);
-    background: var(--paper);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-float);
-    max-width: 17rem;
-  }
-
-  .hero__stat-label,
-  .hero__stat-unit {
-    font-size: var(--text-xs);
-    color: var(--ink-muted);
-  }
-
-  .hero__stat-value {
-    font-family: var(--font-display);
-    font-size: var(--text-2xl);
-    font-weight: 900;
-    font-stretch: var(--wide);
-    color: var(--navy);
-    font-variant-numeric: tabular-nums;
-    line-height: 1.05;
-  }
-
-  @media (min-width: 900px) {
-    .hero__shell {
-      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.85fr);
-      gap: var(--space-9);
-    }
-
-    .hero__stat {
-      position: absolute;
-      left: calc(var(--space-7) * -1);
-      bottom: var(--space-7);
-    }
-  }
-
-  /* Below the two-column breakpoint the card tucks under the image instead of
-     overlapping it, where there is no room to hang outside. */
-  @media (max-width: 899px) {
-    .hero__stat {
-      margin-top: calc(var(--space-6) * -1);
-      margin-left: var(--space-4);
-      position: relative;
-    }
-  }
-
-  /* --- Steps --- */
-  .steps {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-5);
-    margin: var(--space-6) 0 0;
-    padding: 0;
-    list-style: none;
-    counter-reset: step;
-  }
-
-  /* Each step is a raised surface rather than a rule on white — the numbered
-     list was reading as an outline, not as three things you do. */
-  .step {
-    background: var(--paper);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-flat);
-    padding: var(--space-5);
-  }
-
-  /* Icon and number share one mark: the icon says what the step is, the
-     numeral says where it sits in the sequence. */
-  .step__mark {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-3);
-    color: var(--blue-ink);
-    margin-bottom: var(--space-4);
-    padding: var(--space-3);
-    border-radius: var(--radius-sm);
-    background: var(--blue-pale);
-  }
-
-  .step__n {
-    font-family: var(--font-display);
-    font-size: var(--text-sm);
-    font-weight: 800;
-    font-stretch: var(--widest);
-    line-height: 1;
-    padding-left: var(--space-3);
-    border-left: 1px solid rgba(27, 108, 174, 0.3);
-  }
-
-  .step h3 {
-    font-size: var(--text-lg);
-    color: var(--ink);
-    margin-bottom: var(--space-2);
-  }
-
-  .step p {
-    font-size: var(--text-sm);
-    color: var(--ink-muted);
+    display: none;
   }
 
   @media (min-width: 780px) {
-    .steps {
-      grid-template-columns: repeat(3, 1fr);
-      gap: var(--space-6);
+    .hero__shell {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: var(--space-8);
+    }
+
+    .hero__figure {
+      display: block;
+    }
+
+    .hero__figure :global(.slot) {
+      max-height: 18rem;
+      margin-inline: auto;
     }
   }
 
-  /* --- Plans --- */
-  .plans-wrap {
+  /* --- How it pays out --- */
+  .payout__stats {
     margin-top: var(--space-6);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
   }
 
-  .plans-note {
-    margin-top: var(--space-5);
+  .payout__stat {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    padding: var(--space-5);
+  }
+
+  .payout__value {
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    color: var(--navy);
+  }
+
+  .payout__label {
+    display: block;
+    margin-top: var(--space-2);
     font-size: var(--text-sm);
     color: var(--ink-muted);
+    max-width: 26ch;
+  }
+
+  .payout__condensed {
+    margin-top: var(--space-4);
+    font-size: var(--text-base);
+    color: var(--ink);
+    max-width: var(--measure);
+  }
+
+  @media (min-width: 700px) {
+    .payout__stats {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  /* --- Terms --- */
+  .terms__list {
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: var(--space-3);
+    max-width: var(--measure);
+  }
+
+  .terms__list li {
+    padding: var(--space-3) var(--space-4);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--blue);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+    box-shadow: var(--shadow-flat);
   }
 
   /* --- FAQ --- */
   .faq-wrap {
     margin-top: var(--space-5);
+    max-width: var(--measure);
   }
 
   /* --- Close --- */
   .close__lead {
     margin-block: var(--space-4) var(--space-6);
+    max-width: var(--measure);
   }
 </style>

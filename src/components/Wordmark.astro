@@ -6,10 +6,11 @@
 // mediocre invented one is harder to remove later than none at all — so this
 // is a considered setting of the name, which is a real asset either way.
 //
-// The device is the site's own idea: the name is set in Archivo with the width
-// axis doing the work, and "Secure" carries a baseline rule in the covered
-// green — the same green that means "what is covered" everywhere else. The
-// mark is therefore the thesis, not decoration.
+// The device is the site's own idea: the name is set in Inter, with weight and
+// opacity alone doing the work of separating "My" from "Income Secure" — no
+// width axis. "Secure" carries a baseline rule in the covered green — the same
+// green that means "what is covered" everywhere else. The mark is therefore
+// the thesis, not decoration.
 // ---------------------------------------------------------------------------
 
 interface Props {
@@ -62,17 +63,16 @@ const Tag = href ? 'a' : 'span';
     white-space: nowrap;
   }
 
-  /* "My" is the quiet part — narrow and light, so the eye lands on the two
-     words that carry the promise. */
+  /* "My" is the quiet part — light and low-opacity, so the eye lands on the
+     two words that carry the promise. Weight and opacity do the work that
+     the width axis used to. */
   .wm__my {
     font-weight: 400;
-    font-stretch: 88%;
-    opacity: 0.75;
+    opacity: 0.6;
   }
 
   .wm__income {
     font-weight: 800;
-    font-stretch: var(--wide);
   }
 
   /* The rule under "Secure" is the covered green. It is the only place the
@@ -81,7 +81,6 @@ const Tag = href ? 'a' : 'span';
   .wm__secure {
     position: relative;
     font-weight: 800;
-    font-stretch: var(--wide);
     padding-bottom: 0.14em;
   }
 
@@ -114,7 +113,6 @@ const Tag = href ? 'a' : 'span';
 
   .wm__mono {
     font-weight: 900;
-    font-stretch: var(--widest);
     letter-spacing: -0.03em;
   }
 
