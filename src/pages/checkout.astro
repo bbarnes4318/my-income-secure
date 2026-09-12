@@ -428,21 +428,10 @@ const surplusIsDraft = Boolean(noticeText) && !surplusOk;
     position: relative;
     background: var(--paper);
     border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-glow);
+    border-top: 3px solid var(--navy);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-raised);
     padding: var(--space-6) var(--space-5) var(--space-5);
-    overflow: hidden;
-  }
-
-  /* A thin gradient rule at the top — the same flourish as the recommended
-     plan card, because this is that same choice, carried through to payment. */
-  .summary::before {
-    content: '';
-    position: absolute;
-    inset-block-start: 0;
-    inset-inline: 0;
-    block-size: 4px;
-    background: var(--gradient-brand);
   }
 
   /* One wrapper owns the form column so its children flow in order instead of

@@ -1,189 +1,214 @@
 ---
-// The funnel's spine: one question per screen, then one recommendation.
+// The guided coverage check: one question per screen, then one recommendation.
 //
 // Reuses the same state-formula functions and plan data as the standalone
 // calculator at ROUTES.calculator — that page is untouched, this is a separate,
 // trimmed embed built for the homepage specifically. No plan window, no
-// three-card grid: the result is a single recommended tier, because a funnel
-// presents one offer.
+// three-card grid: the result is a single recommended tier, because this
+// section presents one offer, not a ladder to browse.
 //
-// Layout contract: exactly one step is ever visible. The steps container is
-// given a JS-measured min-height equal to the tallest step at the current
-// viewport width, so switching steps never changes the container's size —
-// there is nothing to scroll to. The hero above collapses to a compact strip
-// the moment the first question is answered, which is what actually buys the
-// room for the later, taller steps to fit above the fold on a phone.
+// This does not fight for a fixed height or a frozen hero. Each step sizes
+// itself naturally; advancing smooth-scrolls the new question into view,
+// the same pattern the standalone calculator already uses. If a question
+// needs more room than the last one, it takes it.
 import GapBar from './GapBar.astro';
 import PlanCard from './PlanCard.astro';
 import { STATES } from '../lib/states.js';
-import { PLANS, ELIGIBILITY_CRITERIA } from '../config/plans.js';
+import { PLANS, ELIGIBILITY_CRITERIA, PROGRAM_TERMS } from '../config/plans.js';
 import { ROUTES } from '../config/site.js';
+
+const T = PROGRAM_TERMS;
+const steps = ['State', 'Income', 'Expenses', 'Eligibility'];
 ---
 
-<div class="flow" data-flow>
-  {/* Step 0 sits directly under the hero copy — nothing else competes with it. */}
-  <section class="flow__question" id="coverage-check" data-flow-form>
-    <div class="shell">
-      <p class="flow__meta">Four short questions &mdash; takes about a minute.</p>
+<section class="coverage" id="coverage-check">
+  <div class="shell coverage__intro">
+    <p class="eyebrow">Your coverage check</p>
+    <h2>Let's see what unemployment could cover for you.</h2>
+    <p class="lead">
+      Four short questions. We use your state's published unemployment
+      formula to estimate the gap your household could face.
+    </p>
+  </div>
 
-      <div class="progress" data-progress aria-hidden="true">
-        <span class="progress__dot" data-progress-step="0"></span>
-        <span class="progress__dot" data-progress-step="1"></span>
-        <span class="progress__dot" data-progress-step="2"></span>
-        <span class="progress__dot" data-progress-step="3"></span>
+  {/* ---- The questions ---- */}
+  <div class="shell coverage__shell" data-flow-form>
+    <div class="progress" data-progress aria-hidden="true">
+      <p class="progress__label">
+        Step <span data-progress-current>1</span> of {steps.length}
+        <span class="progress__name" data-progress-name>{steps[0]}</span>
+      </p>
+      <div class="progress__track">
+        <div class="progress__fill" data-progress-fill></div>
       </div>
-
-      <form class="flow__form" data-flow-steps novalidate>
-        <div class="flow__steps-wrap" data-steps-wrap>
-          <fieldset class="fstep" data-step="0">
-            <legend class="fstep__q">Which state do you work in?</legend>
-            <label class="visually-hidden" for="flow-state">Your state</label>
-            <select id="flow-state" data-field="state">
-              <option value="" selected disabled>Choose your state&hellip;</option>
-              {STATES.map((s) => <option value={s.code}>{s.name}</option>)}
-            </select>
-
-            <p class="flow__trust">
-              Figures come from the U.S. Department of Labor's published state
-              formulas. Cancel within 48 hours of enrolling for a full refund.
-            </p>
-          </fieldset>
-
-          <fieldset class="fstep" data-step="1" hidden>
-            <legend class="fstep__q">Roughly what do you earn a year?</legend>
-            <p class="fstep__help">Gross, before tax.</p>
-            <div class="field">
-              <label for="flow-income">Annual income</label>
-              <div class="input-money">
-                <span aria-hidden="true">$</span>
-                <input
-                  type="number"
-                  id="flow-income"
-                  data-field="income"
-                  inputmode="numeric"
-                  min="0"
-                  step="1000"
-                  placeholder="52,000"
-                  autocomplete="off"
-                />
-              </div>
-            </div>
-            <div class="field" data-deps-field hidden>
-              <label for="flow-deps">Number of dependants</label>
-              <input
-                type="number"
-                id="flow-deps"
-                data-field="deps"
-                inputmode="numeric"
-                min="0"
-                max="10"
-                value="0"
-              />
-              <p class="hint" data-deps-hint></p>
-            </div>
-            <div class="flow__actions">
-              <button type="button" class="btn btn--secondary" data-back>&larr; Back</button>
-              <button type="button" class="btn btn--primary" data-next>Continue</button>
-            </div>
-          </fieldset>
-
-          <fieldset class="fstep" data-step="2" hidden>
-            <legend class="fstep__q">What does your month cost?</legend>
-            <p class="fstep__help">Round numbers are fine.</p>
-            <div class="field">
-              <label for="flow-housing">Housing</label>
-              <div class="input-money">
-                <span aria-hidden="true">$</span>
-                <input type="number" id="flow-housing" data-field="housing" data-expense min="0" step="50" placeholder="1,400" autocomplete="off" />
-              </div>
-            </div>
-            <div class="field">
-              <label for="flow-vehicle">Vehicle</label>
-              <div class="input-money">
-                <span aria-hidden="true">$</span>
-                <input type="number" id="flow-vehicle" data-field="vehicle" data-expense min="0" step="25" placeholder="450" autocomplete="off" />
-              </div>
-            </div>
-            <div class="field">
-              <label for="flow-other">Everything else</label>
-              <div class="input-money">
-                <span aria-hidden="true">$</span>
-                <input type="number" id="flow-other" data-field="other" data-expense min="0" step="50" placeholder="750" autocomplete="off" />
-              </div>
-            </div>
-            <div class="flow__actions">
-              <button type="button" class="btn btn--secondary" data-back>&larr; Back</button>
-              <button type="button" class="btn btn--primary" data-next>Continue</button>
-            </div>
-          </fieldset>
-
-          <fieldset class="fstep" data-step="3" hidden>
-            <legend class="fstep__q">Last thing &mdash; what has to be true of you.</legend>
-            <div class="flow__checks">
-              {
-                ELIGIBILITY_CRITERIA.map((c) => (
-                  <label class="check">
-                    <input type="checkbox" data-eligibility={c.id} data-required={c.required ? 'true' : 'false'} />
-                    <span>
-                      {c.label}
-                      {c.detail && <span class="check__detail">{c.detail}</span>}
-                    </span>
-                  </label>
-                ))
-              }
-            </div>
-            <div class="flow__actions">
-              <button type="button" class="btn btn--secondary" data-back>&larr; Back</button>
-              <button type="button" class="btn btn--primary" data-next>See what I'd get</button>
-            </div>
-          </fieldset>
-        </div>
-
-        <p class="flow__error" data-error role="alert" hidden></p>
-      </form>
     </div>
-  </section>
 
-  {/* The result: one figure, one plan, in a single deliberate composition
-      that uses the full width — this is where the sale happens, rendered in
-      place, no navigation. */}
-  <section class="flow__result section section--deep section--generous" data-flow-result hidden>
-    <div class="shell flow__result-shell">
-      <div class="flow__result-figure">
-        <GapBar
-          id="flow-gap"
-          eyebrow="What your month leaves uncovered"
-          unit="short every month"
-          coveredLabel="Your state pays"
-          uncoveredLabel="You cover this yourself"
-        />
-        <p class="flow__result-fact" data-out="fact"></p>
-      </div>
+    <form class="flow__form" data-flow-steps novalidate>
+      <fieldset class="fstep" data-step="0">
+        <legend class="fstep__q">Which state do you work in?</legend>
+        <p class="fstep__why">
+          File where you worked, not where you live &mdash; that is the state
+          whose formula sets your benefit.
+        </p>
+        <label class="visually-hidden" for="flow-state">Your state</label>
+        <select id="flow-state" data-field="state">
+          <option value="" selected disabled>Choose your state&hellip;</option>
+          {STATES.map((s) => <option value={s.code}>{s.name}</option>)}
+        </select>
+      </fieldset>
 
-      <div class="flow__result-plan">
-        <div class="flow__plan" data-flow-plan>
+      <fieldset class="fstep" data-step="1" hidden>
+        <legend class="fstep__q">Roughly what do you earn a year?</legend>
+        <p class="fstep__why">Gross, before tax &mdash; this sets your state's weekly benefit amount.</p>
+        <div class="field">
+          <label for="flow-income">Annual income</label>
+          <div class="input-money">
+            <span aria-hidden="true">$</span>
+            <input
+              type="number"
+              id="flow-income"
+              data-field="income"
+              inputmode="numeric"
+              min="0"
+              step="1000"
+              placeholder="52,000"
+              autocomplete="off"
+            />
+          </div>
+        </div>
+        <div class="field" data-deps-field hidden>
+          <label for="flow-deps">Number of dependants</label>
+          <input
+            type="number"
+            id="flow-deps"
+            data-field="deps"
+            inputmode="numeric"
+            min="0"
+            max="10"
+            value="0"
+          />
+          <p class="hint" data-deps-hint></p>
+        </div>
+        <div class="flow__actions">
+          <button type="button" class="btn btn--secondary" data-back>&larr; Back</button>
+          <button type="button" class="btn btn--primary" data-next>Continue</button>
+        </div>
+      </fieldset>
+
+      <fieldset class="fstep" data-step="2" hidden>
+        <legend class="fstep__q">What does your month cost?</legend>
+        <p class="fstep__why">Round numbers are fine &mdash; this is what we compare your state benefit against.</p>
+        <div class="field">
+          <label for="flow-housing">Housing</label>
+          <div class="input-money">
+            <span aria-hidden="true">$</span>
+            <input type="number" id="flow-housing" data-field="housing" data-expense min="0" step="50" placeholder="1,400" autocomplete="off" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="flow-vehicle">Vehicle</label>
+          <div class="input-money">
+            <span aria-hidden="true">$</span>
+            <input type="number" id="flow-vehicle" data-field="vehicle" data-expense min="0" step="25" placeholder="450" autocomplete="off" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="flow-other">Everything else</label>
+          <div class="input-money">
+            <span aria-hidden="true">$</span>
+            <input type="number" id="flow-other" data-field="other" data-expense min="0" step="50" placeholder="750" autocomplete="off" />
+          </div>
+        </div>
+        <div class="flow__actions">
+          <button type="button" class="btn btn--secondary" data-back>&larr; Back</button>
+          <button type="button" class="btn btn--primary" data-next>Continue</button>
+        </div>
+      </fieldset>
+
+      <fieldset class="fstep" data-step="3" hidden>
+        <legend class="fstep__q">Last thing &mdash; what has to be true of you.</legend>
+        <p class="fstep__why">
+          These are the attestations you make at enrollment, not boxes to
+          click past.
+        </p>
+        <div class="flow__checks">
           {
-            PLANS.map((plan) => (
-              <div class="flow__plan-card" data-flow-card={plan.id} hidden>
-                <PlanCard
-                  plan={plan}
-                  recommended
-                  reason=""
-                  ctaHref={`${ROUTES.checkout}?plan=${plan.id}`}
-                  ctaLabel="Get this plan"
-                />
-              </div>
+            ELIGIBILITY_CRITERIA.map((c) => (
+              <label class="check">
+                <input type="checkbox" data-eligibility={c.id} data-required={c.required ? 'true' : 'false'} />
+                <span>
+                  {c.label}
+                  {c.detail && <span class="check__detail">{c.detail}</span>}
+                </span>
+              </label>
             ))
           }
         </div>
+        <div class="flow__actions">
+          <button type="button" class="btn btn--secondary" data-back>&larr; Back</button>
+          <button type="button" class="btn btn--primary" data-next>See my protection options</button>
+        </div>
+      </fieldset>
 
-        <p class="flow__alt">
-          <button type="button" class="linkish" data-flow-restart>See a different amount &rarr;</button>
-        </p>
+      <p class="flow__error" data-error role="alert" hidden></p>
+    </form>
+  </div>
+
+  {/* ---- The result: the problem, then the offer. ---- */}
+  <div class="flow__result section--deep" data-flow-result hidden>
+    <div class="shell">
+      <div class="result__head">
+        <p class="eyebrow">Your result</p>
+        <h2>Here's the gap, and what closes it.</h2>
+      </div>
+
+      <div class="result__grid">
+        <div class="result__problem">
+          <dl class="result__facts">
+            <div class="result__fact">
+              <dt>Your unemployment estimate</dt>
+              <dd data-out="benefit">&mdash;</dd>
+            </div>
+            <div class="result__fact">
+              <dt>Your estimated monthly expenses</dt>
+              <dd data-out="expenses">&mdash;</dd>
+            </div>
+          </dl>
+
+          <GapBar
+            id="flow-gap"
+            eyebrow="Monthly gap"
+            unit="short every month"
+            coveredLabel="Your state pays"
+            uncoveredLabel="You cover this yourself"
+          />
+        </div>
+
+        <div class="result__offer">
+          <p class="result__offer-label">Recommended for you</p>
+          <div class="flow__plan" data-flow-plan>
+            {
+              PLANS.map((plan) => (
+                <div class="flow__plan-card" data-flow-card={plan.id} hidden>
+                  <PlanCard
+                    plan={plan}
+                    recommended
+                    reason=""
+                    ctaHref={`${ROUTES.checkout}?plan=${plan.id}`}
+                    ctaLabel="Continue with this protection"
+                  />
+                </div>
+              ))
+            }
+          </div>
+          <p class="flow__alt">
+            <button type="button" class="linkish" data-flow-restart>See a different amount &rarr;</button>
+          </p>
+        </div>
       </div>
     </div>
-  </section>
-</div>
+  </div>
+</section>
 
 <script>
   import {
@@ -199,14 +224,13 @@ import { ROUTES } from '../config/site.js';
   import { saveCalcResult } from '../lib/storage.js';
   import { track, EVENTS, CALC_STEPS } from '../lib/analytics.js';
 
-  const root = document.querySelector('[data-flow]');
+  const root = document.querySelector('#coverage-check');
   if (root) {
-    const hero = document.querySelector('.hero');
     const formSection = root.querySelector('[data-flow-form]');
     const resultSection = root.querySelector('[data-flow-result]');
-    const stepsWrap = root.querySelector('[data-steps-wrap]');
     const stepEls = [...root.querySelectorAll('[data-step]')];
     const errorEl = root.querySelector('[data-error]');
+    const STEP_NAMES = ['State', 'Income', 'Expenses', 'Eligibility'];
 
     const stateSel = root.querySelector('[data-field="state"]');
     const incomeInput = root.querySelector('[data-field="income"]');
@@ -219,48 +243,22 @@ import { ROUTES } from '../config/site.js';
 
     track(EVENTS.CALC_START, {});
 
-    // --- Fixed-height step container -------------------------------------
-    // Every step is measured off-flow at the current width, and the wrap is
-    // sized to the tallest one. Switching steps then never changes the
-    // container's height, so there is nothing for the layout to shift.
-    function sizeStepsWrap() {
-      let max = 0;
-      stepEls.forEach((el) => {
-        const wasHidden = el.hidden;
-        el.hidden = false;
-        el.style.position = 'absolute';
-        el.style.visibility = 'hidden';
-        el.style.inlineSize = '100%';
-        const h = el.getBoundingClientRect().height;
-        if (h > max) max = h;
-        el.style.position = '';
-        el.style.visibility = '';
-        el.style.inlineSize = '';
-        el.hidden = wasHidden;
-      });
-      stepsWrap.style.minHeight = Math.ceil(max) + 'px';
-    }
-
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(sizeStepsWrap, 150);
-    });
-
-    function showStep(n, { focus = true } = {}) {
+    function showStep(n, { focus = true, scroll = true } = {}) {
       step = n;
       stepEls.forEach((el, i) => { el.hidden = i !== n; });
       errorEl.hidden = true;
-      root.querySelectorAll('[data-progress-step]').forEach((el, i) => {
-        el.dataset.state = i < n ? 'done' : i === n ? 'current' : 'todo';
-      });
-      // The full hero has already done its job once the visitor is answering
-      // questions — collapse it so the active step has room to sit above the
-      // fold. Step 0 keeps the full hero, since that is the first thing seen.
-      if (hero) hero.classList.toggle('hero--compact', n > 0);
+
+      root.querySelector('[data-progress-current]').textContent = String(n + 1);
+      root.querySelector('[data-progress-name]').textContent = STEP_NAMES[n];
+      root.querySelector('[data-progress-fill]').style.inlineSize =
+        `${((n + 1) / stepEls.length) * 100}%`;
+
       if (focus) {
         const first = stepEls[n].querySelector('select, input');
         if (first) first.focus({ preventScroll: true });
+      }
+      if (scroll) {
+        stepEls[n].scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }
 
@@ -352,31 +350,13 @@ import { ROUTES } from '../config/site.js';
       });
     }
 
-    // Sections below the flow that repeat what a visitor with a result has
-    // already scrolled past. Once a result exists they collapse to what is
-    // still relevant — payout mechanics in one line, and the terms — and the
-    // FAQ/close (both re-treading ground, and close's own CTA would otherwise
-    // point backward into the flow at the exact moment it should point to
-    // checkout) are cut entirely.
-    const payoutFull = document.querySelector('[data-payout-full]');
-    const payoutCondensed = document.querySelector('[data-payout-condensed]');
-    const faqSection = document.querySelector('[data-faq-section]');
-    const closeSection = document.querySelector('[data-close-section]');
-
-    function setPostResultSections(hasResult) {
-      if (payoutFull) payoutFull.hidden = hasResult;
-      if (payoutCondensed) payoutCondensed.hidden = !hasResult;
-      if (faqSection) faqSection.hidden = hasResult;
-      if (closeSection) closeSection.hidden = hasResult;
-    }
-
-    // The result replaces the question form in place — same page, no
-    // navigation. Its own section owns the scroll into view, which is fine:
-    // that is bringing new in-page content into frame, not leaving the page.
+    // The result replaces the questions in place — same page, no navigation.
     function paint(result, s, raw) {
       formSection.hidden = true;
       resultSection.hidden = false;
-      setPostResultSections(true);
+
+      root.querySelector('[data-out="benefit"]').textContent = `${money(raw.monthlyBenefit)}/month`;
+      root.querySelector('[data-out="expenses"]').textContent = `${money(raw.monthlyExpenses)}/month`;
 
       renderGap(document.getElementById('flow-gap'), {
         covered: Math.min(raw.monthlyBenefit, raw.monthlyExpenses),
@@ -384,10 +364,6 @@ import { ROUTES } from '../config/site.js';
         coveredLabel: `${s.name} pays`,
         uncoveredLabel: 'You cover this yourself',
       });
-
-      root.querySelector('[data-out="fact"]').textContent =
-        `${s.name} pays about ${money(raw.monthlyBenefit)} a month against ` +
-        `${money(raw.monthlyExpenses)} in bills you told us about.`;
 
       const cards = [...root.querySelectorAll('[data-flow-card]')];
       cards.forEach((c) => { c.hidden = true; });
@@ -399,11 +375,15 @@ import { ROUTES } from '../config/site.js';
           if (card) {
             card.hidden = false;
             const reasonEl = card.querySelector('[data-plan-reason]');
+            const ctaEl = card.querySelector('[data-plan-cta]');
             if (reasonEl) {
               reasonEl.hidden = false;
               reasonEl.textContent = rec.closesGap
-                ? `The smallest plan that covers your ${money(raw.monthlyGap)} monthly shortfall.`
+                ? `This closes your ${money(raw.monthlyGap)} monthly shortfall for ${rec.plan.installments} months.`
                 : `The largest plan available. It covers part of your ${money(raw.monthlyGap)} shortfall, leaving ${money(raw.monthlyGap - rec.plan.monthlyBenefit)} still on you.`;
+            }
+            if (ctaEl) {
+              ctaEl.textContent = `Continue with ${money(rec.plan.totalLimit)} protection`;
             }
           }
         }
@@ -419,55 +399,69 @@ import { ROUTES } from '../config/site.js';
     root.querySelector('[data-flow-restart]').addEventListener('click', () => {
       resultSection.hidden = true;
       formSection.hidden = false;
-      setPostResultSections(false);
       showStep(1);
-      formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 
-    sizeStepsWrap();
-    showStep(0, { focus: false });
+    showStep(0, { focus: false, scroll: false });
   }
 </script>
 
 <style>
-  .flow__question {
-    padding-block: 0 var(--pad-tight);
+  .coverage {
+    background: var(--surface-sunken);
+    border-block: 1px solid var(--line);
+    padding-block: var(--pad-generous);
   }
 
-  .flow__meta {
+  .coverage__intro {
+    max-width: 46rem;
+  }
+
+  .coverage__intro h2 {
+    margin-top: var(--space-2);
+  }
+
+  .coverage__intro .lead {
+    margin-top: var(--space-4);
+  }
+
+  .coverage__shell {
+    margin-top: var(--space-8);
+  }
+
+  /* --- Progress --- */
+  .progress {
+    max-width: 30rem;
+    margin-bottom: var(--space-6);
+  }
+
+  .progress__label {
     font-size: var(--text-sm);
     font-weight: 600;
-    color: var(--blue-ink);
-    margin-bottom: var(--space-3);
+    color: var(--ink-muted);
+    margin-bottom: var(--space-2);
   }
 
-  .progress {
-    display: flex;
-    gap: 6px;
-    margin-bottom: var(--space-4);
+  .progress__name {
+    margin-left: var(--space-2);
+    padding-left: var(--space-2);
+    border-left: 1px solid var(--line-strong);
+    font-weight: 700;
+    color: var(--navy);
   }
 
-  .progress__dot {
-    flex: 1;
-    max-width: 3rem;
-    block-size: 6px;
-    border-radius: var(--radius-full);
+  .progress__track {
+    block-size: 4px;
+    border-radius: 2px;
     background: var(--line-strong);
-    transition: background 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
   }
 
-  .progress__dot[data-state='done'] {
-    background: var(--covered-ink);
-  }
-
-  .progress__dot[data-state='current'] {
-    background: var(--gradient-brand);
-    box-shadow: 0 0 10px rgba(27, 58, 107, 0.5);
-  }
-
-  /* Sized by JS to the tallest step, so switching steps never resizes it. */
-  .flow__steps-wrap {
-    position: relative;
+  .progress__fill {
+    block-size: 100%;
+    background: var(--navy);
+    inline-size: 25%;
+    transition: inline-size 0.3s ease;
   }
 
   .fstep {
@@ -479,18 +473,19 @@ import { ROUTES } from '../config/site.js';
 
   .fstep__q {
     display: block;
-    font-size: var(--text-xl);
+    font-size: var(--text-2xl);
     font-weight: 800;
     line-height: 1.2;
     letter-spacing: -0.01em;
     color: var(--navy);
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-2);
   }
 
-  .fstep__help {
+  .fstep__why {
     color: var(--ink-muted);
     font-size: var(--text-sm);
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-5);
+    max-width: 40ch;
   }
 
   .field + .field {
@@ -507,19 +502,6 @@ import { ROUTES } from '../config/site.js';
     background: var(--paper);
     font-size: var(--text-base);
     color: var(--ink);
-    box-shadow: var(--shadow-flat);
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
-  }
-
-  #flow-state:hover {
-    border-color: var(--blue);
-  }
-
-  .flow__trust {
-    margin-top: var(--space-3);
-    max-width: 34rem;
-    font-size: var(--text-xs);
-    color: var(--ink-muted);
   }
 
   .input-money {
@@ -545,15 +527,15 @@ import { ROUTES } from '../config/site.js';
 
   .flow__checks {
     display: grid;
-    gap: var(--space-2);
+    gap: var(--space-3);
   }
 
   .check {
     display: flex;
     align-items: flex-start;
-    gap: var(--space-2);
+    gap: var(--space-3);
     min-height: var(--tap);
-    padding: var(--space-2);
+    padding: var(--space-3);
     border: 1.5px solid var(--line);
     border-radius: var(--radius-sm);
     font-size: var(--text-sm);
@@ -561,17 +543,12 @@ import { ROUTES } from '../config/site.js';
     line-height: 1.35;
     color: var(--ink);
     cursor: pointer;
-    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
-  }
-
-  .check:hover {
-    border-color: var(--blue);
+    background: var(--paper);
   }
 
   .check:has(input:checked) {
     border-color: var(--navy);
     background: var(--blue-pale);
-    box-shadow: 0 0 0 1px var(--navy);
   }
 
   .check__detail {
@@ -593,7 +570,7 @@ import { ROUTES } from '../config/site.js';
   .flow__actions {
     display: flex;
     gap: var(--space-3);
-    margin-top: var(--space-4);
+    margin-top: var(--space-6);
   }
 
   .flow__actions .btn--primary {
@@ -601,43 +578,73 @@ import { ROUTES } from '../config/site.js';
   }
 
   .flow__error {
-    margin-top: var(--space-2);
+    margin-top: var(--space-3);
     font-size: var(--text-sm);
     font-weight: 600;
     color: #a3231b;
   }
 
-  /* --- Result: one deliberate two-part composition, full width at desktop.
-     The figure establishes the problem; the plan — substantial, not
-     incidental — is the answer sitting right beside it.
-     The richer ground is scoped to this component only — the standalone
-     calculator's result reuses the plain `.section--deep` flat navy and
-     stays exactly as it is. --- */
+  /* --- Result --- */
   .flow__result {
-    background: var(--gradient-deep);
+    background: var(--navy-deep);
+    padding-block: var(--pad-generous);
   }
 
-  .flow__result-shell {
+  .result__head h2 {
+    margin-top: var(--space-2);
+    max-width: 20ch;
+  }
+
+  .result__grid {
+    margin-top: var(--space-8);
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--space-8);
+    gap: var(--space-9);
   }
 
-  .flow__result-fact {
-    margin-top: var(--space-5);
-    max-width: 50ch;
-    color: #cbd8ec;
-    font-size: var(--text-lg);
+  .result__facts {
+    display: grid;
+    gap: var(--space-4);
+    margin: 0 0 var(--space-7);
   }
 
-  .flow__result-plan {
+  .result__fact {
     display: flex;
-    flex-direction: column;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  }
+
+  .result__fact dt {
+    font-size: var(--text-sm);
+    color: #9fb3d1;
+  }
+
+  .result__fact dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .result__offer-label {
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--uncovered);
+    margin-bottom: var(--space-4);
   }
 
   .flow__plan {
     width: 100%;
-    max-width: 30rem;
+    max-width: 28rem;
   }
 
   /* The card is white, even though its section is the dark ground — so the
@@ -660,15 +667,14 @@ import { ROUTES } from '../config/site.js';
     font-size: var(--text-sm);
   }
 
-  @media (min-width: 860px) {
-    .flow__result-shell {
-      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr);
-      gap: var(--space-9);
+  @media (min-width: 900px) {
+    .result__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       align-items: center;
     }
 
     .flow__plan {
-      max-width: 34rem;
+      max-width: 30rem;
     }
   }
 

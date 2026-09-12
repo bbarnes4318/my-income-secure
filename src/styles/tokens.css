@@ -94,35 +94,23 @@
   --width-text: 720px;
   --width-form: 560px;
 
-  --radius: 14px;
-  --radius-sm: 10px;
-  --radius-lg: 22px;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
   --radius-full: 999px;
 
   /* --- Elevation ------------------------------------------------------
      Four steps, used to say how far something sits off the page. Everything
      was previously a 1px border on white, which is why the site read flat.
      Pick by meaning: raised = interactive surface, lifted = the one thing
-     that matters on screen, floating = breaks out of its container. */
+     that matters on screen, floating = breaks out of its container.
+     Restrained on purpose — a neutral shadow reads as premium; a tinted glow
+     reads as a template. */
   --shadow-flat: 0 1px 2px rgba(20, 32, 58, 0.05);
   --shadow-card: 0 1px 2px rgba(20, 32, 58, 0.04), 0 8px 24px rgba(20, 32, 58, 0.06);
   --shadow-raised: 0 2px 4px rgba(20, 32, 58, 0.05), 0 12px 28px rgba(20, 32, 58, 0.09);
   --shadow-lift: 0 2px 4px rgba(20, 32, 58, 0.06), 0 18px 44px rgba(20, 32, 58, 0.14);
   --shadow-float: 0 4px 10px rgba(20, 32, 58, 0.08), 0 30px 70px rgba(20, 32, 58, 0.20);
-  /* A tinted, soft glow rather than a neutral drop shadow — used under the
-     primary button and the recommended plan, the two places worth the extra
-     warmth. */
-  --shadow-glow: 0 1px 2px rgba(27, 58, 107, 0.12), 0 16px 32px -8px rgba(27, 58, 107, 0.38);
-  --shadow-glow-lg: 0 4px 8px rgba(27, 58, 107, 0.14), 0 28px 56px -12px rgba(27, 58, 107, 0.4);
-
-  /* --- Brand gradients --------------------------------------------------
-     Used sparingly: the primary button, the hero ground, the dark reveal.
-     Everywhere else stays flat navy — a gradient on every surface is how you
-     get a site that looks like a template instead of a considered one. */
-  --gradient-brand: linear-gradient(135deg, var(--navy-mid) 0%, var(--navy) 55%, var(--navy-deep) 100%);
-  --gradient-deep: radial-gradient(120% 140% at 12% -10%, #16305e 0%, transparent 55%),
-    radial-gradient(100% 120% at 100% 110%, #143054 0%, transparent 60%),
-    var(--navy-deep);
 
   /* --- Surface ladder --------------------------------------------------
      Backgrounds get progressively deeper as sections layer. Never two

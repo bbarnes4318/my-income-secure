@@ -127,7 +127,8 @@ img {
   background: var(--blue-pale);
 }
 
-/* The dark ground. Used by the gap reveal and nothing else. */
+/* The dark ground. Used for moments that should feel like a decision point:
+   the gap reveal, and a closing call to action. Never for routine content. */
 .section--deep {
   background: var(--navy-deep);
   color: #dbe5f4;
@@ -204,22 +205,22 @@ h2 + .lead {
 }
 
 .btn--primary {
-  background: var(--gradient-brand);
-  border-color: transparent;
+  background: var(--navy);
+  border-color: var(--navy);
   color: #ffffff;
   font-size: var(--text-lg);
   padding: 1.0625rem 2.25rem;
-  box-shadow: var(--shadow-glow);
+  box-shadow: var(--shadow-raised);
 }
 
 .btn--primary:hover {
-  box-shadow: var(--shadow-glow-lg);
-  transform: translateY(-1px);
+  background: var(--navy-mid);
+  border-color: var(--navy-mid);
+  box-shadow: var(--shadow-lift);
 }
 
 .btn--primary:active {
-  transform: translateY(0);
-  box-shadow: var(--shadow-lift);
+  box-shadow: var(--shadow-raised);
 }
 
 .btn--primary:disabled,
