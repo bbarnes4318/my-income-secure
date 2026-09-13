@@ -1,597 +1,353 @@
 ---
-import Page from '../layouts/Page.astro';
+import Base from '../layouts/Base.astro';
+import Footer from '../components/Footer.astro';
+import Wordmark from '../components/Wordmark.astro';
 import CoverageFlow from '../components/CoverageFlow.astro';
 import Faq from '../components/Faq.astro';
-import ImageSlot from '../components/ImageSlot.astro';
-import { ROUTES, URGENCY, STATE_FILING_REQUIREMENT } from '../config/site.js';
-import { ELIGIBILITY_CRITERIA, PROGRAM_TERMS, PLANS } from '../config/plans.js';
+import { PLANS, PROGRAM_TERMS, ELIGIBILITY_CRITERIA } from '../config/plans.js';
+import { DISCLAIMER, DISCLOSURES, ROUTES, STATE_FILING_REQUIREMENT, URGENCY } from '../config/site.js';
 import { money, price } from '../lib/format.js';
 
-const T = PROGRAM_TERMS;
 const cheapest = PLANS[0];
 const largest = PLANS[PLANS.length - 1];
-
-const facts = [
-  {
-    kicker: `${T.installments} payments`,
-    title: `${money(largest.monthlyBenefit)} at a time`,
-    body: `A qualifying claim is paid in ${T.installments} installments, ${T.installmentIntervalDays} days apart.`,
-  },
-  {
-    kicker: 'A fixed benefit',
-    title: `Up to ${money(largest.totalLimit)} total`,
-    body: 'Your tier determines the total benefit. It is not an open-ended monthly promise.',
-  },
-  {
-    kicker: 'Before you need it',
-    title: 'Set it up before the job loss',
-    body: URGENCY,
-  },
-];
+const T = PROGRAM_TERMS;
 
 const faqs = [
   {
-    q: 'What exactly am I buying?',
-    a:
-      'My Income Secure is a membership benefit program. The membership itself is not an insurance policy. The income protection benefit within the program is insured separately and has its own eligibility, claim and payment conditions.',
+    q: 'What am I actually buying?',
+    a: 'My Income Secure is a membership benefit program. The membership itself is separate from the insured income protection benefit inside the program. Your selected tier sets the total job-loss benefit available under its terms.',
   },
   {
-    q: 'How much could I receive?',
-    a:
-      `Your selected tier determines the total benefit, from ${money(cheapest.totalLimit)} to ${money(largest.totalLimit)}. Each income-protection tier pays that total in ${T.installments} installments.`,
+    q: 'How much can the program pay?',
+    a: `Income-protection tiers range from ${money(cheapest.totalLimit)} to ${money(largest.totalLimit)} total. Each tier pays its total in ${T.installments} installments, ${T.installmentIntervalDays} days apart, subject to the program terms.`,
   },
   {
-    q: 'When does a claim become payable?',
-    a:
-      `A claim becomes admissible after ${T.claimThresholdDays} consecutive days unemployed. The first installment is scheduled ${T.firstInstallmentDays} days after the qualifying job loss.`,
-  },
-  {
-    q: 'Do I still need to file for state unemployment?',
-    a: STATE_FILING_REQUIREMENT,
-    cta: { href: ROUTES.guide, label: 'Read the filing guide' },
+    q: 'When would I receive the first payment?',
+    a: `A claim becomes admissible after ${T.claimThresholdDays} consecutive days unemployed. The first installment is scheduled ${T.firstInstallmentDays} days after the qualifying job loss.`,
   },
   {
     q: 'What happens if I go back to work?',
-    a:
-      `Each installment after the first is paid only while you remain unemployed. Return to work before all installments are paid, and the remaining installments are forfeited.`,
+    a: 'Each installment after the first is paid only if you are still unemployed. Return to work before all installments are paid and the remaining installments are forfeited.',
+  },
+  {
+    q: 'Do I still have to file for unemployment?',
+    a: STATE_FILING_REQUIREMENT,
+    cta: { href: ROUTES.guide, label: 'Read the state filing guide' },
   },
   {
     q: 'Can I cancel?',
-    a:
-      `You can cancel. A full refund is available within ${T.refundWindowHours} hours of purchase provided no benefits have been used.`,
+    a: `You can cancel. A full refund is available within ${T.refundWindowHours} hours of purchase if no benefits have been used.`,
   },
 ];
 ---
 
-<Page
-  title="Protect the gap between your paycheck and your bills — My Income Secure"
-  description={`My Income Secure provides up to ${money(largest.totalLimit)} in job-loss income protection. Plans start at ${price(cheapest.priceMonthly)}/month.`}
-  landing
+<Base
+  title="My Income Secure — Protect the gap when a paycheck stops"
+  description={`My Income Secure is a membership benefit program providing job-loss income protection from ${price(cheapest.priceMonthly)}/month, with tiers up to ${money(largest.totalLimit)} total.`}
 >
-  <section class="hero">
-    <div class="shell hero__shell">
-      <div class="hero__copy">
-        <p class="hero__eyebrow">Job-loss income protection</p>
-        <h1>Protect the gap between your paycheck and your bills.</h1>
-        <p class="hero__lead">
-          My Income Secure is a membership that pays a fixed cash benefit after
-          a qualifying job loss — directly to you while you look for your next job.
-        </p>
-
-        <div class="hero__offer">
-          <div class="hero__offer-price">
-            <span>Plans from</span>
-            <strong>{price(cheapest.priceMonthly)}</strong>
-            <span>/month</span>
-          </div>
-          <div class="hero__offer-divider" aria-hidden="true"></div>
-          <div class="hero__offer-max">
-            <strong>Up to {money(largest.totalLimit)}</strong>
-            <span>total job-loss benefit</span>
-          </div>
-        </div>
-
-        <div class="hero__actions">
-          <a class="btn btn--primary" href="#coverage-check">Calculate my coverage gap <span aria-hidden="true">→</span></a>
-          <span class="hero__action-note">See your estimated gap before you enroll.</span>
-        </div>
-
-        <div class="hero__proof" aria-label="Program highlights">
-          <span>Fixed cash benefit</span>
-          <span>{T.installments} installments</span>
-          <span>Paid directly to you</span>
+  <div class="mis-home">
+    <header class="topbar">
+      <div class="topbar__inner">
+        <Wordmark href={ROUTES.home} />
+        <div class="topbar__right">
+          <a href="#how-it-works">How it works</a>
+          <a href="#coverage-check">Calculate my gap <span aria-hidden="true">↗</span></a>
         </div>
       </div>
+    </header>
 
-      <div class="hero__visual">
-        <ImageSlot name="home-hero" ratio="4 / 5" />
-        <div class="hero__visual-card" aria-label="How the protection works">
-          <span class="hero__visual-kicker">The simple idea</span>
-          <strong>Your state benefit<br />may not cover the full month.</strong>
-          <span>We calculate the gap, then show you one protection amount built around it.</span>
-        </div>
-      </div>
-    </div>
-  </section>
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero__grid">
+          <div class="hero__copy">
+            <p class="hero__kicker"><span></span> Income protection for the moment your paycheck stops</p>
+            <h1 id="hero-title">Your bills don't stop when your job does.</h1>
+            <p class="hero__dek">My Income Secure gives you a fixed cash benefit after a qualifying job loss — so the gap between your state unemployment payment and your monthly expenses does not have to come entirely out of savings.</p>
 
-  <section class="section section--alt facts" aria-label="How the benefit works">
-    <div class="shell">
-      <div class="section-heading section-heading--wide">
-        <p class="eyebrow">How the protection works</p>
-        <h2>A fixed benefit. A defined amount. No guesswork about the tier.</h2>
-      </div>
+            <div class="hero__actions">
+              <a class="cta cta--solid" href="#coverage-check">Calculate my coverage gap <span aria-hidden="true">→</span></a>
+              <p>4 questions · personalized result · no obligation to enroll</p>
+            </div>
 
-      <div class="facts__grid">
-        {facts.map((fact, i) => (
-          <article class="fact">
-            <span class="fact__index">0{i + 1}</span>
-            <p class="fact__kicker">{fact.kicker}</p>
-            <h3>{fact.title}</h3>
-            <p>{fact.body}</p>
-          </article>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <CoverageFlow />
-
-  <section class="section eligibility">
-    <div class="shell eligibility__shell">
-      <div class="eligibility__intro">
-        <p class="eyebrow">Before you enroll</p>
-        <h2>Eligibility is straightforward and visible up front.</h2>
-        <p class="lead">
-          The enrollment attestations are shown before the recommendation so you
-          can see exactly what the program requires before moving toward checkout.
-        </p>
-      </div>
-
-      <div class="eligibility__list">
-        {ELIGIBILITY_CRITERIA.map((criterion, i) => (
-          <div class="eligibility__item">
-            <span class="eligibility__number">{i + 1}</span>
-            <div>
-              <strong>{criterion.label}</strong>
-              {criterion.detail && <p>{criterion.detail}</p>}
+            <div class="hero__numbers">
+              <div>
+                <strong>{price(cheapest.priceMonthly)}</strong>
+                <span>starting monthly membership</span>
+              </div>
+              <div>
+                <strong>Up to {money(largest.totalLimit)}</strong>
+                <span>maximum total job-loss benefit</span>
+              </div>
             </div>
           </div>
-        ))}
-      </div>
-    </div>
-  </section>
 
-  <section class="section section--warm faq-section">
-    <div class="shell faq-section__shell">
-      <div class="section-heading">
-        <p class="eyebrow">Before you decide</p>
-        <h2>The answers people usually want before enrolling.</h2>
-      </div>
-      <div class="faq-wrap">
-        <Faq items={faqs} />
-      </div>
-    </div>
-  </section>
-
-  <section class="section section--deep close">
-    <div class="shell close__shell">
-      <div>
-        <p class="eyebrow">Get your number</p>
-        <h2>Find out what your paycheck could leave uncovered.</h2>
-        <p class="lead">
-          Four short questions. Your state's formula. Your monthly expenses.
-          One recommended protection amount.
-        </p>
-      </div>
-      <div class="close__cta">
-        <div class="close__price">
-          <strong>Plans from {price(cheapest.priceMonthly)}/month</strong>
-          <span>Up to {money(largest.totalLimit)} total benefit</span>
+          <div class="hero__art" aria-hidden="true">
+            <div class="hero__art-top">
+              <span>THE GAP</span>
+              <span>01 / 03</span>
+            </div>
+            <div class="hero__art-main">
+              <div class="art-paycheck">
+                <small>PAYCHECK</small>
+                <strong>STOPPED</strong>
+              </div>
+              <div class="art-gap"></div>
+              <div class="art-cover">
+                <small>PROTECTION</small>
+                <strong>STILL ON</strong>
+              </div>
+            </div>
+            <div class="hero__art-bottom">
+              <span>STATE BENEFIT</span>
+              <span>+ MY INCOME SECURE</span>
+            </div>
+          </div>
         </div>
-        <a class="btn btn--primary" href="#coverage-check">Calculate my coverage gap <span aria-hidden="true">→</span></a>
-      </div>
-    </div>
-  </section>
-</Page>
+      </section>
+
+      <section class="proof-strip" id="how-it-works">
+        <div class="proof-strip__inner">
+          <div><span>01</span><strong>Know your gap</strong><p>We use your state's benefit formula and your real monthly costs.</p></div>
+          <div><span>02</span><strong>See one fit</strong><p>Your result produces one recommended protection amount — not a wall of options.</p></div>
+          <div><span>03</span><strong>Decide with the facts</strong><p>Pricing, eligibility, timing and cancellation are shown before enrollment.</p></div>
+        </div>
+      </section>
+
+      <section class="statement">
+        <div class="statement__inner">
+          <p class="section-label">The idea</p>
+          <div class="statement__quote">A job loss can turn a normal month into a math problem.</div>
+          <div class="statement__copy">
+            <p>State unemployment can replace part of a paycheck. Your mortgage, rent, car payment, groceries and utilities still arrive on their normal schedule.</p>
+            <p>My Income Secure is designed to sit in that gap with a fixed benefit that is sized by the membership tier you select.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="coverage-intro">
+        <div class="coverage-intro__inner">
+          <div>
+            <p class="section-label">Your number, not a generic example</p>
+            <h2>Let's find out what the gap could look like for you.</h2>
+          </div>
+          <p>Choose your state, tell us roughly what you earn and spend each month, then confirm the program's eligibility statements. The calculation uses the site's existing state-benefit formulas and recommends the cheapest tier whose monthly installment can cover the calculated shortfall.</p>
+        </div>
+      </section>
+
+      <CoverageFlow />
+
+      <section class="facts">
+        <div class="facts__inner">
+          <div class="facts__heading">
+            <p class="section-label">What you should know</p>
+            <h2>Important details, without the sales fog.</h2>
+          </div>
+          <div class="facts__list">
+            <article><span>Benefit</span><strong>Fixed total, paid in {T.installments}</strong><p>Each income-protection tier pays its total in {T.installments} installments, {T.installmentIntervalDays} days apart.</p></article>
+            <article><span>Timing</span><strong>Set it up before the loss</strong><p>{URGENCY}</p></article>
+            <article><span>Eligibility</span><strong>Visible before enrollment</strong><p>The enrollment attestations are shown in the coverage check before you move toward checkout.</p></article>
+            <article><span>State filing</span><strong>Still required</strong><p>{STATE_FILING_REQUIREMENT}</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="eligibility">
+        <div class="eligibility__inner">
+          <div class="eligibility__intro">
+            <p class="section-label">Before you continue</p>
+            <h2>The rules are part of the product.</h2>
+            <p>These are the same attestations used by the enrollment flow. They are here so nothing important is hidden behind a checkout button.</p>
+          </div>
+          <div class="eligibility__list">
+            {ELIGIBILITY_CRITERIA.map((criterion, i) => (
+              <div class="eligibility__item">
+                <span>{String(i + 1).padStart(2, '0')}</span>
+                <div><strong>{criterion.label}</strong>{criterion.detail && <p>{criterion.detail}</p>}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section class="faq">
+        <div class="faq__inner">
+          <div class="faq__heading">
+            <p class="section-label">Questions people ask</p>
+            <h2>Read the fine print before the fine print.</h2>
+          </div>
+          <div class="faq__wrap"><Faq items={faqs} /></div>
+        </div>
+      </section>
+
+      <section class="closing">
+        <div class="closing__inner">
+          <p class="section-label">Start with the number</p>
+          <h2>Don't guess what a job loss would do to your budget.</h2>
+          <p>Run the coverage check. See the state benefit estimate. See the gap. Then see the one protection amount the math points to.</p>
+          <a class="cta cta--light" href="#coverage-check">Calculate my coverage gap <span aria-hidden="true">→</span></a>
+        </div>
+      </section>
+    </main>
+
+    <Footer minimal />
+  </div>
+</Base>
 
 <style>
-  .hero {
-    background:
-      radial-gradient(circle at 76% 28%, rgba(46, 127, 196, 0.11), transparent 30%),
-      linear-gradient(180deg, var(--blue-pale) 0%, #f6f9fc 100%);
-    border-bottom: 1px solid var(--line);
-    overflow: clip;
+  .mis-home {
+    --m-black: #10100f;
+    --m-cream: #f4f0e7;
+    --m-paper: #fbfaf6;
+    --m-ink: #171715;
+    --m-muted: #67665f;
+    --m-line: #d7d2c7;
+    --m-red: #d65a3f;
+    --m-red-deep: #b8442e;
+    --m-acid: #d9f26b;
+    --m-blue: #1747d1;
+    background: var(--m-paper);
+    color: var(--m-ink);
+    font-family: Arial, Helvetica, sans-serif;
   }
 
-  .hero__shell {
-    display: grid;
-    gap: var(--space-8);
-    padding-block: clamp(3rem, 4vw, 5.5rem);
+  .mis-home * { box-sizing: border-box; }
+  .mis-home a { color: inherit; }
+  .mis-home .topbar { position: relative; background: var(--m-paper); border-bottom: 1px solid var(--m-line); }
+  .mis-home .topbar__inner { width: min(1320px, calc(100% - 40px)); margin: auto; min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .mis-home .topbar :global(.wm) { font-size: 1.15rem; }
+  .mis-home .topbar__right { display: flex; align-items: center; gap: 28px; font-size: 14px; font-weight: 700; }
+  .mis-home .topbar__right a { text-decoration: none; }
+  .mis-home .topbar__right a:last-child { color: var(--m-blue); }
+
+  .mis-home .hero { background: var(--m-cream); }
+  .mis-home .hero__grid { width: min(1320px, calc(100% - 40px)); margin: auto; min-height: 760px; display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(420px, .92fr); align-items: stretch; }
+  .mis-home .hero__copy { padding: clamp(60px, 8vw, 115px) 0 clamp(60px, 7vw, 100px); max-width: 800px; display: flex; flex-direction: column; justify-content: center; }
+  .mis-home .hero__kicker { display: flex; align-items: center; gap: 10px; font-size: 12px; line-height: 1.2; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; color: var(--m-red-deep); margin: 0 0 28px; }
+  .mis-home .hero__kicker span { width: 10px; height: 10px; background: var(--m-red); display: block; }
+  .mis-home .hero h1 { font-family: Georgia, 'Times New Roman', serif; color: var(--m-black); font-size: clamp(58px, 7vw, 116px); line-height: .9; letter-spacing: -.055em; max-width: 8ch; }
+  .mis-home .hero__dek { margin-top: 30px; font-size: clamp(18px, 1.55vw, 23px); line-height: 1.45; max-width: 650px; color: #3c3b37; }
+  .mis-home .hero__actions { margin-top: 34px; display: flex; align-items: center; flex-wrap: wrap; gap: 16px 22px; }
+  .mis-home .hero__actions > p { font-size: 13px; color: var(--m-muted); }
+  .mis-home .cta { min-height: 56px; display: inline-flex; align-items: center; justify-content: center; gap: 14px; padding: 0 25px; text-decoration: none; font-size: 16px; font-weight: 800; border: 1px solid transparent; }
+  .mis-home .cta--solid { background: var(--m-black); color: white; }
+  .mis-home .cta--solid:hover { background: #2a2925; }
+  .mis-home .hero__numbers { margin-top: 64px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 680px; border-top: 1px solid #c9c3b6; }
+  .mis-home .hero__numbers div { padding: 20px 25px 0 0; border-right: 1px solid #c9c3b6; }
+  .mis-home .hero__numbers div + div { padding-left: 25px; border-right: 0; }
+  .mis-home .hero__numbers strong { display: block; font-size: 30px; line-height: 1; font-weight: 900; letter-spacing: -.04em; }
+  .mis-home .hero__numbers span { display: block; margin-top: 9px; font-size: 12px; line-height: 1.4; color: var(--m-muted); text-transform: uppercase; letter-spacing: .06em; }
+
+  .mis-home .hero__art { position: relative; margin: 28px 0 28px 40px; background: var(--m-black); color: white; overflow: hidden; display: grid; grid-template-rows: auto 1fr auto; padding: 25px; }
+  .mis-home .hero__art::before { content: ''; position: absolute; width: 340px; height: 340px; right: -120px; top: 180px; border: 1px solid rgba(255,255,255,.13); border-radius: 50%; box-shadow: 0 0 0 60px rgba(255,255,255,.035), 0 0 0 120px rgba(255,255,255,.025); }
+  .mis-home .hero__art::after { content: ''; position: absolute; left: 25px; right: 25px; top: 25px; bottom: 25px; border: 1px solid rgba(255,255,255,.09); pointer-events: none; }
+  .mis-home .hero__art-top, .mis-home .hero__art-bottom { display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .16em; color: #b6b4ad; }
+  .mis-home .hero__art-main { align-self: center; position: relative; z-index: 1; display: grid; gap: 14px; padding: 50px 25px; }
+  .mis-home .art-paycheck, .mis-home .art-cover { padding: 24px; border: 1px solid rgba(255,255,255,.18); }
+  .mis-home .art-paycheck { background: rgba(255,255,255,.055); }
+  .mis-home .art-cover { background: var(--m-acid); color: var(--m-black); border-color: var(--m-acid); transform: translateX(46px); }
+  .mis-home .art-paycheck small, .mis-home .art-cover small { display: block; font-size: 10px; font-weight: 900; letter-spacing: .14em; }
+  .mis-home .art-paycheck strong, .mis-home .art-cover strong { display: block; margin-top: 8px; font-size: clamp(30px, 3vw, 52px); line-height: .9; letter-spacing: -.05em; }
+  .mis-home .art-gap { height: 50px; width: 1px; background: var(--m-red); margin-left: 22px; position: relative; }
+  .mis-home .art-gap::after { content: 'THE GAP'; position: absolute; left: 12px; top: 17px; font-size: 10px; letter-spacing: .14em; color: #ff876f; white-space: nowrap; }
+
+  .mis-home .proof-strip { background: var(--m-red); color: white; }
+  .mis-home .proof-strip__inner { width: min(1320px, calc(100% - 40px)); margin: auto; display: grid; grid-template-columns: repeat(3, 1fr); }
+  .mis-home .proof-strip__inner > div { min-height: 210px; padding: 32px 30px 30px 0; }
+  .mis-home .proof-strip__inner > div + div { border-left: 1px solid rgba(255,255,255,.25); padding-left: 30px; }
+  .mis-home .proof-strip span { font-size: 11px; font-weight: 900; letter-spacing: .16em; opacity: .7; }
+  .mis-home .proof-strip strong { display: block; margin-top: 44px; font-size: 25px; letter-spacing: -.03em; }
+  .mis-home .proof-strip p { margin-top: 8px; max-width: 320px; font-size: 14px; line-height: 1.5; color: #ffe8e1; }
+
+  .mis-home .statement { background: var(--m-paper); }
+  .mis-home .statement__inner { width: min(1320px, calc(100% - 40px)); margin: auto; padding: 120px 0 125px; display: grid; grid-template-columns: .7fr 1.5fr 1fr; gap: 50px; }
+  .mis-home .section-label { margin: 0; font-size: 11px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; color: var(--m-red-deep); }
+  .mis-home .statement__quote { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(40px, 5vw, 78px); line-height: .98; letter-spacing: -.05em; max-width: 12ch; }
+  .mis-home .statement__copy { padding-top: 8px; display: grid; gap: 25px; font-size: 17px; line-height: 1.6; color: var(--m-muted); max-width: 38ch; }
+
+  .mis-home .coverage-intro { background: var(--m-blue); color: white; }
+  .mis-home .coverage-intro__inner { width: min(1320px, calc(100% - 40px)); margin: auto; padding: 105px 0 95px; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: end; }
+  .mis-home .coverage-intro .section-label { color: var(--m-acid); }
+  .mis-home .coverage-intro h2 { margin-top: 16px; color: white; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(44px, 5vw, 74px); line-height: .97; letter-spacing: -.05em; max-width: 12ch; }
+  .mis-home .coverage-intro__inner > p { font-size: 18px; line-height: 1.6; color: #dbe4ff; max-width: 48ch; }
+
+  .mis-home :global(#coverage-check) { background: white; border: 0; padding-block: 100px; }
+  .mis-home :global(#coverage-check .coverage__intro), .mis-home :global(#coverage-check .coverage__shell), .mis-home :global(#coverage-check .shell) { width: min(1100px, calc(100% - 40px)); max-width: none; }
+  .mis-home :global(#coverage-check .coverage__intro) { display: none; }
+  .mis-home :global(#coverage-check .coverage__shell) { margin-top: 0; }
+  .mis-home :global(#coverage-check .progress) { max-width: none; }
+  .mis-home :global(#coverage-check .progress__fill) { background: var(--m-blue); }
+  .mis-home :global(#coverage-check .fstep__q) { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(34px, 4vw, 55px); letter-spacing: -.04em; }
+  .mis-home :global(#coverage-check .btn--primary) { background: var(--m-black); border-color: var(--m-black); border-radius: 0; }
+  .mis-home :global(#coverage-check .btn--secondary) { border-radius: 0; }
+  .mis-home :global(#coverage-check select), .mis-home :global(#coverage-check input[type='number']) { border-radius: 0; border-color: #a6a39a; }
+  .mis-home :global(#coverage-check .flow__result) { background: var(--m-black); margin-top: 70px; }
+  .mis-home :global(#coverage-check .flow__result .result__head h2) { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(40px, 5vw, 66px); }
+  .mis-home :global(#coverage-check .flow__plan :global(.plan--recommended)) { border-radius: 0; border: 2px solid var(--m-black); box-shadow: none; }
+
+  .mis-home .facts { background: var(--m-cream); }
+  .mis-home .facts__inner { width: min(1320px, calc(100% - 40px)); margin: auto; padding: 120px 0; display: grid; grid-template-columns: .65fr 1.35fr; gap: 90px; }
+  .mis-home .facts h2, .mis-home .eligibility h2, .mis-home .faq h2 { margin-top: 16px; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(44px, 5vw, 72px); line-height: .97; letter-spacing: -.05em; max-width: 11ch; }
+  .mis-home .facts__list { border-top: 1px solid #bbb5aa; }
+  .mis-home .facts__list article { display: grid; grid-template-columns: 120px 1fr; gap: 20px; padding: 30px 0; border-bottom: 1px solid #bbb5aa; }
+  .mis-home .facts__list span { font-size: 11px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; color: var(--m-red-deep); }
+  .mis-home .facts__list strong { font-size: 22px; letter-spacing: -.025em; }
+  .mis-home .facts__list p { grid-column: 2; margin-top: -7px; color: var(--m-muted); max-width: 52ch; line-height: 1.5; }
+
+  .mis-home .eligibility { background: var(--m-paper); }
+  .mis-home .eligibility__inner { width: min(1320px, calc(100% - 40px)); margin: auto; padding: 120px 0; display: grid; grid-template-columns: .8fr 1.2fr; gap: 100px; }
+  .mis-home .eligibility__intro > p:last-child { margin-top: 25px; color: var(--m-muted); line-height: 1.6; max-width: 38ch; }
+  .mis-home .eligibility__list { border-top: 2px solid var(--m-black); }
+  .mis-home .eligibility__item { display: grid; grid-template-columns: 55px 1fr; gap: 22px; padding: 24px 0; border-bottom: 1px solid var(--m-line); }
+  .mis-home .eligibility__item > span { font-size: 11px; font-weight: 900; letter-spacing: .12em; color: var(--m-red-deep); }
+  .mis-home .eligibility__item strong { font-size: 18px; line-height: 1.4; }
+  .mis-home .eligibility__item p { margin-top: 5px; color: var(--m-muted); font-size: 14px; line-height: 1.5; }
+
+  .mis-home .faq { background: #ece8df; }
+  .mis-home .faq__inner { width: min(1000px, calc(100% - 40px)); margin: auto; padding: 120px 0; }
+  .mis-home .faq__heading { max-width: 600px; }
+  .mis-home .faq__wrap { margin-top: 55px; }
+  .mis-home :global(.faq-section) { background: transparent; }
+
+  .mis-home .closing { background: var(--m-black); color: white; }
+  .mis-home .closing__inner { width: min(1320px, calc(100% - 40px)); margin: auto; padding: 130px 0 140px; display: grid; grid-template-columns: 1fr .7fr; gap: 80px; align-items: end; }
+  .mis-home .closing .section-label { color: var(--m-acid); }
+  .mis-home .closing h2 { margin-top: 18px; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(58px, 7vw, 102px); line-height: .91; letter-spacing: -.06em; max-width: 10ch; }
+  .mis-home .closing__inner > p:not(.section-label) { grid-column: 2; font-size: 18px; line-height: 1.55; color: #c6c5bf; max-width: 38ch; }
+  .mis-home .cta--light { background: var(--m-acid); color: var(--m-black); margin-top: 25px; grid-column: 2; justify-self: start; }
+
+  @media (max-width: 940px) {
+    .mis-home .hero__grid { grid-template-columns: 1fr; }
+    .mis-home .hero__copy { padding-bottom: 55px; }
+    .mis-home .hero__art { margin: 0 0 40px; min-height: 520px; }
+    .mis-home .statement__inner, .mis-home .facts__inner, .mis-home .eligibility__inner, .mis-home .coverage-intro__inner, .mis-home .closing__inner { grid-template-columns: 1fr; gap: 45px; }
+    .mis-home .statement__quote, .mis-home .facts h2, .mis-home .eligibility h2, .mis-home .faq h2 { max-width: 15ch; }
+    .mis-home .closing__inner > p:not(.section-label), .mis-home .cta--light { grid-column: auto; }
+    .mis-home .closing__inner { align-items: start; }
   }
 
-  .hero__copy {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .hero__eyebrow {
-    margin: 0 0 var(--space-4);
-    color: var(--blue-ink);
-    font-size: var(--text-xs);
-    font-weight: 800;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-  }
-
-  .hero h1 {
-    max-width: 11ch;
-    font-size: clamp(2.65rem, 4.8vw, 4.9rem);
-    line-height: 0.99;
-    letter-spacing: -0.045em;
-  }
-
-  .hero__lead {
-    max-width: 56ch;
-    margin-top: var(--space-5);
-    font-size: clamp(1.05rem, 1vw + 0.7rem, 1.35rem);
-    line-height: 1.5;
-    color: var(--ink-muted);
-  }
-
-  .hero__offer {
-    display: flex;
-    align-items: center;
-    gap: var(--space-5);
-    margin-top: var(--space-6);
-    max-width: 38rem;
-    padding: 1rem 1.125rem;
-    background: rgba(255, 255, 255, 0.82);
-    border: 1px solid var(--line-strong);
-    border-radius: var(--radius-sm);
-    box-shadow: var(--shadow-card);
-  }
-
-  .hero__offer-price,
-  .hero__offer-max {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.15;
-  }
-
-  .hero__offer-price span,
-  .hero__offer-max span {
-    color: var(--ink-muted);
-    font-size: var(--text-xs);
-  }
-
-  .hero__offer-price strong,
-  .hero__offer-max strong {
-    color: var(--navy);
-    font-size: var(--text-xl);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .hero__offer-divider {
-    width: 1px;
-    align-self: stretch;
-    background: var(--line-strong);
-  }
-
-  .hero__actions {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--space-4);
-    margin-top: var(--space-6);
-  }
-
-  .hero__action-note {
-    color: var(--ink-muted);
-    font-size: var(--text-sm);
-    max-width: 26ch;
-  }
-
-  .hero__proof {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.65rem 1.25rem;
-    margin-top: var(--space-5);
-    color: var(--ink);
-    font-size: var(--text-sm);
-    font-weight: 650;
-  }
-
-  .hero__proof span {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-  }
-
-  .hero__proof span::before {
-    content: '';
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--covered-ink);
-  }
-
-  .hero__visual {
-    position: relative;
-    min-width: 0;
-  }
-
-  .hero__visual :global(.slot) {
-    width: 100%;
-    aspect-ratio: 4 / 5;
-    min-height: 24rem;
-    border: 1px solid var(--line-strong);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-float);
-    overflow: hidden;
-  }
-
-  .hero__visual-card {
-    position: absolute;
-    left: -1rem;
-    bottom: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    width: min(78%, 22rem);
-    padding: 1rem 1.125rem;
-    background: rgba(14, 33, 67, 0.96);
-    color: #fff;
-    border-radius: var(--radius-sm);
-    box-shadow: var(--shadow-float);
-  }
-
-  .hero__visual-kicker {
-    color: var(--uncovered);
-    font-size: var(--text-xs);
-    font-weight: 800;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  .hero__visual-card strong {
-    font-size: var(--text-lg);
-    line-height: 1.25;
-  }
-
-  .hero__visual-card > span:last-child {
-    color: #c2d0e4;
-    font-size: var(--text-xs);
-    line-height: 1.5;
-  }
-
-  .section-heading {
-    max-width: 46rem;
-  }
-
-  .section-heading--wide {
-    max-width: 58rem;
-  }
-
-  .section-heading h2 {
-    max-width: 22ch;
-  }
-
-  .section-heading .eyebrow {
-    margin-bottom: var(--space-2);
-  }
-
-  .facts__grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0;
-    margin-top: var(--space-7);
-    border-top: 1px solid var(--line-strong);
-  }
-
-  .fact {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    column-gap: var(--space-4);
-    padding: var(--space-6) 0;
-    border-bottom: 1px solid var(--line-strong);
-  }
-
-  .fact__index {
-    grid-row: 1 / span 3;
-    font-size: var(--text-xs);
-    font-weight: 800;
-    color: var(--ink-muted);
-    letter-spacing: 0.08em;
-  }
-
-  .fact__kicker {
-    color: var(--blue-ink);
-    font-size: var(--text-xs);
-    font-weight: 800;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  .fact h3 {
-    margin-top: 0.2rem;
-    color: var(--navy);
-  }
-
-  .fact > p:last-child {
-    margin-top: 0.35rem;
-    color: var(--ink-muted);
-    max-width: 52ch;
-    font-size: var(--text-sm);
-  }
-
-  .eligibility {
-    background: var(--paper);
-  }
-
-  .eligibility__shell {
-    display: grid;
-    gap: var(--space-8);
-  }
-
-  .eligibility__intro .lead {
-    margin-top: var(--space-4);
-  }
-
-  .eligibility__list {
-    border-top: 1px solid var(--line-strong);
-  }
-
-  .eligibility__item {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: var(--space-4);
-    padding: var(--space-5) 0;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .eligibility__number {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    width: 2rem;
-    height: 2rem;
-    border: 1px solid var(--line-strong);
-    border-radius: 50%;
-    color: var(--navy);
-    font-size: var(--text-xs);
-    font-weight: 800;
-  }
-
-  .eligibility__item strong {
-    display: block;
-    color: var(--navy);
-    line-height: 1.35;
-  }
-
-  .eligibility__item p {
-    margin-top: 0.35rem;
-    color: var(--ink-muted);
-    font-size: var(--text-sm);
-    line-height: 1.5;
-  }
-
-  .faq-section__shell {
-    max-width: 1050px;
-  }
-
-  .faq-wrap {
-    max-width: 60rem;
-    margin-top: var(--space-6);
-  }
-
-  .close__shell {
-    display: grid;
-    gap: var(--space-7);
-    align-items: end;
-  }
-
-  .close h2 {
-    max-width: 15ch;
-  }
-
-  .close .lead {
-    margin-top: var(--space-4);
-  }
-
-  .close__cta {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-4);
-  }
-
-  .close__price {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-  }
-
-  .close__price strong {
-    color: #fff;
-    font-size: var(--text-lg);
-  }
-
-  .close__price span {
-    color: #b9c9df;
-    font-size: var(--text-sm);
-  }
-
-  @media (min-width: 760px) {
-    .hero__shell {
-      grid-template-columns: minmax(0, 1.08fr) minmax(20rem, 0.72fr);
-      align-items: center;
-      min-height: min(760px, calc(100vh - 4.5rem));
-    }
-
-    .hero__visual-card {
-      left: -2rem;
-    }
-
-    .facts__grid {
-      grid-template-columns: repeat(3, 1fr);
-      column-gap: var(--space-7);
-    }
-
-    .fact {
-      border-right: 1px solid var(--line-strong);
-      padding-right: var(--space-6);
-    }
-
-    .fact:last-child {
-      border-right: 0;
-    }
-
-    .eligibility__shell {
-      grid-template-columns: 0.85fr 1.15fr;
-      align-items: start;
-    }
-
-    .close__shell {
-      grid-template-columns: minmax(0, 1fr) auto;
-    }
-  }
-
-  @media (max-width: 759px) {
-    .hero__visual {
-      order: -1;
-    }
-
-    .hero__visual :global(.slot) {
-      aspect-ratio: 16 / 10;
-      min-height: 0;
-      border-radius: 0;
-    }
-
-    .hero__visual-card {
-      left: 0.75rem;
-      right: 0.75rem;
-      bottom: 0.75rem;
-      width: auto;
-    }
-
-    .hero h1 {
-      max-width: 13ch;
-    }
-
-    .hero__offer {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-4);
-      align-items: stretch;
-    }
-
-    .hero__offer-divider {
-      display: none;
-    }
-
-    .hero__actions .btn {
-      width: 100%;
-    }
+  @media (max-width: 700px) {
+    .mis-home .topbar__inner, .mis-home .hero__grid, .mis-home .proof-strip__inner, .mis-home .statement__inner, .mis-home .coverage-intro__inner, .mis-home .facts__inner, .mis-home .eligibility__inner, .mis-home .closing__inner, .mis-home .faq__inner { width: min(100% - 28px, 1320px); }
+    .mis-home .topbar__right a:first-child { display: none; }
+    .mis-home .topbar__inner { min-height: 66px; }
+    .mis-home .hero__grid { min-height: 0; }
+    .mis-home .hero__copy { padding: 55px 0 35px; }
+    .mis-home .hero h1 { font-size: clamp(50px, 16vw, 78px); }
+    .mis-home .hero__dek { font-size: 18px; }
+    .mis-home .hero__numbers { grid-template-columns: 1fr; }
+    .mis-home .hero__numbers div, .mis-home .hero__numbers div + div { padding: 18px 0; border-right: 0; border-bottom: 1px solid #c9c3b6; }
+    .mis-home .hero__numbers div:last-child { border-bottom: 0; }
+    .mis-home .hero__art { min-height: 410px; padding: 18px; }
+    .mis-home .hero__art-main { padding: 30px 12px; }
+    .mis-home .art-cover { transform: none; }
+    .mis-home .proof-strip__inner { grid-template-columns: 1fr; }
+    .mis-home .proof-strip__inner > div { min-height: auto; padding: 25px 0; border-top: 1px solid rgba(255,255,255,.22); }
+    .mis-home .proof-strip__inner > div + div { border-left: 0; padding-left: 0; }
+    .mis-home .proof-strip__inner > div:first-child { border-top: 0; }
+    .mis-home .statement__inner, .mis-home .facts__inner, .mis-home .eligibility__inner, .mis-home .faq__inner { padding: 78px 0; }
+    .mis-home .coverage-intro__inner { padding: 70px 0 65px; }
+    .mis-home :global(#coverage-check) { padding-block: 65px; }
+    .mis-home .facts__list article { grid-template-columns: 1fr; gap: 10px; }
+    .mis-home .facts__list p { grid-column: auto; margin-top: 0; }
+    .mis-home .closing__inner { padding: 85px 0 90px; }
   }
 </style>
