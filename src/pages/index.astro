@@ -1,11 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
 import Footer from '../components/Footer.astro';
-import Wordmark from '../components/Wordmark.astro';
 import CoverageFlow from '../components/CoverageFlow.astro';
 import Faq from '../components/Faq.astro';
 import { PLANS, PROGRAM_TERMS, ELIGIBILITY_CRITERIA } from '../config/plans.js';
-import { DISCLAIMER, DISCLOSURES, ROUTES, STATE_FILING_REQUIREMENT, URGENCY } from '../config/site.js';
+import { ROUTES, STATE_FILING_REQUIREMENT, URGENCY } from '../config/site.js';
 import { money, price } from '../lib/format.js';
 
 const cheapest = PLANS[0];
@@ -14,23 +13,23 @@ const T = PROGRAM_TERMS;
 
 const faqs = [
   {
-    q: 'What am I actually buying?',
-    a: 'My Income Secure is a membership benefit program. The membership itself is separate from the insured income protection benefit inside the program. Your selected tier sets the total job-loss benefit available under its terms.',
+    q: 'What exactly is My Income Secure?',
+    a: 'My Income Secure is a membership benefit program built around a fixed job-loss income protection benefit. Your membership tier determines the total benefit available under the program terms.',
   },
   {
-    q: 'How much can the program pay?',
+    q: 'How much can I get?',
     a: `Income-protection tiers range from ${money(cheapest.totalLimit)} to ${money(largest.totalLimit)} total. Each tier pays its total in ${T.installments} installments, ${T.installmentIntervalDays} days apart, subject to the program terms.`,
   },
   {
-    q: 'When would I receive the first payment?',
+    q: 'When does a claim become payable?',
     a: `A claim becomes admissible after ${T.claimThresholdDays} consecutive days unemployed. The first installment is scheduled ${T.firstInstallmentDays} days after the qualifying job loss.`,
   },
   {
-    q: 'What happens if I go back to work?',
-    a: 'Each installment after the first is paid only if you are still unemployed. Return to work before all installments are paid and the remaining installments are forfeited.',
+    q: 'What happens when I go back to work?',
+    a: 'Each installment after the first is paid only while you remain unemployed. Return to work before all installments are paid and the remaining installments are forfeited.',
   },
   {
-    q: 'Do I still have to file for unemployment?',
+    q: 'Do I still have to file for state unemployment?',
     a: STATE_FILING_REQUIREMENT,
     cta: { href: ROUTES.guide, label: 'Read the state filing guide' },
   },
@@ -43,148 +42,218 @@ const faqs = [
 
 <Base
   title="My Income Secure — Protect the gap when a paycheck stops"
-  description={`My Income Secure is a membership benefit program providing job-loss income protection from ${price(cheapest.priceMonthly)}/month, with tiers up to ${money(largest.totalLimit)} total.`}
+  description={`My Income Secure provides job-loss income protection through a membership benefit program, with plans from ${price(cheapest.priceMonthly)}/month and up to ${money(largest.totalLimit)} total.`}
 >
-  <div class="mis-home">
-    <header class="topbar">
-      <div class="topbar__inner">
-        <Wordmark href={ROUTES.home} />
-        <div class="topbar__right">
-          <a href="#how-it-works">How it works</a>
-          <a href="#coverage-check">Calculate my gap <span aria-hidden="true">↗</span></a>
-        </div>
+  <div class="income-secure-home">
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="brand" href={ROUTES.home} aria-label="My Income Secure home">
+          <span class="brand__my">MY</span>
+          <span class="brand__name">INCOME SECURE</span>
+        </a>
+        <a class="header-cta" href="#coverage-check">See my gap <span aria-hidden="true">↗</span></a>
       </div>
     </header>
 
     <main id="main">
       <section class="hero" aria-labelledby="hero-title">
-        <div class="hero__grid">
+        <div class="hero__inner">
           <div class="hero__copy">
-            <p class="hero__kicker"><span></span> Income protection for the moment your paycheck stops</p>
-            <h1 id="hero-title">Your bills don't stop when your job does.</h1>
-            <p class="hero__dek">My Income Secure gives you a fixed cash benefit after a qualifying job loss — so the gap between your state unemployment payment and your monthly expenses does not have to come entirely out of savings.</p>
+            <p class="eyebrow">Job-loss income protection</p>
+            <h1 id="hero-title">Your paycheck can stop overnight. Your bills don't.</h1>
+            <p class="hero__lead">
+              My Income Secure gives you a fixed cash benefit after a qualifying job loss —
+              built to help with the gap between your state unemployment benefit and what your household still has to cover.
+            </p>
 
-            <div class="hero__actions">
-              <a class="cta cta--solid" href="#coverage-check">Calculate my coverage gap <span aria-hidden="true">→</span></a>
-              <p>4 questions · personalized result · no obligation to enroll</p>
-            </div>
-
-            <div class="hero__numbers">
-              <div>
+            <div class="hero__offer" aria-label="Program pricing and maximum benefit">
+              <div class="hero__offer-block">
+                <span>FROM</span>
                 <strong>{price(cheapest.priceMonthly)}</strong>
-                <span>starting monthly membership</span>
+                <small>/ month</small>
               </div>
-              <div>
-                <strong>Up to {money(largest.totalLimit)}</strong>
-                <span>maximum total job-loss benefit</span>
+              <div class="hero__offer-rule" aria-hidden="true"></div>
+              <div class="hero__offer-block hero__offer-block--right">
+                <span>UP TO</span>
+                <strong>{money(largest.totalLimit)}</strong>
+                <small>total benefit</small>
               </div>
+            </div>
+
+            <div class="hero__cta-row">
+              <a class="primary-cta" href="#coverage-check">
+                Calculate my coverage gap <span aria-hidden="true">→</span>
+              </a>
+              <span class="hero__microcopy">Four short questions. A personalized number. No generic quote.</span>
+            </div>
+
+            <div class="hero__proofline">
+              <span>Fixed cash benefit</span>
+              <span>{T.installments} payments</span>
+              <span>Paid to you</span>
             </div>
           </div>
 
-          <div class="hero__art" aria-hidden="true">
-            <div class="hero__art-top">
-              <span>THE GAP</span>
-              <span>01 / 03</span>
-            </div>
-            <div class="hero__art-main">
-              <div class="art-paycheck">
-                <small>PAYCHECK</small>
-                <strong>STOPPED</strong>
+          <div class="hero__visual" aria-hidden="true">
+            <div class="visual-frame">
+              <div class="visual-frame__top">
+                <span>WHEN INCOME STOPS</span>
+                <span>01</span>
               </div>
-              <div class="art-gap"></div>
-              <div class="art-cover">
-                <small>PROTECTION</small>
-                <strong>STILL ON</strong>
+
+              <div class="visual-stack">
+                <div class="visual-row visual-row--paycheck">
+                  <span>PAYCHECK</span>
+                  <strong>STOP</strong>
+                </div>
+                <div class="visual-gap">
+                  <span>THE GAP</span>
+                  <div class="visual-gap__line"></div>
+                </div>
+                <div class="visual-row visual-row--cover">
+                  <span>PROTECTION</span>
+                  <strong>CONTINUES</strong>
+                </div>
               </div>
-            </div>
-            <div class="hero__art-bottom">
-              <span>STATE BENEFIT</span>
-              <span>+ MY INCOME SECURE</span>
+
+              <div class="visual-frame__bottom">
+                <span>STATE BENEFIT</span>
+                <span>+ MY INCOME SECURE</span>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section class="proof-strip" id="how-it-works">
-        <div class="proof-strip__inner">
-          <div><span>01</span><strong>Know your gap</strong><p>We use your state's benefit formula and your real monthly costs.</p></div>
-          <div><span>02</span><strong>See one fit</strong><p>Your result produces one recommended protection amount — not a wall of options.</p></div>
-          <div><span>03</span><strong>Decide with the facts</strong><p>Pricing, eligibility, timing and cancellation are shown before enrollment.</p></div>
-        </div>
-      </section>
-
-      <section class="statement">
-        <div class="statement__inner">
-          <p class="section-label">The idea</p>
-          <div class="statement__quote">A job loss can turn a normal month into a math problem.</div>
-          <div class="statement__copy">
-            <p>State unemployment can replace part of a paycheck. Your mortgage, rent, car payment, groceries and utilities still arrive on their normal schedule.</p>
-            <p>My Income Secure is designed to sit in that gap with a fixed benefit that is sized by the membership tier you select.</p>
+      <section class="bridge">
+        <div class="bridge__inner">
+          <div class="bridge__lead">
+            <span class="section-tag">The problem</span>
+            <h2>Most people don't know their real number until they have to live through it.</h2>
+          </div>
+          <div class="bridge__body">
+            <p>State unemployment may replace part of your paycheck. Your housing, car, food, utilities and other monthly costs do not pause.</p>
+            <p>So don't guess. Run the numbers using your state, your income and your actual monthly expenses.</p>
           </div>
         </div>
       </section>
 
-      <section class="coverage-intro">
-        <div class="coverage-intro__inner">
-          <div>
-            <p class="section-label">Your number, not a generic example</p>
-            <h2>Let's find out what the gap could look like for you.</h2>
+      <section class="coverage-launch" id="coverage-check">
+        <div class="coverage-launch__inner">
+          <div class="coverage-launch__heading">
+            <span class="section-tag">Your personalized number</span>
+            <h2>Let's calculate the gap.</h2>
+            <p>We use the existing state-benefit formulas, your income and the costs you enter. Then we show you one recommendation based on the result.</p>
           </div>
-          <p>Choose your state, tell us roughly what you earn and spend each month, then confirm the program's eligibility statements. The calculation uses the site's existing state-benefit formulas and recommends the cheapest tier whose monthly installment can cover the calculated shortfall.</p>
+          <div class="coverage-launch__steps" aria-label="Coverage check steps">
+            <span><b>01</b> State</span>
+            <span><b>02</b> Income</span>
+            <span><b>03</b> Expenses</span>
+            <span><b>04</b> Eligibility</span>
+          </div>
         </div>
       </section>
 
-      <CoverageFlow />
+      <div class="coverage-shell">
+        <CoverageFlow />
+      </div>
+
+      <section class="decision" aria-label="How the recommendation works">
+        <div class="decision__inner">
+          <div class="decision__intro">
+            <span class="section-tag">After your result</span>
+            <h2>No plan maze. One answer built from your number.</h2>
+          </div>
+          <div class="decision__steps">
+            <div class="decision-step">
+              <span>01</span>
+              <strong>Your state benefit</strong>
+              <p>Your estimated unemployment benefit gives us the starting point.</p>
+            </div>
+            <div class="decision-step">
+              <span>02</span>
+              <strong>Your monthly gap</strong>
+              <p>Your expenses show what is still left to cover each month.</p>
+            </div>
+            <div class="decision-step">
+              <span>03</span>
+              <strong>Your recommendation</strong>
+              <p>The system recommends the least-expensive protection tier that can close the calculated shortfall.</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section class="facts">
         <div class="facts__inner">
           <div class="facts__heading">
-            <p class="section-label">What you should know</p>
-            <h2>Important details, without the sales fog.</h2>
+            <span class="section-tag">Know what you're buying</span>
+            <h2>Simple rules. Clear numbers. Nothing important hidden.</h2>
           </div>
-          <div class="facts__list">
-            <article><span>Benefit</span><strong>Fixed total, paid in {T.installments}</strong><p>Each income-protection tier pays its total in {T.installments} installments, {T.installmentIntervalDays} days apart.</p></article>
-            <article><span>Timing</span><strong>Set it up before the loss</strong><p>{URGENCY}</p></article>
-            <article><span>Eligibility</span><strong>Visible before enrollment</strong><p>The enrollment attestations are shown in the coverage check before you move toward checkout.</p></article>
-            <article><span>State filing</span><strong>Still required</strong><p>{STATE_FILING_REQUIREMENT}</p></article>
+          <div class="facts__grid">
+            <article>
+              <span>PAYMENT</span>
+              <strong>{T.installments} installments</strong>
+              <p>A qualifying claim is paid in {T.installments} installments, {T.installmentIntervalDays} days apart.</p>
+            </article>
+            <article>
+              <span>TIMING</span>
+              <strong>Set it up before the loss</strong>
+              <p>{URGENCY}</p>
+            </article>
+            <article>
+              <span>REFUND</span>
+              <strong>{T.refundWindowHours}-hour window</strong>
+              <p>A full refund is available within the stated window when no benefits have been used.</p>
+            </article>
+            <article>
+              <span>STATE FILING</span>
+              <strong>Still required</strong>
+              <p>{STATE_FILING_REQUIREMENT}</p>
+            </article>
           </div>
         </div>
       </section>
 
       <section class="eligibility">
         <div class="eligibility__inner">
-          <div class="eligibility__intro">
-            <p class="section-label">Before you continue</p>
-            <h2>The rules are part of the product.</h2>
-            <p>These are the same attestations used by the enrollment flow. They are here so nothing important is hidden behind a checkout button.</p>
+          <div class="eligibility__heading">
+            <span class="section-tag">Before enrollment</span>
+            <h2>See the rules before you reach the decision.</h2>
+            <p>These are the same attestations used in the guided flow.</p>
           </div>
           <div class="eligibility__list">
             {ELIGIBILITY_CRITERIA.map((criterion, i) => (
               <div class="eligibility__item">
-                <span>{String(i + 1).padStart(2, '0')}</span>
-                <div><strong>{criterion.label}</strong>{criterion.detail && <p>{criterion.detail}</p>}</div>
+                <span class="eligibility__num">{String(i + 1).padStart(2, '0')}</span>
+                <div>
+                  <strong>{criterion.label}</strong>
+                  {criterion.detail && <p>{criterion.detail}</p>}
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section class="faq">
-        <div class="faq__inner">
-          <div class="faq__heading">
-            <p class="section-label">Questions people ask</p>
-            <h2>Read the fine print before the fine print.</h2>
+      <section class="faq-section">
+        <div class="faq-section__inner">
+          <div class="faq-section__heading">
+            <span class="section-tag">The questions that matter</span>
+            <h2>Read this before you decide.</h2>
           </div>
-          <div class="faq__wrap"><Faq items={faqs} /></div>
+          <div class="faq-section__wrap">
+            <Faq items={faqs} />
+          </div>
         </div>
       </section>
 
-      <section class="closing">
-        <div class="closing__inner">
-          <p class="section-label">Start with the number</p>
-          <h2>Don't guess what a job loss would do to your budget.</h2>
-          <p>Run the coverage check. See the state benefit estimate. See the gap. Then see the one protection amount the math points to.</p>
-          <a class="cta cta--light" href="#coverage-check">Calculate my coverage gap <span aria-hidden="true">→</span></a>
+      <section class="close">
+        <div class="close__inner">
+          <span class="section-tag">Start with your number</span>
+          <h2>Know your gap before you need to close it.</h2>
+          <p>Run the coverage check and see what your own state benefit and monthly costs look like together.</p>
+          <a class="primary-cta primary-cta--light" href="#coverage-check">Calculate my coverage gap <span aria-hidden="true">→</span></a>
         </div>
       </section>
     </main>
@@ -194,160 +263,1000 @@ const faqs = [
 </Base>
 
 <style>
-  .mis-home {
-    --m-black: #10100f;
-    --m-cream: #f4f0e7;
-    --m-paper: #fbfaf6;
-    --m-ink: #171715;
-    --m-muted: #67665f;
-    --m-line: #d7d2c7;
-    --m-red: #d65a3f;
-    --m-red-deep: #b8442e;
-    --m-acid: #d9f26b;
-    --m-blue: #1747d1;
-    background: var(--m-paper);
-    color: var(--m-ink);
-    font-family: Arial, Helvetica, sans-serif;
+  .income-secure-home {
+    --black: #11110f;
+    --ink: #1b1a17;
+    --muted: #69665e;
+    --paper: #fbf8f1;
+    --paper-2: #f1ede3;
+    --line: #d7d1c6;
+    --red: #c94d39;
+    --red-dark: #a73d2d;
+    --blue: #2351c8;
+    --acid: #d8ef68;
+    --white: #ffffff;
+    background: var(--paper);
+    color: var(--ink);
+    overflow-x: clip;
   }
 
-  .mis-home * { box-sizing: border-box; }
-  .mis-home a { color: inherit; }
-  .mis-home .topbar { position: relative; background: var(--m-paper); border-bottom: 1px solid var(--m-line); }
-  .mis-home .topbar__inner { width: min(1320px, calc(100% - 40px)); margin: auto; min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-  .mis-home .topbar :global(.wm) { font-size: 1.15rem; }
-  .mis-home .topbar__right { display: flex; align-items: center; gap: 28px; font-size: 14px; font-weight: 700; }
-  .mis-home .topbar__right a { text-decoration: none; }
-  .mis-home .topbar__right a:last-child { color: var(--m-blue); }
-
-  .mis-home .hero { background: var(--m-cream); }
-  .mis-home .hero__grid { width: min(1320px, calc(100% - 40px)); margin: auto; min-height: 760px; display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(420px, .92fr); align-items: stretch; }
-  .mis-home .hero__copy { padding: clamp(60px, 8vw, 115px) 0 clamp(60px, 7vw, 100px); max-width: 800px; display: flex; flex-direction: column; justify-content: center; }
-  .mis-home .hero__kicker { display: flex; align-items: center; gap: 10px; font-size: 12px; line-height: 1.2; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; color: var(--m-red-deep); margin: 0 0 28px; }
-  .mis-home .hero__kicker span { width: 10px; height: 10px; background: var(--m-red); display: block; }
-  .mis-home .hero h1 { font-family: Georgia, 'Times New Roman', serif; color: var(--m-black); font-size: clamp(58px, 7vw, 116px); line-height: .9; letter-spacing: -.055em; max-width: 8ch; }
-  .mis-home .hero__dek { margin-top: 30px; font-size: clamp(18px, 1.55vw, 23px); line-height: 1.45; max-width: 650px; color: #3c3b37; }
-  .mis-home .hero__actions { margin-top: 34px; display: flex; align-items: center; flex-wrap: wrap; gap: 16px 22px; }
-  .mis-home .hero__actions > p { font-size: 13px; color: var(--m-muted); }
-  .mis-home .cta { min-height: 56px; display: inline-flex; align-items: center; justify-content: center; gap: 14px; padding: 0 25px; text-decoration: none; font-size: 16px; font-weight: 800; border: 1px solid transparent; }
-  .mis-home .cta--solid { background: var(--m-black); color: white; }
-  .mis-home .cta--solid:hover { background: #2a2925; }
-  .mis-home .hero__numbers { margin-top: 64px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 680px; border-top: 1px solid #c9c3b6; }
-  .mis-home .hero__numbers div { padding: 20px 25px 0 0; border-right: 1px solid #c9c3b6; }
-  .mis-home .hero__numbers div + div { padding-left: 25px; border-right: 0; }
-  .mis-home .hero__numbers strong { display: block; font-size: 30px; line-height: 1; font-weight: 900; letter-spacing: -.04em; }
-  .mis-home .hero__numbers span { display: block; margin-top: 9px; font-size: 12px; line-height: 1.4; color: var(--m-muted); text-transform: uppercase; letter-spacing: .06em; }
-
-  .mis-home .hero__art { position: relative; margin: 28px 0 28px 40px; background: var(--m-black); color: white; overflow: hidden; display: grid; grid-template-rows: auto 1fr auto; padding: 25px; }
-  .mis-home .hero__art::before { content: ''; position: absolute; width: 340px; height: 340px; right: -120px; top: 180px; border: 1px solid rgba(255,255,255,.13); border-radius: 50%; box-shadow: 0 0 0 60px rgba(255,255,255,.035), 0 0 0 120px rgba(255,255,255,.025); }
-  .mis-home .hero__art::after { content: ''; position: absolute; left: 25px; right: 25px; top: 25px; bottom: 25px; border: 1px solid rgba(255,255,255,.09); pointer-events: none; }
-  .mis-home .hero__art-top, .mis-home .hero__art-bottom { display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .16em; color: #b6b4ad; }
-  .mis-home .hero__art-main { align-self: center; position: relative; z-index: 1; display: grid; gap: 14px; padding: 50px 25px; }
-  .mis-home .art-paycheck, .mis-home .art-cover { padding: 24px; border: 1px solid rgba(255,255,255,.18); }
-  .mis-home .art-paycheck { background: rgba(255,255,255,.055); }
-  .mis-home .art-cover { background: var(--m-acid); color: var(--m-black); border-color: var(--m-acid); transform: translateX(46px); }
-  .mis-home .art-paycheck small, .mis-home .art-cover small { display: block; font-size: 10px; font-weight: 900; letter-spacing: .14em; }
-  .mis-home .art-paycheck strong, .mis-home .art-cover strong { display: block; margin-top: 8px; font-size: clamp(30px, 3vw, 52px); line-height: .9; letter-spacing: -.05em; }
-  .mis-home .art-gap { height: 50px; width: 1px; background: var(--m-red); margin-left: 22px; position: relative; }
-  .mis-home .art-gap::after { content: 'THE GAP'; position: absolute; left: 12px; top: 17px; font-size: 10px; letter-spacing: .14em; color: #ff876f; white-space: nowrap; }
-
-  .mis-home .proof-strip { background: var(--m-red); color: white; }
-  .mis-home .proof-strip__inner { width: min(1320px, calc(100% - 40px)); margin: auto; display: grid; grid-template-columns: repeat(3, 1fr); }
-  .mis-home .proof-strip__inner > div { min-height: 210px; padding: 32px 30px 30px 0; }
-  .mis-home .proof-strip__inner > div + div { border-left: 1px solid rgba(255,255,255,.25); padding-left: 30px; }
-  .mis-home .proof-strip span { font-size: 11px; font-weight: 900; letter-spacing: .16em; opacity: .7; }
-  .mis-home .proof-strip strong { display: block; margin-top: 44px; font-size: 25px; letter-spacing: -.03em; }
-  .mis-home .proof-strip p { margin-top: 8px; max-width: 320px; font-size: 14px; line-height: 1.5; color: #ffe8e1; }
-
-  .mis-home .statement { background: var(--m-paper); }
-  .mis-home .statement__inner { width: min(1320px, calc(100% - 40px)); margin: auto; padding: 120px 0 125px; display: grid; grid-template-columns: .7fr 1.5fr 1fr; gap: 50px; }
-  .mis-home .section-label { margin: 0; font-size: 11px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; color: var(--m-red-deep); }
-  .mis-home .statement__quote { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(40px, 5vw, 78px); line-height: .98; letter-spacing: -.05em; max-width: 12ch; }
-  .mis-home .statement__copy { padding-top: 8px; display: grid; gap: 25px; font-size: 17px; line-height: 1.6; color: var(--m-muted); max-width: 38ch; }
-
-  .mis-home .coverage-intro { background: var(--m-blue); color: white; }
-  .mis-home .coverage-intro__inner { width: min(1320px, calc(100% - 40px)); margin: auto; padding: 105px 0 95px; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: end; }
-  .mis-home .coverage-intro .section-label { color: var(--m-acid); }
-  .mis-home .coverage-intro h2 { margin-top: 16px; color: white; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(44px, 5vw, 74px); line-height: .97; letter-spacing: -.05em; max-width: 12ch; }
-  .mis-home .coverage-intro__inner > p { font-size: 18px; line-height: 1.6; color: #dbe4ff; max-width: 48ch; }
-
-  .mis-home :global(#coverage-check) { background: white; border: 0; padding-block: 100px; }
-  .mis-home :global(#coverage-check .coverage__intro), .mis-home :global(#coverage-check .coverage__shell), .mis-home :global(#coverage-check .shell) { width: min(1100px, calc(100% - 40px)); max-width: none; }
-  .mis-home :global(#coverage-check .coverage__intro) { display: none; }
-  .mis-home :global(#coverage-check .coverage__shell) { margin-top: 0; }
-  .mis-home :global(#coverage-check .progress) { max-width: none; }
-  .mis-home :global(#coverage-check .progress__fill) { background: var(--m-blue); }
-  .mis-home :global(#coverage-check .fstep__q) { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(34px, 4vw, 55px); letter-spacing: -.04em; }
-  .mis-home :global(#coverage-check .btn--primary) { background: var(--m-black); border-color: var(--m-black); border-radius: 0; }
-  .mis-home :global(#coverage-check .btn--secondary) { border-radius: 0; }
-  .mis-home :global(#coverage-check select), .mis-home :global(#coverage-check input[type='number']) { border-radius: 0; border-color: #a6a39a; }
-  .mis-home :global(#coverage-check .flow__result) { background: var(--m-black); margin-top: 70px; }
-  .mis-home :global(#coverage-check .flow__result .result__head h2) { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(40px, 5vw, 66px); }
-  .mis-home :global(#coverage-check .flow__plan :global(.plan--recommended)) { border-radius: 0; border: 2px solid var(--m-black); box-shadow: none; }
-
-  .mis-home .facts { background: var(--m-cream); }
-  .mis-home .facts__inner { width: min(1320px, calc(100% - 40px)); margin: auto; padding: 120px 0; display: grid; grid-template-columns: .65fr 1.35fr; gap: 90px; }
-  .mis-home .facts h2, .mis-home .eligibility h2, .mis-home .faq h2 { margin-top: 16px; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(44px, 5vw, 72px); line-height: .97; letter-spacing: -.05em; max-width: 11ch; }
-  .mis-home .facts__list { border-top: 1px solid #bbb5aa; }
-  .mis-home .facts__list article { display: grid; grid-template-columns: 120px 1fr; gap: 20px; padding: 30px 0; border-bottom: 1px solid #bbb5aa; }
-  .mis-home .facts__list span { font-size: 11px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; color: var(--m-red-deep); }
-  .mis-home .facts__list strong { font-size: 22px; letter-spacing: -.025em; }
-  .mis-home .facts__list p { grid-column: 2; margin-top: -7px; color: var(--m-muted); max-width: 52ch; line-height: 1.5; }
-
-  .mis-home .eligibility { background: var(--m-paper); }
-  .mis-home .eligibility__inner { width: min(1320px, calc(100% - 40px)); margin: auto; padding: 120px 0; display: grid; grid-template-columns: .8fr 1.2fr; gap: 100px; }
-  .mis-home .eligibility__intro > p:last-child { margin-top: 25px; color: var(--m-muted); line-height: 1.6; max-width: 38ch; }
-  .mis-home .eligibility__list { border-top: 2px solid var(--m-black); }
-  .mis-home .eligibility__item { display: grid; grid-template-columns: 55px 1fr; gap: 22px; padding: 24px 0; border-bottom: 1px solid var(--m-line); }
-  .mis-home .eligibility__item > span { font-size: 11px; font-weight: 900; letter-spacing: .12em; color: var(--m-red-deep); }
-  .mis-home .eligibility__item strong { font-size: 18px; line-height: 1.4; }
-  .mis-home .eligibility__item p { margin-top: 5px; color: var(--m-muted); font-size: 14px; line-height: 1.5; }
-
-  .mis-home .faq { background: #ece8df; }
-  .mis-home .faq__inner { width: min(1000px, calc(100% - 40px)); margin: auto; padding: 120px 0; }
-  .mis-home .faq__heading { max-width: 600px; }
-  .mis-home .faq__wrap { margin-top: 55px; }
-  .mis-home :global(.faq-section) { background: transparent; }
-
-  .mis-home .closing { background: var(--m-black); color: white; }
-  .mis-home .closing__inner { width: min(1320px, calc(100% - 40px)); margin: auto; padding: 130px 0 140px; display: grid; grid-template-columns: 1fr .7fr; gap: 80px; align-items: end; }
-  .mis-home .closing .section-label { color: var(--m-acid); }
-  .mis-home .closing h2 { margin-top: 18px; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(58px, 7vw, 102px); line-height: .91; letter-spacing: -.06em; max-width: 10ch; }
-  .mis-home .closing__inner > p:not(.section-label) { grid-column: 2; font-size: 18px; line-height: 1.55; color: #c6c5bf; max-width: 38ch; }
-  .mis-home .cta--light { background: var(--m-acid); color: var(--m-black); margin-top: 25px; grid-column: 2; justify-self: start; }
-
-  @media (max-width: 940px) {
-    .mis-home .hero__grid { grid-template-columns: 1fr; }
-    .mis-home .hero__copy { padding-bottom: 55px; }
-    .mis-home .hero__art { margin: 0 0 40px; min-height: 520px; }
-    .mis-home .statement__inner, .mis-home .facts__inner, .mis-home .eligibility__inner, .mis-home .coverage-intro__inner, .mis-home .closing__inner { grid-template-columns: 1fr; gap: 45px; }
-    .mis-home .statement__quote, .mis-home .facts h2, .mis-home .eligibility h2, .mis-home .faq h2 { max-width: 15ch; }
-    .mis-home .closing__inner > p:not(.section-label), .mis-home .cta--light { grid-column: auto; }
-    .mis-home .closing__inner { align-items: start; }
+  .income-secure-home,
+  .income-secure-home * {
+    box-sizing: border-box;
   }
 
-  @media (max-width: 700px) {
-    .mis-home .topbar__inner, .mis-home .hero__grid, .mis-home .proof-strip__inner, .mis-home .statement__inner, .mis-home .coverage-intro__inner, .mis-home .facts__inner, .mis-home .eligibility__inner, .mis-home .closing__inner, .mis-home .faq__inner { width: min(100% - 28px, 1320px); }
-    .mis-home .topbar__right a:first-child { display: none; }
-    .mis-home .topbar__inner { min-height: 66px; }
-    .mis-home .hero__grid { min-height: 0; }
-    .mis-home .hero__copy { padding: 55px 0 35px; }
-    .mis-home .hero h1 { font-size: clamp(50px, 16vw, 78px); }
-    .mis-home .hero__dek { font-size: 18px; }
-    .mis-home .hero__numbers { grid-template-columns: 1fr; }
-    .mis-home .hero__numbers div, .mis-home .hero__numbers div + div { padding: 18px 0; border-right: 0; border-bottom: 1px solid #c9c3b6; }
-    .mis-home .hero__numbers div:last-child { border-bottom: 0; }
-    .mis-home .hero__art { min-height: 410px; padding: 18px; }
-    .mis-home .hero__art-main { padding: 30px 12px; }
-    .mis-home .art-cover { transform: none; }
-    .mis-home .proof-strip__inner { grid-template-columns: 1fr; }
-    .mis-home .proof-strip__inner > div { min-height: auto; padding: 25px 0; border-top: 1px solid rgba(255,255,255,.22); }
-    .mis-home .proof-strip__inner > div + div { border-left: 0; padding-left: 0; }
-    .mis-home .proof-strip__inner > div:first-child { border-top: 0; }
-    .mis-home .statement__inner, .mis-home .facts__inner, .mis-home .eligibility__inner, .mis-home .faq__inner { padding: 78px 0; }
-    .mis-home .coverage-intro__inner { padding: 70px 0 65px; }
-    .mis-home :global(#coverage-check) { padding-block: 65px; }
-    .mis-home .facts__list article { grid-template-columns: 1fr; gap: 10px; }
-    .mis-home .facts__list p { grid-column: auto; margin-top: 0; }
-    .mis-home .closing__inner { padding: 85px 0 90px; }
+  .income-secure-home a {
+    color: inherit;
+  }
+
+  .site-header {
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .site-header__inner {
+    width: min(1360px, calc(100% - 44px));
+    min-height: 76px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 10px;
+    text-decoration: none;
+    letter-spacing: -.03em;
+  }
+
+  .brand__my {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .12em;
+    color: var(--red);
+  }
+
+  .brand__name {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--black);
+  }
+
+  .header-cta {
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+    color: var(--blue) !important;
+  }
+
+  .hero {
+    background: var(--paper-2);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .hero__inner {
+    width: min(1360px, calc(100% - 44px));
+    min-height: min(800px, calc(100vh - 77px));
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1.06fr) minmax(400px, .94fr);
+    gap: clamp(40px, 6vw, 100px);
+    align-items: stretch;
+  }
+
+  .hero__copy {
+    align-self: center;
+    padding: 80px 0;
+  }
+
+  .eyebrow,
+  .section-tag {
+    display: inline-block;
+    margin: 0 0 20px;
+    font-size: 11px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--red-dark);
+  }
+
+  .hero h1 {
+    margin: 0;
+    max-width: 9ch;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(62px, 7.3vw, 118px);
+    line-height: .88;
+    letter-spacing: -.06em;
+    color: var(--black);
+    font-weight: 700;
+  }
+
+  .hero__lead {
+    max-width: 700px;
+    margin-top: 32px;
+    font-size: clamp(18px, 1.35vw, 22px);
+    line-height: 1.48;
+    color: #403f3a;
+  }
+
+  .hero__offer {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 22px;
+    width: min(620px, 100%);
+    margin-top: 34px;
+    padding: 20px 22px;
+    background: var(--black);
+    color: var(--white);
+  }
+
+  .hero__offer-block {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 8px;
+  }
+
+  .hero__offer-block span {
+    flex: 0 0 100%;
+    margin-bottom: 4px;
+    font-size: 10px;
+    letter-spacing: .16em;
+    font-weight: 800;
+    color: #a9a69d;
+  }
+
+  .hero__offer-block strong {
+    font-size: 32px;
+    line-height: 1;
+    letter-spacing: -.035em;
+  }
+
+  .hero__offer-block small {
+    font-size: 12px;
+    color: #c3c0b8;
+  }
+
+  .hero__offer-block--right {
+    justify-content: flex-end;
+    text-align: right;
+  }
+
+  .hero__offer-rule {
+    width: 1px;
+    height: 54px;
+    background: rgba(255,255,255,.18);
+  }
+
+  .hero__cta-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 18px 20px;
+    margin-top: 26px;
+  }
+
+  .primary-cta {
+    min-height: 58px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 0 28px;
+    background: var(--red);
+    color: white !important;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 900;
+    border: 1px solid var(--red);
+    transition: transform .16s ease, background-color .16s ease;
+  }
+
+  .primary-cta:hover {
+    background: var(--red-dark);
+    transform: translateY(-1px);
+  }
+
+  .hero__microcopy {
+    max-width: 280px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .hero__proofline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    margin-top: 26px;
+    font-size: 12px;
+    font-weight: 800;
+    color: #45433e;
+  }
+
+  .hero__proofline span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .hero__proofline span::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    background: var(--red);
+    flex: 0 0 auto;
+  }
+
+  .hero__visual {
+    padding: 28px 0 28px 0;
+  }
+
+  .visual-frame {
+    position: relative;
+    height: 100%;
+    min-height: 620px;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    background: var(--black);
+    color: var(--white);
+    padding: 28px;
+    overflow: hidden;
+  }
+
+  .visual-frame::before {
+    content: '';
+    position: absolute;
+    width: 520px;
+    height: 520px;
+    right: -230px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 50%;
+    box-shadow: 0 0 0 80px rgba(255,255,255,.025), 0 0 0 160px rgba(255,255,255,.018);
+  }
+
+  .visual-frame__top,
+  .visual-frame__bottom {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .15em;
+    color: #aaa69d;
+  }
+
+  .visual-stack {
+    position: relative;
+    z-index: 1;
+    align-self: center;
+    display: grid;
+    gap: 16px;
+    padding: 30px 0;
+  }
+
+  .visual-row {
+    border: 1px solid rgba(255,255,255,.18);
+    padding: 28px;
+  }
+
+  .visual-row span {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .16em;
+    color: #aaa69d;
+  }
+
+  .visual-row strong {
+    display: block;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(42px, 4vw, 64px);
+    line-height: .9;
+    letter-spacing: -.05em;
+  }
+
+  .visual-row--paycheck strong {
+    color: var(--acid);
+  }
+
+  .visual-row--cover {
+    margin-left: 14%;
+    background: var(--red);
+    border-color: var(--red);
+  }
+
+  .visual-row--cover span {
+    color: #f8d8cf;
+  }
+
+  .visual-gap {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 2px 20px;
+    color: #cac6bc;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .17em;
+  }
+
+  .visual-gap__line {
+    height: 1px;
+    flex: 1;
+    background: linear-gradient(90deg, rgba(216,239,104,.85), rgba(216,239,104,.1), rgba(255,255,255,.25));
+  }
+
+  .bridge {
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .bridge__inner {
+    width: min(1200px, calc(100% - 44px));
+    margin: 0 auto;
+    padding: 100px 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(280px, .7fr);
+    gap: clamp(50px, 10vw, 150px);
+    align-items: start;
+  }
+
+  .bridge h2,
+  .coverage-launch h2,
+  .decision h2,
+  .facts h2,
+  .eligibility h2,
+  .faq-section h2,
+  .close h2 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 700;
+    letter-spacing: -.045em;
+    line-height: .98;
+  }
+
+  .bridge h2 {
+    margin: 0;
+    max-width: 16ch;
+    font-size: clamp(42px, 5vw, 72px);
+  }
+
+  .bridge__body {
+    display: grid;
+    gap: 22px;
+    padding-top: 12px;
+  }
+
+  .bridge__body p {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.55;
+    color: #4d4a43;
+  }
+
+  .coverage-launch {
+    background: var(--black);
+    color: white;
+    border-bottom: 1px solid #2a2926;
+  }
+
+  .coverage-launch__inner {
+    width: min(1200px, calc(100% - 44px));
+    margin: 0 auto;
+    padding: 92px 0 56px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, .65fr);
+    gap: 50px;
+    align-items: end;
+  }
+
+  .coverage-launch__heading h2 {
+    margin: 0;
+    max-width: 9ch;
+    font-size: clamp(52px, 5.8vw, 86px);
+    color: white;
+  }
+
+  .coverage-launch__heading p {
+    margin: 22px 0 0;
+    max-width: 58ch;
+    font-size: 17px;
+    line-height: 1.55;
+    color: #bcb8af;
+  }
+
+  .coverage-launch__steps {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid rgba(255,255,255,.16);
+    border-left: 1px solid rgba(255,255,255,.16);
+  }
+
+  .coverage-launch__steps span {
+    min-height: 70px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 14px;
+    border-right: 1px solid rgba(255,255,255,.16);
+    border-bottom: 1px solid rgba(255,255,255,.16);
+    font-size: 12px;
+    font-weight: 800;
+    color: #dedad1;
+  }
+
+  .coverage-launch__steps b {
+    color: var(--acid);
+    font-size: 11px;
+    letter-spacing: .06em;
+  }
+
+  .coverage-shell {
+    background: var(--black);
+    padding-bottom: 100px;
+  }
+
+  .coverage-shell :global(.coverage) {
+    width: min(1200px, calc(100% - 44px));
+    margin: 0 auto;
+    background: #f4f1ea;
+    border: 0;
+    padding: 62px clamp(24px, 4vw, 64px);
+  }
+
+  .coverage-shell :global(.coverage__intro) {
+    display: none;
+  }
+
+  .coverage-shell :global(.coverage__shell) {
+    margin-top: 0;
+    padding: 0;
+  }
+
+  .coverage-shell :global(.progress) {
+    max-width: none;
+    margin-bottom: 34px;
+  }
+
+  .coverage-shell :global(.progress__label) {
+    color: #5a574f;
+  }
+
+  .coverage-shell :global(.progress__name) {
+    color: var(--red-dark);
+  }
+
+  .coverage-shell :global(.fstep) {
+    max-width: 760px;
+  }
+
+  .coverage-shell :global(.fstep__q) {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(34px, 4vw, 56px);
+    line-height: .98;
+    letter-spacing: -.035em;
+    color: var(--black);
+  }
+
+  .coverage-shell :global(.fstep__why) {
+    font-size: 15px;
+    line-height: 1.5;
+    color: #6b675f;
+  }
+
+  .coverage-shell :global(select),
+  .coverage-shell :global(input[type='number']) {
+    background: #fff;
+    border-color: #c7c1b7;
+    border-radius: 0;
+    min-height: 58px;
+  }
+
+  .coverage-shell :global(label) {
+    color: var(--black);
+  }
+
+  .coverage-shell :global(.input-money > span) {
+    border-radius: 0;
+    background: #ece7dc;
+    border-color: #c7c1b7;
+  }
+
+  .coverage-shell :global(.btn) {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .coverage-shell :global(.btn--primary) {
+    background: var(--red);
+    border-color: var(--red);
+  }
+
+  .coverage-shell :global(.btn--primary:hover) {
+    background: var(--red-dark);
+    border-color: var(--red-dark);
+  }
+
+  .coverage-shell :global(.btn--secondary) {
+    background: transparent;
+    border-color: #bfb8ac;
+  }
+
+  .coverage-shell :global(.flow__actions) {
+    gap: 12px;
+  }
+
+  .coverage-shell :global(.check) {
+    border-radius: 0;
+    background: white;
+    border-color: #d0c9be;
+  }
+
+  .coverage-shell :global(.check:has(input:checked)) {
+    background: #f5eadf;
+    border-color: var(--red);
+  }
+
+  .coverage-shell :global(.flow__result) {
+    width: min(1200px, calc(100% - 44px));
+    margin: 0 auto;
+    padding: 0;
+    background: var(--black);
+  }
+
+  .coverage-shell :global(.flow__result > .shell) {
+    padding: 78px clamp(24px, 4vw, 64px);
+  }
+
+  .coverage-shell :global(.result__head h2) {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(48px, 5vw, 76px);
+    letter-spacing: -.045em;
+  }
+
+  .coverage-shell :global(.result__fact dt) {
+    color: #8e8a80;
+  }
+
+  .coverage-shell :global(.result__fact dd) {
+    color: white;
+  }
+
+  .coverage-shell :global(.result__offer-label) {
+    color: #e5c0b8;
+  }
+
+  .coverage-shell :global(.plan) {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .coverage-shell :global(.plan--recommended) {
+    border-radius: 0;
+    border: 2px solid var(--red);
+    box-shadow: none;
+  }
+
+  .coverage-shell :global(.plan__flag) {
+    border-radius: 0;
+    background: var(--red);
+  }
+
+  .coverage-shell :global(.flow__alt) {
+    margin-bottom: 0;
+  }
+
+  .decision {
+    background: var(--paper-2);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .decision__inner {
+    width: min(1200px, calc(100% - 44px));
+    margin: 0 auto;
+    padding: 100px 0;
+    display: grid;
+    grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
+    gap: 80px;
+  }
+
+  .decision h2 {
+    margin: 0;
+    max-width: 12ch;
+    font-size: clamp(44px, 5vw, 72px);
+  }
+
+  .decision__steps {
+    display: grid;
+    gap: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .decision-step {
+    display: grid;
+    grid-template-columns: 46px minmax(0, 1fr);
+    gap: 18px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .decision-step > span {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .1em;
+    color: var(--red);
+  }
+
+  .decision-step strong {
+    display: block;
+    font-size: 18px;
+  }
+
+  .decision-step p {
+    grid-column: 2;
+    margin: 6px 0 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #625f58;
+  }
+
+  .facts {
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .facts__inner {
+    width: min(1200px, calc(100% - 44px));
+    margin: 0 auto;
+    padding: 100px 0;
+  }
+
+  .facts h2 {
+    margin: 0;
+    max-width: 15ch;
+    font-size: clamp(46px, 5vw, 74px);
+  }
+
+  .facts__grid {
+    margin-top: 58px;
+    border-top: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .facts__grid article {
+    min-height: 210px;
+    padding: 26px 28px 26px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .facts__grid article:nth-child(odd) {
+    border-right: 1px solid var(--line);
+    padding-right: 30px;
+  }
+
+  .facts__grid article:nth-child(even) {
+    padding-left: 30px;
+  }
+
+  .facts__grid article span {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .14em;
+    color: var(--red-dark);
+  }
+
+  .facts__grid article strong {
+    display: block;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 28px;
+    line-height: 1;
+    letter-spacing: -.03em;
+  }
+
+  .facts__grid article p {
+    margin: 10px 0 0;
+    max-width: 46ch;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #635f56;
+  }
+
+  .eligibility {
+    background: var(--paper-2);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .eligibility__inner {
+    width: min(1200px, calc(100% - 44px));
+    margin: 0 auto;
+    padding: 100px 0;
+    display: grid;
+    grid-template-columns: .7fr 1.3fr;
+    gap: 90px;
+  }
+
+  .eligibility h2 {
+    margin: 0;
+    max-width: 12ch;
+    font-size: clamp(44px, 4.7vw, 68px);
+  }
+
+  .eligibility__heading > p:last-child {
+    margin: 20px 0 0;
+    max-width: 32ch;
+    color: #666258;
+    line-height: 1.5;
+  }
+
+  .eligibility__list {
+    border-top: 1px solid var(--line);
+  }
+
+  .eligibility__item {
+    display: grid;
+    grid-template-columns: 48px minmax(0,1fr);
+    gap: 18px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .eligibility__num {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .1em;
+    color: var(--red);
+  }
+
+  .eligibility__item strong {
+    display: block;
+    font-size: 17px;
+    line-height: 1.35;
+  }
+
+  .eligibility__item p {
+    margin: 8px 0 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #6a665d;
+  }
+
+  .faq-section {
+    background: var(--paper);
+  }
+
+  .faq-section__inner {
+    width: min(1200px, calc(100% - 44px));
+    margin: 0 auto;
+    padding: 100px 0;
+  }
+
+  .faq-section h2 {
+    margin: 0;
+    max-width: 11ch;
+    font-size: clamp(48px, 5vw, 74px);
+  }
+
+  .faq-section__wrap {
+    margin-top: 54px;
+    max-width: 1000px;
+  }
+
+  .close {
+    background: var(--red);
+    color: white;
+  }
+
+  .close__inner {
+    width: min(1000px, calc(100% - 44px));
+    margin: 0 auto;
+    padding: 110px 0 120px;
+    text-align: center;
+  }
+
+  .close h2 {
+    margin: 0 auto;
+    max-width: 12ch;
+    font-size: clamp(54px, 6.2vw, 88px);
+    color: white;
+  }
+
+  .close__inner > p:not(.section-tag) {
+    max-width: 50ch;
+    margin: 24px auto 0;
+    font-size: 18px;
+    line-height: 1.55;
+    color: #f7ded8;
+  }
+
+  .primary-cta--light {
+    margin-top: 34px;
+    background: white;
+    border-color: white;
+    color: var(--black) !important;
+  }
+
+  .primary-cta--light:hover {
+    background: #f2efe8;
+    border-color: #f2efe8;
+  }
+
+  @media (max-width: 960px) {
+    .hero__inner {
+      grid-template-columns: 1fr;
+      min-height: auto;
+      gap: 0;
+    }
+
+    .hero__copy {
+      padding: 64px 0 46px;
+    }
+
+    .hero__visual {
+      padding: 0 0 30px;
+    }
+
+    .visual-frame {
+      min-height: 470px;
+    }
+
+    .bridge__inner,
+    .coverage-launch__inner,
+    .decision__inner,
+    .eligibility__inner {
+      grid-template-columns: 1fr;
+      gap: 46px;
+    }
+
+    .bridge__inner,
+    .decision__inner,
+    .facts__inner,
+    .eligibility__inner,
+    .faq-section__inner {
+      padding-block: 76px;
+    }
+
+    .coverage-launch__inner {
+      padding-top: 76px;
+    }
+  }
+
+  @media (max-width: 680px) {
+    .site-header__inner,
+    .hero__inner,
+    .bridge__inner,
+    .coverage-launch__inner,
+    .coverage-shell :global(.coverage),
+    .coverage-shell :global(.flow__result),
+    .decision__inner,
+    .facts__inner,
+    .eligibility__inner,
+    .faq-section__inner,
+    .close__inner {
+      width: min(100% - 28px, 1200px);
+    }
+
+    .hero h1 {
+      max-width: 11ch;
+      font-size: clamp(50px, 15vw, 76px);
+    }
+
+    .hero__lead {
+      font-size: 17px;
+    }
+
+    .hero__offer {
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .hero__offer-rule {
+      display: none;
+    }
+
+    .hero__offer-block--right {
+      justify-content: flex-start;
+      text-align: left;
+    }
+
+    .hero__offer-block strong {
+      font-size: 28px;
+    }
+
+    .primary-cta {
+      width: 100%;
+    }
+
+    .hero__microcopy {
+      max-width: none;
+      width: 100%;
+    }
+
+    .hero__proofline {
+      gap: 12px 16px;
+    }
+
+    .visual-frame {
+      min-height: 430px;
+      padding: 20px;
+    }
+
+    .visual-row {
+      padding: 22px;
+    }
+
+    .visual-row strong {
+      font-size: 44px;
+    }
+
+    .visual-row--cover {
+      margin-left: 0;
+    }
+
+    .bridge h2,
+    .coverage-launch h2,
+    .decision h2,
+    .facts h2,
+    .eligibility h2,
+    .faq-section h2,
+    .close h2 {
+      max-width: none;
+    }
+
+    .bridge h2 {
+      font-size: 44px;
+    }
+
+    .coverage-launch__steps {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .coverage-shell {
+      padding-bottom: 58px;
+    }
+
+    .coverage-shell :global(.coverage) {
+      padding: 42px 18px;
+    }
+
+    .coverage-shell :global(.flow__result > .shell) {
+      padding: 50px 18px;
+    }
+
+    .coverage-shell :global(.result__grid) {
+      gap: 40px;
+    }
+
+    .facts__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .facts__grid article,
+    .facts__grid article:nth-child(odd),
+    .facts__grid article:nth-child(even) {
+      border-right: 0;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .faq-section__wrap {
+      margin-top: 40px;
+    }
+
+    .close__inner {
+      padding-block: 84px 92px;
+    }
   }
 </style>
