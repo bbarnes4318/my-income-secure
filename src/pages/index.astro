@@ -1,397 +1,597 @@
 ---
-// The homepage sells first, then guides. The hero establishes what this is,
-// why it matters, and what it costs before anyone is asked a question — the
-// coverage check (CoverageFlow) is a mid-page section, not the opening act.
-// The full plan ladder, the standalone calculator, and the filing guide are
-// untouched and still reachable directly; nothing on this page links to them
-// except the filing guide, which is genuinely relevant reading.
 import Page from '../layouts/Page.astro';
 import CoverageFlow from '../components/CoverageFlow.astro';
 import Faq from '../components/Faq.astro';
 import ImageSlot from '../components/ImageSlot.astro';
 import { ROUTES, URGENCY, STATE_FILING_REQUIREMENT } from '../config/site.js';
-import { PROGRAM_TERMS, PLANS } from '../config/plans.js';
+import { ELIGIBILITY_CRITERIA, PROGRAM_TERMS, PLANS } from '../config/plans.js';
 import { money, price } from '../lib/format.js';
 
 const T = PROGRAM_TERMS;
 const cheapest = PLANS[0];
 const largest = PLANS[PLANS.length - 1];
 
-const trustItems = [
+const facts = [
   {
-    label: 'Clear pricing',
-    detail: `Plans start at ${price(cheapest.priceMonthly)}/month. No hidden fees.`,
+    kicker: `${T.installments} payments`,
+    title: `${money(largest.monthlyBenefit)} at a time`,
+    body: `A qualifying claim is paid in ${T.installments} installments, ${T.installmentIntervalDays} days apart.`,
   },
   {
-    label: 'No medical exam',
-    detail: "Enrollment is based on your employment, not your health.",
+    kicker: 'A fixed benefit',
+    title: `Up to ${money(largest.totalLimit)} total`,
+    body: 'Your tier determines the total benefit. It is not an open-ended monthly promise.',
   },
   {
-    label: 'Cancel anytime',
-    detail: `A full refund is available within ${T.refundWindowHours} hours of purchase if no benefits have been used.`,
-  },
-  {
-    label: 'Transparent payout',
-    detail: `Paid in ${T.installments} installments, ${T.installmentIntervalDays} days apart, starting ${T.firstInstallmentDays} days after a qualifying job loss.`,
-  },
-  {
-    label: 'State unemployment, explained plainly',
-    detail: STATE_FILING_REQUIREMENT,
-  },
-  {
-    label: 'Clear eligibility',
-    detail: 'You see exactly what you are attesting to before you enroll — nothing is revealed after the fact.',
+    kicker: 'Before you need it',
+    title: 'Set it up before the job loss',
+    body: URGENCY,
   },
 ];
 
 const faqs = [
   {
-    q: 'How is this different from insurance?',
+    q: 'What exactly am I buying?',
     a:
-      'It is a membership benefit program, not an insurance product. You are not ' +
-      'buying a policy and there is no insurer indemnifying a loss. You hold a ' +
-      'membership that pays a fixed benefit if you lose your job.',
+      'My Income Secure is a membership benefit program. The membership itself is not an insurance policy. The income protection benefit within the program is insured separately and has its own eligibility, claim and payment conditions.',
   },
   {
-    q: 'When can I make a claim?',
+    q: 'How much could I receive?',
     a:
-      `A claim becomes admissible after ${T.claimThresholdDays} consecutive days ` +
-      `unemployed, and the first payment arrives ${T.firstInstallmentDays} days ` +
-      'after the qualifying job loss. Your membership has to be in place before ' +
-      'the job loss happens — it does not reach backwards.',
+      `Your selected tier determines the total benefit, from ${money(cheapest.totalLimit)} to ${money(largest.totalLimit)}. Each income-protection tier pays that total in ${T.installments} installments.`,
   },
   {
-    q: 'Do I still apply for unemployment?',
+    q: 'When does a claim become payable?',
     a:
-      'Yes. A claim requires you to be eligible for and approved to receive ' +
-      'state unemployment benefits for the same period you are claiming. If you ' +
-      'never file with your state, there is nothing here to pay out on.',
+      `A claim becomes admissible after ${T.claimThresholdDays} consecutive days unemployed. The first installment is scheduled ${T.firstInstallmentDays} days after the qualifying job loss.`,
+  },
+  {
+    q: 'Do I still need to file for state unemployment?',
+    a: STATE_FILING_REQUIREMENT,
     cta: { href: ROUTES.guide, label: 'Read the filing guide' },
   },
   {
     q: 'What happens if I go back to work?',
     a:
-      "Each installment after the first is paid only if you're still " +
-      'unemployed. Back at work before all of them are paid, and the ' +
-      'remaining ones are forfeited.',
+      `Each installment after the first is paid only while you remain unemployed. Return to work before all installments are paid, and the remaining installments are forfeited.`,
   },
   {
-    q: 'Can I cancel, and can I get a refund?',
+    q: 'Can I cancel?',
     a:
-      `You can cancel at any time. A full refund is available within ` +
-      `${T.refundWindowHours} hours of purchase, provided no benefits have ` +
-      'been used. There is no refund after that window.',
-  },
-  {
-    q: 'What if I quit rather than getting laid off?',
-    a:
-      'The program exists for job loss you did not choose. Resigning ' +
-      'voluntarily is not the situation it is built to cover.',
+      `You can cancel. A full refund is available within ${T.refundWindowHours} hours of purchase provided no benefits have been used.`,
   },
 ];
 ---
 
 <Page
-  title="If you lost your job tomorrow, how long could your savings carry you? — My Income Secure"
-  description={`My Income Secure pays up to ${money(largest.totalLimit)} in job-loss income protection while you look for your next job — starting at ${price(cheapest.priceMonthly)}/month.`}
+  title="Protect the gap between your paycheck and your bills — My Income Secure"
+  description={`My Income Secure provides up to ${money(largest.totalLimit)} in job-loss income protection. Plans start at ${price(cheapest.priceMonthly)}/month.`}
   landing
 >
   <section class="hero">
     <div class="shell hero__shell">
-      <div class="hero__figure">
-        <ImageSlot name="home-hero" ratio="4 / 5" />
-      </div>
-
-      <div class="hero__text">
+      <div class="hero__copy">
         <p class="hero__eyebrow">Job-loss income protection</p>
-        <h1>If you lost your job tomorrow, how long could your savings carry you?</h1>
+        <h1>Protect the gap between your paycheck and your bills.</h1>
         <p class="hero__lead">
-          My Income Secure pays up to {money(largest.totalLimit)} in job-loss
-          income protection while you look for your next job &mdash; paid
-          directly to you.
+          My Income Secure is a membership that pays a fixed cash benefit after
+          a qualifying job loss — directly to you while you look for your next job.
         </p>
 
-        <div class="hero__cta">
-          <a class="btn btn--primary" href="#coverage-check">See what I'd get</a>
-          <p class="hero__price">Plans start at {price(cheapest.priceMonthly)}/month.</p>
+        <div class="hero__offer">
+          <div class="hero__offer-price">
+            <span>Plans from</span>
+            <strong>{price(cheapest.priceMonthly)}</strong>
+            <span>/month</span>
+          </div>
+          <div class="hero__offer-divider" aria-hidden="true"></div>
+          <div class="hero__offer-max">
+            <strong>Up to {money(largest.totalLimit)}</strong>
+            <span>total job-loss benefit</span>
+          </div>
         </div>
 
-        <ul class="hero__trust">
-          <li>No medical exam</li>
-          <li>Cancel anytime</li>
-          <li>Benefit begins with a qualifying job loss</li>
-          <li>Paid directly to you</li>
-        </ul>
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="#coverage-check">Calculate my coverage gap <span aria-hidden="true">→</span></a>
+          <span class="hero__action-note">See your estimated gap before you enroll.</span>
+        </div>
+
+        <div class="hero__proof" aria-label="Program highlights">
+          <span>Fixed cash benefit</span>
+          <span>{T.installments} installments</span>
+          <span>Paid directly to you</span>
+        </div>
+      </div>
+
+      <div class="hero__visual">
+        <ImageSlot name="home-hero" ratio="4 / 5" />
+        <div class="hero__visual-card" aria-label="How the protection works">
+          <span class="hero__visual-kicker">The simple idea</span>
+          <strong>Your state benefit<br />may not cover the full month.</strong>
+          <span>We calculate the gap, then show you one protection amount built around it.</span>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="section section--tight section--alt promise">
-    <div class="shell promise__shell">
-      <div class="promise__item">
-        <span class="promise__value">Up to {money(largest.totalLimit)}</span>
-        <span class="promise__label">paid to you if you lose your job</span>
+  <section class="section section--alt facts" aria-label="How the benefit works">
+    <div class="shell">
+      <div class="section-heading section-heading--wide">
+        <p class="eyebrow">How the protection works</p>
+        <h2>A fixed benefit. A defined amount. No guesswork about the tier.</h2>
       </div>
-      <div class="promise__item">
-        <span class="promise__value">{T.installments} payments</span>
-        <span class="promise__label">{T.installmentIntervalDays} days apart</span>
-      </div>
-      <div class="promise__item">
-        <span class="promise__value">Stops</span>
-        <span class="promise__label">the moment you're back at work</span>
+
+      <div class="facts__grid">
+        {facts.map((fact, i) => (
+          <article class="fact">
+            <span class="fact__index">0{i + 1}</span>
+            <p class="fact__kicker">{fact.kicker}</p>
+            <h3>{fact.title}</h3>
+            <p>{fact.body}</p>
+          </article>
+        ))}
       </div>
     </div>
   </section>
 
   <CoverageFlow />
 
-  <section class="section trust">
-    <div class="shell">
-      <p class="eyebrow">Straightforward, on purpose</p>
-      <h2>What you should know before you enroll.</h2>
-      <dl class="trust__grid">
-        {
-          trustItems.map((item) => (
-            <div class="trust__item">
-              <dt>{item.label}</dt>
-              <dd>{item.detail}</dd>
+  <section class="section eligibility">
+    <div class="shell eligibility__shell">
+      <div class="eligibility__intro">
+        <p class="eyebrow">Before you enroll</p>
+        <h2>Eligibility is straightforward and visible up front.</h2>
+        <p class="lead">
+          The enrollment attestations are shown before the recommendation so you
+          can see exactly what the program requires before moving toward checkout.
+        </p>
+      </div>
+
+      <div class="eligibility__list">
+        {ELIGIBILITY_CRITERIA.map((criterion, i) => (
+          <div class="eligibility__item">
+            <span class="eligibility__number">{i + 1}</span>
+            <div>
+              <strong>{criterion.label}</strong>
+              {criterion.detail && <p>{criterion.detail}</p>}
             </div>
-          ))
-        }
-      </dl>
+          </div>
+        ))}
+      </div>
     </div>
   </section>
 
-  <section class="section section--tight section--warm">
-    <div class="shell">
-      <h2>Before you enroll, here's what matters.</h2>
+  <section class="section section--warm faq-section">
+    <div class="shell faq-section__shell">
+      <div class="section-heading">
+        <p class="eyebrow">Before you decide</p>
+        <h2>The answers people usually want before enrolling.</h2>
+      </div>
       <div class="faq-wrap">
         <Faq items={faqs} />
       </div>
     </div>
   </section>
 
-  <section class="section section--generous section--deep close">
-    <div class="shell shell--text">
-      <p class="eyebrow">One more thing</p>
-      <h2>If you could lose your paycheck tomorrow, would you rather have a plan in place?</h2>
-      <p class="lead">{URGENCY}</p>
-      <p class="close__price">Plans start at {price(cheapest.priceMonthly)}/month.</p>
-      <a class="btn btn--primary" href="#coverage-check">See what I'd get &rarr;</a>
+  <section class="section section--deep close">
+    <div class="shell close__shell">
+      <div>
+        <p class="eyebrow">Get your number</p>
+        <h2>Find out what your paycheck could leave uncovered.</h2>
+        <p class="lead">
+          Four short questions. Your state's formula. Your monthly expenses.
+          One recommended protection amount.
+        </p>
+      </div>
+      <div class="close__cta">
+        <div class="close__price">
+          <strong>Plans from {price(cheapest.priceMonthly)}/month</strong>
+          <span>Up to {money(largest.totalLimit)} total benefit</span>
+        </div>
+        <a class="btn btn--primary" href="#coverage-check">Calculate my coverage gap <span aria-hidden="true">→</span></a>
+      </div>
     </div>
   </section>
 </Page>
 
 <style>
-  /* --- Hero ---------------------------------------------------------------
-     Mobile-first: the image runs first in the DOM (a real top-of-page
-     moment, not something hidden), then the sales copy. Desktop reorders it
-     beside the copy via flex order, and gives it its intended portrait crop. */
   .hero {
-    background: var(--blue-pale);
+    background:
+      radial-gradient(circle at 76% 28%, rgba(46, 127, 196, 0.11), transparent 30%),
+      linear-gradient(180deg, var(--blue-pale) 0%, #f6f9fc 100%);
     border-bottom: 1px solid var(--line);
+    overflow: clip;
   }
 
   .hero__shell {
+    display: grid;
+    gap: var(--space-8);
+    padding-block: clamp(3rem, 4vw, 5.5rem);
+  }
+
+  .hero__copy {
     display: flex;
     flex-direction: column;
-    padding-block: 0 var(--pad-generous);
-  }
-
-  .hero__figure {
-    margin-inline: calc(clamp(1.25rem, 0.75rem + 2vw, 2.5rem) * -1);
-  }
-
-  .hero__figure :global(.slot) {
-    aspect-ratio: 16 / 10;
-    border-radius: 0;
-    box-shadow: none;
-  }
-
-  .hero__text {
-    padding-top: var(--pad-tight);
+    justify-content: center;
   }
 
   .hero__eyebrow {
-    font-family: var(--font-display);
-    font-size: var(--text-xs);
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    margin: 0 0 var(--space-4);
     color: var(--blue-ink);
-    margin-bottom: var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
   }
 
   .hero h1 {
-    font-size: var(--text-3xl);
-    font-weight: 800;
-    letter-spacing: -0.025em;
-    line-height: 1.08;
-    max-width: 18ch;
+    max-width: 11ch;
+    font-size: clamp(2.65rem, 4.8vw, 4.9rem);
+    line-height: 0.99;
+    letter-spacing: -0.045em;
   }
 
   .hero__lead {
-    max-width: 46ch;
+    max-width: 56ch;
     margin-top: var(--space-5);
-    font-size: var(--text-lg);
-    color: var(--ink);
+    font-size: clamp(1.05rem, 1vw + 0.7rem, 1.35rem);
+    line-height: 1.5;
+    color: var(--ink-muted);
   }
 
-  .hero__cta {
+  .hero__offer {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
     margin-top: var(--space-6);
+    max-width: 38rem;
+    padding: 1rem 1.125rem;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-card);
+  }
+
+  .hero__offer-price,
+  .hero__offer-max {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+  }
+
+  .hero__offer-price span,
+  .hero__offer-max span {
+    color: var(--ink-muted);
+    font-size: var(--text-xs);
+  }
+
+  .hero__offer-price strong,
+  .hero__offer-max strong {
+    color: var(--navy);
+    font-size: var(--text-xl);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hero__offer-divider {
+    width: 1px;
+    align-self: stretch;
+    background: var(--line-strong);
+  }
+
+  .hero__actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+
+  .hero__action-note {
+    color: var(--ink-muted);
+    font-size: var(--text-sm);
+    max-width: 26ch;
+  }
+
+  .hero__proof {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-4);
-  }
-
-  .hero__price {
-    font-size: var(--text-sm);
-    font-weight: 600;
-    color: var(--ink-muted);
-  }
-
-  .hero__trust {
-    margin: var(--space-6) 0 0;
-    padding: var(--space-5) 0 0;
-    border-top: 1px solid var(--line-strong);
-    list-style: none;
-    display: grid;
-    gap: var(--space-2) var(--space-6);
-  }
-
-  .hero__trust li {
-    display: flex;
-    align-items: baseline;
-    gap: var(--space-2);
-    font-size: var(--text-sm);
-    font-weight: 600;
-    color: var(--ink);
-  }
-
-  .hero__trust li::before {
-    content: '\2713';
-    color: var(--covered-ink);
-    font-weight: 800;
-  }
-
-  @media (min-width: 780px) {
-    .hero__shell {
-      flex-direction: row;
-      align-items: center;
-      gap: var(--space-9);
-      padding-block: var(--pad-generous);
-    }
-
-    .hero__figure {
-      order: 2;
-      flex: 0 0 42%;
-      margin-inline: 0;
-    }
-
-    .hero__figure :global(.slot) {
-      aspect-ratio: 4 / 5;
-      border-radius: var(--radius);
-      border: 1px solid var(--line-strong);
-      box-shadow: var(--shadow-raised);
-    }
-
-    .hero__text {
-      order: 1;
-      flex: 1 1 auto;
-      padding-top: 0;
-    }
-  }
-
-  /* --- Quick coverage promise --------------------------------------------
-     Plain figures separated by rule lines, not cards — the numbers carry it. */
-  .promise__shell {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-6);
-  }
-
-  .promise__item {
-    padding-top: var(--space-4);
-    border-top: 2px solid var(--navy);
-  }
-
-  .promise__value {
-    display: block;
-    font-family: var(--font-display);
-    font-size: var(--text-2xl);
-    font-weight: 800;
-    color: var(--navy);
-  }
-
-  .promise__label {
-    display: block;
-    margin-top: var(--space-1);
-    font-size: var(--text-sm);
-    color: var(--ink-muted);
-  }
-
-  @media (min-width: 700px) {
-    .promise__shell {
-      grid-template-columns: repeat(3, 1fr);
-      gap: var(--space-8);
-    }
-  }
-
-  /* --- Trust --- */
-  .trust__grid {
-    margin: var(--space-7) 0 0;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-6);
-  }
-
-  .trust__item {
-    padding-top: var(--space-4);
-    border-top: 1px solid var(--line-strong);
-  }
-
-  .trust__item dt {
-    font-family: var(--font-display);
-    font-weight: 700;
-    color: var(--navy);
-    font-size: var(--text-base);
-  }
-
-  .trust__item dd {
-    margin: var(--space-2) 0 0;
-    font-size: var(--text-sm);
-    color: var(--ink-muted);
-    max-width: 40ch;
-  }
-
-  @media (min-width: 700px) {
-    .trust__grid {
-      grid-template-columns: repeat(2, 1fr);
-      column-gap: var(--space-8);
-    }
-  }
-
-  /* --- FAQ --- */
-  .faq-wrap {
+    gap: 0.65rem 1.25rem;
     margin-top: var(--space-5);
-    max-width: var(--measure);
+    color: var(--ink);
+    font-size: var(--text-sm);
+    font-weight: 650;
   }
 
-  /* --- Close --- */
-  .close h2 {
+  .hero__proof span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .hero__proof span::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--covered-ink);
+  }
+
+  .hero__visual {
+    position: relative;
+    min-width: 0;
+  }
+
+  .hero__visual :global(.slot) {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    min-height: 24rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-float);
+    overflow: hidden;
+  }
+
+  .hero__visual-card {
+    position: absolute;
+    left: -1rem;
+    bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    width: min(78%, 22rem);
+    padding: 1rem 1.125rem;
+    background: rgba(14, 33, 67, 0.96);
+    color: #fff;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-float);
+  }
+
+  .hero__visual-kicker {
+    color: var(--uncovered);
+    font-size: var(--text-xs);
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .hero__visual-card strong {
+    font-size: var(--text-lg);
+    line-height: 1.25;
+  }
+
+  .hero__visual-card > span:last-child {
+    color: #c2d0e4;
+    font-size: var(--text-xs);
+    line-height: 1.5;
+  }
+
+  .section-heading {
+    max-width: 46rem;
+  }
+
+  .section-heading--wide {
+    max-width: 58rem;
+  }
+
+  .section-heading h2 {
     max-width: 22ch;
-    margin-top: var(--space-2);
+  }
+
+  .section-heading .eyebrow {
+    margin-bottom: var(--space-2);
+  }
+
+  .facts__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    margin-top: var(--space-7);
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .fact {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: var(--space-4);
+    padding: var(--space-6) 0;
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  .fact__index {
+    grid-row: 1 / span 3;
+    font-size: var(--text-xs);
+    font-weight: 800;
+    color: var(--ink-muted);
+    letter-spacing: 0.08em;
+  }
+
+  .fact__kicker {
+    color: var(--blue-ink);
+    font-size: var(--text-xs);
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .fact h3 {
+    margin-top: 0.2rem;
+    color: var(--navy);
+  }
+
+  .fact > p:last-child {
+    margin-top: 0.35rem;
+    color: var(--ink-muted);
+    max-width: 52ch;
+    font-size: var(--text-sm);
+  }
+
+  .eligibility {
+    background: var(--paper);
+  }
+
+  .eligibility__shell {
+    display: grid;
+    gap: var(--space-8);
+  }
+
+  .eligibility__intro .lead {
+    margin-top: var(--space-4);
+  }
+
+  .eligibility__list {
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .eligibility__item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-4);
+    padding: var(--space-5) 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .eligibility__number {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
+    color: var(--navy);
+    font-size: var(--text-xs);
+    font-weight: 800;
+  }
+
+  .eligibility__item strong {
+    display: block;
+    color: var(--navy);
+    line-height: 1.35;
+  }
+
+  .eligibility__item p {
+    margin-top: 0.35rem;
+    color: var(--ink-muted);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+  }
+
+  .faq-section__shell {
+    max-width: 1050px;
+  }
+
+  .faq-wrap {
+    max-width: 60rem;
+    margin-top: var(--space-6);
+  }
+
+  .close__shell {
+    display: grid;
+    gap: var(--space-7);
+    align-items: end;
+  }
+
+  .close h2 {
+    max-width: 15ch;
   }
 
   .close .lead {
-    margin-block: var(--space-4) var(--space-3);
+    margin-top: var(--space-4);
+  }
+
+  .close__cta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
   }
 
   .close__price {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .close__price strong {
+    color: #fff;
+    font-size: var(--text-lg);
+  }
+
+  .close__price span {
+    color: #b9c9df;
     font-size: var(--text-sm);
-    font-weight: 600;
-    color: #9fb3d1;
-    margin-bottom: var(--space-6);
+  }
+
+  @media (min-width: 760px) {
+    .hero__shell {
+      grid-template-columns: minmax(0, 1.08fr) minmax(20rem, 0.72fr);
+      align-items: center;
+      min-height: min(760px, calc(100vh - 4.5rem));
+    }
+
+    .hero__visual-card {
+      left: -2rem;
+    }
+
+    .facts__grid {
+      grid-template-columns: repeat(3, 1fr);
+      column-gap: var(--space-7);
+    }
+
+    .fact {
+      border-right: 1px solid var(--line-strong);
+      padding-right: var(--space-6);
+    }
+
+    .fact:last-child {
+      border-right: 0;
+    }
+
+    .eligibility__shell {
+      grid-template-columns: 0.85fr 1.15fr;
+      align-items: start;
+    }
+
+    .close__shell {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+  }
+
+  @media (max-width: 759px) {
+    .hero__visual {
+      order: -1;
+    }
+
+    .hero__visual :global(.slot) {
+      aspect-ratio: 16 / 10;
+      min-height: 0;
+      border-radius: 0;
+    }
+
+    .hero__visual-card {
+      left: 0.75rem;
+      right: 0.75rem;
+      bottom: 0.75rem;
+      width: auto;
+    }
+
+    .hero h1 {
+      max-width: 13ch;
+    }
+
+    .hero__offer {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+      align-items: stretch;
+    }
+
+    .hero__offer-divider {
+      display: none;
+    }
+
+    .hero__actions .btn {
+      width: 100%;
+    }
   }
 </style>
