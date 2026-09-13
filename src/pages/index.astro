@@ -1,8 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
 import Footer from '../components/Footer.astro';
-import CoverageFlow from '../components/CoverageFlow.astro';
-import Faq from '../components/Faq.astro';
 import { PLANS, PROGRAM_TERMS, ELIGIBILITY_CRITERIA } from '../config/plans.js';
 import { ROUTES, STATE_FILING_REQUIREMENT, URGENCY } from '../config/site.js';
 import { money, price } from '../lib/format.js';
@@ -17,11 +15,11 @@ const faqs = [
     a: 'My Income Secure is a membership benefit program built around a fixed job-loss income protection benefit. Your membership tier determines the total benefit available under the program terms.',
   },
   {
-    q: 'How much can I get?',
+    q: 'How much can I receive?',
     a: `Income-protection tiers range from ${money(cheapest.totalLimit)} to ${money(largest.totalLimit)} total. Each tier pays its total in ${T.installments} installments, ${T.installmentIntervalDays} days apart, subject to the program terms.`,
   },
   {
-    q: 'When does a claim become payable?',
+    q: 'When can a claim be made?',
     a: `A claim becomes admissible after ${T.claimThresholdDays} consecutive days unemployed. The first installment is scheduled ${T.firstInstallmentDays} days after the qualifying job loss.`,
   },
   {
@@ -41,1222 +39,250 @@ const faqs = [
 ---
 
 <Base
-  title="My Income Secure — Protect the gap when a paycheck stops"
-  description={`My Income Secure provides job-loss income protection through a membership benefit program, with plans from ${price(cheapest.priceMonthly)}/month and up to ${money(largest.totalLimit)} total.`}
+  title="My Income Secure — Protect the paycheck your household depends on"
+  description={`My Income Secure is a membership benefit program providing job-loss income protection from ${price(cheapest.priceMonthly)}/month, with tiers up to ${money(largest.totalLimit)} total.`}
 >
-  <div class="income-secure-home">
-    <header class="site-header">
-      <div class="site-header__inner">
+  <div class="mis">
+    <header class="header">
+      <div class="header__inner">
         <a class="brand" href={ROUTES.home} aria-label="My Income Secure home">
-          <span class="brand__my">MY</span>
-          <span class="brand__name">INCOME SECURE</span>
+          <span class="brand__mark">MIS</span>
+          <span class="brand__text"><b>My Income Secure</b><small>Job-loss income protection</small></span>
         </a>
-        <a class="header-cta" href="#coverage-check">See my gap <span aria-hidden="true">↗</span></a>
+        <a class="header__cta" href="#coverage-check">See my gap <span>→</span></a>
       </div>
     </header>
 
     <main id="main">
-      <section class="hero" aria-labelledby="hero-title">
+      <section class="hero">
         <div class="hero__inner">
           <div class="hero__copy">
-            <p class="eyebrow">Job-loss income protection</p>
-            <h1 id="hero-title">Your paycheck can stop overnight. Your bills don't.</h1>
-            <p class="hero__lead">
-              My Income Secure gives you a fixed cash benefit after a qualifying job loss —
-              built to help with the gap between your state unemployment benefit and what your household still has to cover.
-            </p>
+            <p class="eyebrow"><i></i> Income protection before you need it</p>
+            <h1>Your paycheck can disappear. Your bills won't.</h1>
+            <p class="hero__lead">My Income Secure is a membership benefit program designed to help with the cash-flow gap after a qualifying job loss — using a fixed benefit paid directly to you.</p>
 
-            <div class="hero__offer" aria-label="Program pricing and maximum benefit">
-              <div class="hero__offer-block">
-                <span>FROM</span>
-                <strong>{price(cheapest.priceMonthly)}</strong>
-                <small>/ month</small>
-              </div>
-              <div class="hero__offer-rule" aria-hidden="true"></div>
-              <div class="hero__offer-block hero__offer-block--right">
-                <span>UP TO</span>
-                <strong>{money(largest.totalLimit)}</strong>
-                <small>total benefit</small>
-              </div>
+            <div class="hero__offer">
+              <div><span>STARTING AT</span><strong>{price(cheapest.priceMonthly)}</strong><small>/ month</small></div>
+              <div class="hero__offer-line"></div>
+              <div><span>UP TO</span><strong>{money(largest.totalLimit)}</strong><small>total benefit</small></div>
             </div>
 
-            <div class="hero__cta-row">
-              <a class="primary-cta" href="#coverage-check">
-                Calculate my coverage gap <span aria-hidden="true">→</span>
-              </a>
-              <span class="hero__microcopy">Four short questions. A personalized number. No generic quote.</span>
-            </div>
+            <a class="hero__cta" href="#coverage-check">See my coverage gap <span>→</span></a>
+            <p class="hero__micro">Free calculation · 4 short steps · No phone number required</p>
 
-            <div class="hero__proofline">
-              <span>Fixed cash benefit</span>
-              <span>{T.installments} payments</span>
-              <span>Paid to you</span>
+            <div class="hero__bullets">
+              <span><b>✓</b> Fixed cash benefit</span>
+              <span><b>✓</b> Paid in {T.installments} installments</span>
+              <span><b>✓</b> Paid directly to you</span>
             </div>
           </div>
 
-          <div class="hero__visual" aria-hidden="true">
-            <div class="visual-frame">
-              <div class="visual-frame__top">
-                <span>WHEN INCOME STOPS</span>
-                <span>01</span>
-              </div>
-
-              <div class="visual-stack">
-                <div class="visual-row visual-row--paycheck">
-                  <span>PAYCHECK</span>
-                  <strong>STOP</strong>
-                </div>
-                <div class="visual-gap">
-                  <span>THE GAP</span>
-                  <div class="visual-gap__line"></div>
-                </div>
-                <div class="visual-row visual-row--cover">
-                  <span>PROTECTION</span>
-                  <strong>CONTINUES</strong>
-                </div>
-              </div>
-
-              <div class="visual-frame__bottom">
-                <span>STATE BENEFIT</span>
-                <span>+ MY INCOME SECURE</span>
-              </div>
+          <div class="hero-visual" aria-hidden="true">
+            <div class="visual-header"><span>PAYCHECK INTERRUPTED</span><b>YOUR GAP</b></div>
+            <div class="visual-body">
+              <div class="visual-line visual-line--full"><span>PAYCHECK</span><i></i><em>100%</em></div>
+              <div class="visual-label">Then your paycheck stops</div>
+              <div class="visual-line visual-line--state"><span>STATE BENEFIT</span><i></i><em>PARTIAL</em></div>
+              <div class="visual-label">Your state benefit may replace only part of it</div>
+              <div class="visual-gap"><span>REMAINING GAP</span><strong>?</strong></div>
             </div>
+            <div class="visual-footer"><span>STATE BENEFIT</span><b>+</b><span>MY INCOME SECURE</span></div>
           </div>
         </div>
       </section>
 
-      <section class="bridge">
-        <div class="bridge__inner">
-          <div class="bridge__lead">
-            <span class="section-tag">The problem</span>
-            <h2>Most people don't know their real number until they have to live through it.</h2>
+      <section class="thesis">
+        <div class="thesis__inner">
+          <div class="thesis__index">01</div>
+          <div class="thesis__headline"><p class="section-kicker">The question that matters</p><h2>How much of your month survives if your paycheck doesn't?</h2></div>
+          <div class="thesis__copy"><p>Most people know what they earn. Far fewer know what their unemployment benefit would actually replace — or what the remaining monthly shortfall would be.</p><p><strong>Let's calculate yours.</strong></p></div>
+        </div>
+      </section>
+
+      <section class="coverage" id="coverage-check">
+        <div class="coverage__head">
+          <div>
+            <p class="section-kicker">Your personalized coverage check</p>
+            <h2>Put your own numbers on the table.</h2>
+            <p>Choose your state, enter your approximate income and monthly costs, then confirm the actual enrollment criteria. The calculator uses the site's existing state-benefit formulas and returns one recommended protection amount.</p>
           </div>
-          <div class="bridge__body">
-            <p>State unemployment may replace part of your paycheck. Your housing, car, food, utilities and other monthly costs do not pause.</p>
-            <p>So don't guess. Run the numbers using your state, your income and your actual monthly expenses.</p>
+          <div class="coverage__promise"><b>NO SALES QUIZ</b><span>Just the number that matters.</span></div>
+        </div>
+
+        <div class="flow" data-flow>
+          <div class="flow__bar"><div class="flow__track"><i data-progress></i></div><div class="flow__meta"><span>STEP <b data-current>1</b> OF 4</span><strong data-name>STATE</strong></div></div>
+
+          <form novalidate data-form>
+            <fieldset data-step="0">
+              <span class="step-no">01</span><legend>Where do you work?</legend><p>Your work state determines the unemployment formula used for the estimate.</p>
+              <label class="sr-only" for="mis-state">State</label><select id="mis-state" data-state><option value="" selected disabled>Select your state</option></select>
+            </fieldset>
+
+            <fieldset data-step="1" hidden>
+              <span class="step-no">02</span><legend>What do you earn?</legend><p>Use gross annual income before taxes. A rounded number is fine.</p>
+              <label for="mis-income">Annual income</label><div class="money"><span>$</span><input id="mis-income" data-income type="number" min="1" step="1000" inputmode="numeric" placeholder="52,000" /></div>
+              <div class="dependants" data-deps hidden><label for="mis-deps">Dependants</label><input id="mis-deps" data-deps-input type="number" min="0" max="10" value="0" /><small data-deps-hint></small></div>
+            </fieldset>
+
+            <fieldset data-step="2" hidden>
+              <span class="step-no">03</span><legend>What does your month cost?</legend><p>Round numbers are fine. We are calculating the gap, not grading your budget.</p>
+              <div class="expense-grid">
+                <label>Housing<div class="money"><span>$</span><input data-expense type="number" min="0" step="50" placeholder="1,400" /></div></label>
+                <label>Vehicle<div class="money"><span>$</span><input data-expense type="number" min="0" step="25" placeholder="450" /></div></label>
+                <label>Everything else<div class="money"><span>$</span><input data-expense type="number" min="0" step="50" placeholder="750" /></div></label>
+              </div>
+            </fieldset>
+
+            <fieldset data-step="3" hidden>
+              <span class="step-no">04</span><legend>One last check.</legend><p>These are the actual enrollment attestations, shown here before any recommendation.</p>
+              <div class="checks">
+                {ELIGIBILITY_CRITERIA.map((c) => <label class="check"><input type="checkbox" data-eligibility={c.id} data-required={c.required ? 'true' : 'false'} /><span>{c.label}{c.detail && <small>{c.detail}</small>}</span></label>)}
+              </div>
+            </fieldset>
+
+            <p class="flow-error" data-error hidden></p>
+            <div class="flow-actions"><button class="back" type="button" data-back hidden>← Back</button><button class="next" type="button" data-next>Continue <span>→</span></button></div>
+          </form>
+        </div>
+      </section>
+
+      <section class="result" data-result hidden>
+        <div class="result__inner">
+          <div class="result__head"><p class="section-kicker">Your personalized result</p><h2>Now we know the gap.</h2><p>This is an estimate based on the state formula and numbers you entered — not an official determination.</p></div>
+          <div class="result__grid">
+            <div class="result__gap">
+              <span class="result__label">ESTIMATED MONTHLY GAP</span>
+              <strong data-out="gap">$0</strong>
+              <p>The amount your monthly expenses still exceed your estimated state unemployment benefit.</p>
+              <div class="result__rows"><div><span>Estimated state benefit</span><b data-out="benefit">$0</b></div><div><span>Monthly expenses</span><b data-out="expenses">$0</b></div></div>
+              <div class="result__meter"><i data-meter></i></div>
+              <div class="result__meter-labels"><span>State benefit</span><span>Expenses</span></div>
+            </div>
+            <div class="result__offer"><p>THE ONE RECOMMENDED PLAN</p><div data-rec></div><button class="restart" type="button" data-restart>Change my numbers →</button></div>
           </div>
         </div>
       </section>
 
-      <section class="coverage-launch" id="coverage-check">
-        <div class="coverage-launch__inner">
-          <div class="coverage-launch__heading">
-            <span class="section-tag">Your personalized number</span>
-            <h2>Let's calculate the gap.</h2>
-            <p>We use the existing state-benefit formulas, your income and the costs you enter. Then we show you one recommendation based on the result.</p>
-          </div>
-          <div class="coverage-launch__steps" aria-label="Coverage check steps">
-            <span><b>01</b> State</span>
-            <span><b>02</b> Income</span>
-            <span><b>03</b> Expenses</span>
-            <span><b>04</b> Eligibility</span>
-          </div>
-        </div>
+      <section class="proof">
+        <div class="proof__inner"><div class="proof__intro"><p class="section-kicker">Why the recommendation is simple</p><h2>The math does the choosing.</h2><p>Your state benefit establishes what you may receive. Your expenses establish what you still need. The existing plan ladder determines the least-expensive protection tier that can close the calculated shortfall.</p></div><div class="proof__steps"><article><span>01</span><b>Estimate</b><p>Your state + income produce the unemployment estimate.</p></article><article><span>02</span><b>Measure</b><p>Your expenses expose the monthly shortfall.</p></article><article><span>03</span><b>Match</b><p>One protection tier is recommended from the actual gap.</p></article></div></div>
       </section>
 
-      <div class="coverage-shell">
-        <CoverageFlow />
-      </div>
-
-      <section class="decision" aria-label="How the recommendation works">
-        <div class="decision__inner">
-          <div class="decision__intro">
-            <span class="section-tag">After your result</span>
-            <h2>No plan maze. One answer built from your number.</h2>
-          </div>
-          <div class="decision__steps">
-            <div class="decision-step">
-              <span>01</span>
-              <strong>Your state benefit</strong>
-              <p>Your estimated unemployment benefit gives us the starting point.</p>
-            </div>
-            <div class="decision-step">
-              <span>02</span>
-              <strong>Your monthly gap</strong>
-              <p>Your expenses show what is still left to cover each month.</p>
-            </div>
-            <div class="decision-step">
-              <span>03</span>
-              <strong>Your recommendation</strong>
-              <p>The system recommends the least-expensive protection tier that can close the calculated shortfall.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="facts">
-        <div class="facts__inner">
-          <div class="facts__heading">
-            <span class="section-tag">Know what you're buying</span>
-            <h2>Simple rules. Clear numbers. Nothing important hidden.</h2>
-          </div>
-          <div class="facts__grid">
-            <article>
-              <span>PAYMENT</span>
-              <strong>{T.installments} installments</strong>
-              <p>A qualifying claim is paid in {T.installments} installments, {T.installmentIntervalDays} days apart.</p>
-            </article>
-            <article>
-              <span>TIMING</span>
-              <strong>Set it up before the loss</strong>
-              <p>{URGENCY}</p>
-            </article>
-            <article>
-              <span>REFUND</span>
-              <strong>{T.refundWindowHours}-hour window</strong>
-              <p>A full refund is available within the stated window when no benefits have been used.</p>
-            </article>
-            <article>
-              <span>STATE FILING</span>
-              <strong>Still required</strong>
-              <p>{STATE_FILING_REQUIREMENT}</p>
-            </article>
-          </div>
-        </div>
+      <section class="details">
+        <div class="details__inner"><div class="details__heading"><p class="section-kicker">Before you decide</p><h2>Know the rules. Then make the decision.</h2></div><div class="details__grid">
+          <article><span>PAYMENT</span><b>{T.installments} installments</b><p>A qualifying claim is paid in {T.installments} installments, {T.installmentIntervalDays} days apart.</p></article>
+          <article><span>TIMING</span><b>Before the job loss</b><p>{URGENCY}</p></article>
+          <article><span>REFUND</span><b>{T.refundWindowHours}-hour window</b><p>A full refund is available within the stated window if no benefits have been used.</p></article>
+          <article><span>STATE FILING</span><b>Still required</b><p>{STATE_FILING_REQUIREMENT}</p></article>
+        </div></div>
       </section>
 
       <section class="eligibility">
-        <div class="eligibility__inner">
-          <div class="eligibility__heading">
-            <span class="section-tag">Before enrollment</span>
-            <h2>See the rules before you reach the decision.</h2>
-            <p>These are the same attestations used in the guided flow.</p>
-          </div>
-          <div class="eligibility__list">
-            {ELIGIBILITY_CRITERIA.map((criterion, i) => (
-              <div class="eligibility__item">
-                <span class="eligibility__num">{String(i + 1).padStart(2, '0')}</span>
-                <div>
-                  <strong>{criterion.label}</strong>
-                  {criterion.detail && <p>{criterion.detail}</p>}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <div class="eligibility__inner"><div><p class="section-kicker">Eligibility</p><h2>You see the requirements before you enroll.</h2></div><div class="eligibility__list">{ELIGIBILITY_CRITERIA.map((c,i)=><div><span>{String(i+1).padStart(2,'0')}</span><p><b>{c.label}</b>{c.detail && <small>{c.detail}</small>}</p></div>)}</div></div>
       </section>
 
-      <section class="faq-section">
-        <div class="faq-section__inner">
-          <div class="faq-section__heading">
-            <span class="section-tag">The questions that matter</span>
-            <h2>Read this before you decide.</h2>
-          </div>
-          <div class="faq-section__wrap">
-            <Faq items={faqs} />
-          </div>
-        </div>
+      <section class="faq">
+        <div class="faq__inner"><div><p class="section-kicker">Questions</p><h2>Everything worth knowing before the next click.</h2></div><div class="faq__list">{faqs.map((item,i)=><details open={i===0}><summary>{item.q}<span>+</span></summary><div><p>{item.a}</p>{item.cta && <a href={item.cta.href}>{item.cta.label} →</a>}</div></details>)}</div></div>
       </section>
 
-      <section class="close">
-        <div class="close__inner">
-          <span class="section-tag">Start with your number</span>
-          <h2>Know your gap before you need to close it.</h2>
-          <p>Run the coverage check and see what your own state benefit and monthly costs look like together.</p>
-          <a class="primary-cta primary-cta--light" href="#coverage-check">Calculate my coverage gap <span aria-hidden="true">→</span></a>
-        </div>
-      </section>
+      <section class="close"><div class="close__inner"><p class="section-kicker">Start with your number</p><h2>Find out what a job loss could leave uncovered.</h2><p>Run the coverage check. See your number. Then see the protection amount the math recommends.</p><a class="close__cta" href="#coverage-check">Calculate my coverage gap <span>→</span></a></div></section>
     </main>
-
     <Footer minimal />
   </div>
 </Base>
 
+<script>
+  import { STATES, findState, hasDependentAllowance, computeWeeklyBenefit, toMonthly } from '../lib/states.js';
+  import { recommendPlan } from '../config/plans.js';
+  import { saveCalcResult } from '../lib/storage.js';
+  import { track, trackOnVisible, EVENTS, CALC_STEPS } from '../lib/analytics.js';
+  import { money } from '../lib/format.js';
+
+  const root = document.querySelector('.mis');
+  const flow = root?.querySelector('[data-flow]');
+  const result = root?.querySelector('[data-result]');
+
+  if (flow && result) {
+    const stateSel = flow.querySelector('[data-state]');
+    const income = flow.querySelector('[data-income]');
+    const depsField = flow.querySelector('[data-deps]');
+    const depsInput = flow.querySelector('[data-deps-input]');
+    const depsHint = flow.querySelector('[data-deps-hint]');
+    const expenses = [...flow.querySelectorAll('[data-expense]')];
+    const steps = [...flow.querySelectorAll('[data-step]')];
+    const next = flow.querySelector('[data-next]');
+    const back = flow.querySelector('[data-back]');
+    const error = flow.querySelector('[data-error]');
+    const current = flow.querySelector('[data-current]');
+    const name = flow.querySelector('[data-name]');
+    const progress = flow.querySelector('[data-progress]');
+    const form = flow.querySelector('[data-form]');
+    let step = 0;
+
+    stateSel.innerHTML = '<option value="" selected disabled>Select your state</option>' + STATES.map((s) => `<option value="${s.code}">${s.name}</option>`).join('');
+    track(EVENTS.CALC_START, { placement: 'homepage_flow' });
+
+    const fail = (msg) => { error.textContent = msg; error.hidden = false; };
+    const clearError = () => { error.hidden = true; };
+    const setStep = (n, scroll = true) => {
+      step = n;
+      steps.forEach((el,i)=>{ el.hidden = i !== step; });
+      current.textContent = step + 1;
+      name.textContent = CALC_STEPS[step].toUpperCase();
+      progress.style.width = `${((step + 1) / steps.length) * 100}%`;
+      back.hidden = step === 0;
+      clearError();
+      const first = steps[step].querySelector('select,input');
+      if (first) first.focus({ preventScroll: true });
+      if (scroll) flow.scrollIntoView({ behavior:'smooth', block:'center' });
+    };
+    const expenseTotal = () => expenses.reduce((sum,el)=>sum + (parseFloat(el.value)||0),0);
+    const validate = () => {
+      if (step === 0 && !stateSel.value) return 'Choose your state to continue.';
+      if (step === 1 && !(parseFloat(income.value) > 0)) return 'Enter your approximate annual income.';
+      if (step === 2 && expenseTotal() <= 0) return 'Enter at least one monthly expense.';
+      if (step === 3 && [...flow.querySelectorAll('[data-eligibility][data-required="true"]')].some((box)=>!box.checked)) return 'Please confirm every required eligibility statement before continuing.';
+      return null;
+    };
+    const complete = () => {
+      const problem = validate();
+      if (problem) return fail(problem);
+      track(EVENTS.CALC_STEP_COMPLETE, { placement:'homepage_flow', step:step+1, stepName:CALC_STEPS[step] });
+      if (step === steps.length - 1) calculate(); else setStep(step+1);
+    };
+    stateSel.addEventListener('change', ()=>{ const s=findState(stateSel.value); const has=hasDependentAllowance(s); depsField.hidden=!has; if(has) depsHint.textContent=`${s.name} includes a dependent allowance of ${money(s.dep)} a week per dependant, up to ${s.depCap}.`; complete(); });
+    next.addEventListener('click', complete);
+    back.addEventListener('click', ()=>setStep(Math.max(0,step-1)));
+    form.addEventListener('keydown',(e)=>{ if(e.key==='Enter' && e.target.matches('input[type="number"]')){ e.preventDefault(); complete(); } });
+
+    function calculate(){
+      const s=findState(stateSel.value); const annual=parseFloat(income.value)||0; const dependants=parseInt(depsInput.value,10)||0; const monthlyExpenses=expenseTotal();
+      const weekly=computeWeeklyBenefit(s,annual,dependants); const monthlyBenefit=toMonthly(weekly); const monthlyGap=Math.max(0,monthlyExpenses-monthlyBenefit);
+      const data={ stateCode:s.code,stateName:s.name,income:annual,deps:dependants,monthlyExpenses,weekly:Math.round(weekly),monthlyBenefit:Math.round(monthlyBenefit),monthlyGap:Math.round(monthlyGap) };
+      saveCalcResult(data); paint(data,{monthlyBenefit,monthlyExpenses,monthlyGap}); track(EVENTS.GAP_REVEAL,{placement:'homepage_flow',state:s.code,monthlyGap:data.monthlyGap,monthlyBenefit:data.monthlyBenefit});
+    }
+    function paint(data,raw){
+      flow.hidden=true; result.hidden=false;
+      result.querySelector('[data-out="gap"]').textContent=money(raw.monthlyGap);
+      result.querySelector('[data-out="benefit"]').textContent=`${money(raw.monthlyBenefit)}/month`;
+      result.querySelector('[data-out="expenses"]').textContent=`${money(raw.monthlyExpenses)}/month`;
+      result.querySelector('[data-meter]').style.width=`${raw.monthlyExpenses>0?Math.min(100,(raw.monthlyBenefit/raw.monthlyExpenses)*100):0}%`;
+      const target=result.querySelector('[data-rec]'); target.innerHTML='';
+      if(raw.monthlyGap<=0){ target.innerHTML='<div class="no-gap"><strong>Your estimate covers the monthly amount you entered.</strong><p>There is no calculated shortfall to match to a protection tier.</p></div>'; }
+      else { const rec=recommendPlan(raw.monthlyGap); if(rec.plan){ const remaining=Math.max(0,raw.monthlyGap-rec.plan.monthlyBenefit); const match=rec.closesGap?`Closes your ${money(raw.monthlyGap)} estimated monthly shortfall.`:`Covers ${money(rec.plan.monthlyBenefit)} of your ${money(raw.monthlyGap)} estimated monthly shortfall, leaving ${money(remaining)}.`; target.innerHTML=`<article class="rec"><span class="rec__flag">RECOMMENDED</span><h3>${rec.plan.name}</h3><strong>${money(rec.plan.totalLimit)}</strong><small>total benefit</small><p>${rec.plan.installments} payments of ${money(rec.plan.monthlyBenefit)}, ${rec.plan.installmentIntervalDays} days apart</p><div class="rec__match">${match}</div><div class="rec__price">${money(rec.plan.priceMonthly)}<small>/month membership</small></div><a class="rec__cta" data-plan="${rec.plan.id}" href="${ROUTES.checkout}?plan=${rec.plan.id}">Continue with ${money(rec.plan.totalLimit)} protection <span>→</span></a></article>`; const cta=target.querySelector('[data-plan]'); cta.addEventListener('click',()=>{ track(EVENTS.PLAN_SELECT,{placement:'homepage_flow',planId:rec.plan.id,recommended:true}); track(EVENTS.CHECKOUT_START,{placement:'homepage_flow',planId:rec.plan.id}); }); trackOnVisible(target.querySelector('.rec'),EVENTS.PLAN_VIEW,{placement:'homepage_flow'}); } }
+      result.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    root.querySelector('[data-restart]').addEventListener('click',()=>{ result.hidden=true; flow.hidden=false; setStep(1); });
+    setStep(0,false);
+  }
+</script>
+
 <style>
-  .income-secure-home {
-    --black: #11110f;
-    --ink: #1b1a17;
-    --muted: #69665e;
-    --paper: #fbf8f1;
-    --paper-2: #f1ede3;
-    --line: #d7d1c6;
-    --red: #c94d39;
-    --red-dark: #a73d2d;
-    --blue: #2351c8;
-    --acid: #d8ef68;
-    --white: #ffffff;
-    background: var(--paper);
-    color: var(--ink);
-    overflow-x: clip;
-  }
-
-  .income-secure-home,
-  .income-secure-home * {
-    box-sizing: border-box;
-  }
-
-  .income-secure-home a {
-    color: inherit;
-  }
-
-  .site-header {
-    background: var(--paper);
-    border-bottom: 1px solid var(--line);
-  }
-
-  .site-header__inner {
-    width: min(1360px, calc(100% - 44px));
-    min-height: 76px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-  }
-
-  .brand {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 10px;
-    text-decoration: none;
-    letter-spacing: -.03em;
-  }
-
-  .brand__my {
-    font-size: 11px;
-    font-weight: 900;
-    letter-spacing: .12em;
-    color: var(--red);
-  }
-
-  .brand__name {
-    font-size: 20px;
-    font-weight: 900;
-    color: var(--black);
-  }
-
-  .header-cta {
-    font-size: 13px;
-    font-weight: 800;
-    text-decoration: none;
-    color: var(--blue) !important;
-  }
-
-  .hero {
-    background: var(--paper-2);
-    border-bottom: 1px solid var(--line);
-  }
-
-  .hero__inner {
-    width: min(1360px, calc(100% - 44px));
-    min-height: min(800px, calc(100vh - 77px));
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: minmax(0, 1.06fr) minmax(400px, .94fr);
-    gap: clamp(40px, 6vw, 100px);
-    align-items: stretch;
-  }
-
-  .hero__copy {
-    align-self: center;
-    padding: 80px 0;
-  }
-
-  .eyebrow,
-  .section-tag {
-    display: inline-block;
-    margin: 0 0 20px;
-    font-size: 11px;
-    line-height: 1;
-    font-weight: 900;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: var(--red-dark);
-  }
-
-  .hero h1 {
-    margin: 0;
-    max-width: 9ch;
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: clamp(62px, 7.3vw, 118px);
-    line-height: .88;
-    letter-spacing: -.06em;
-    color: var(--black);
-    font-weight: 700;
-  }
-
-  .hero__lead {
-    max-width: 700px;
-    margin-top: 32px;
-    font-size: clamp(18px, 1.35vw, 22px);
-    line-height: 1.48;
-    color: #403f3a;
-  }
-
-  .hero__offer {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 22px;
-    width: min(620px, 100%);
-    margin-top: 34px;
-    padding: 20px 22px;
-    background: var(--black);
-    color: var(--white);
-  }
-
-  .hero__offer-block {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    column-gap: 8px;
-  }
-
-  .hero__offer-block span {
-    flex: 0 0 100%;
-    margin-bottom: 4px;
-    font-size: 10px;
-    letter-spacing: .16em;
-    font-weight: 800;
-    color: #a9a69d;
-  }
-
-  .hero__offer-block strong {
-    font-size: 32px;
-    line-height: 1;
-    letter-spacing: -.035em;
-  }
-
-  .hero__offer-block small {
-    font-size: 12px;
-    color: #c3c0b8;
-  }
-
-  .hero__offer-block--right {
-    justify-content: flex-end;
-    text-align: right;
-  }
-
-  .hero__offer-rule {
-    width: 1px;
-    height: 54px;
-    background: rgba(255,255,255,.18);
-  }
-
-  .hero__cta-row {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 18px 20px;
-    margin-top: 26px;
-  }
-
-  .primary-cta {
-    min-height: 58px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    padding: 0 28px;
-    background: var(--red);
-    color: white !important;
-    text-decoration: none;
-    font-size: 16px;
-    font-weight: 900;
-    border: 1px solid var(--red);
-    transition: transform .16s ease, background-color .16s ease;
-  }
-
-  .primary-cta:hover {
-    background: var(--red-dark);
-    transform: translateY(-1px);
-  }
-
-  .hero__microcopy {
-    max-width: 280px;
-    color: var(--muted);
-    font-size: 12px;
-    line-height: 1.45;
-  }
-
-  .hero__proofline {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px 24px;
-    margin-top: 26px;
-    font-size: 12px;
-    font-weight: 800;
-    color: #45433e;
-  }
-
-  .hero__proofline span {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .hero__proofline span::before {
-    content: '';
-    width: 7px;
-    height: 7px;
-    background: var(--red);
-    flex: 0 0 auto;
-  }
-
-  .hero__visual {
-    padding: 28px 0 28px 0;
-  }
-
-  .visual-frame {
-    position: relative;
-    height: 100%;
-    min-height: 620px;
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    background: var(--black);
-    color: var(--white);
-    padding: 28px;
-    overflow: hidden;
-  }
-
-  .visual-frame::before {
-    content: '';
-    position: absolute;
-    width: 520px;
-    height: 520px;
-    right: -230px;
-    top: 50%;
-    transform: translateY(-50%);
-    border: 1px solid rgba(255,255,255,.10);
-    border-radius: 50%;
-    box-shadow: 0 0 0 80px rgba(255,255,255,.025), 0 0 0 160px rgba(255,255,255,.018);
-  }
-
-  .visual-frame__top,
-  .visual-frame__bottom {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: .15em;
-    color: #aaa69d;
-  }
-
-  .visual-stack {
-    position: relative;
-    z-index: 1;
-    align-self: center;
-    display: grid;
-    gap: 16px;
-    padding: 30px 0;
-  }
-
-  .visual-row {
-    border: 1px solid rgba(255,255,255,.18);
-    padding: 28px;
-  }
-
-  .visual-row span {
-    display: block;
-    margin-bottom: 10px;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: .16em;
-    color: #aaa69d;
-  }
-
-  .visual-row strong {
-    display: block;
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: clamp(42px, 4vw, 64px);
-    line-height: .9;
-    letter-spacing: -.05em;
-  }
-
-  .visual-row--paycheck strong {
-    color: var(--acid);
-  }
-
-  .visual-row--cover {
-    margin-left: 14%;
-    background: var(--red);
-    border-color: var(--red);
-  }
-
-  .visual-row--cover span {
-    color: #f8d8cf;
-  }
-
-  .visual-gap {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 2px 20px;
-    color: #cac6bc;
-    font-size: 10px;
-    font-weight: 900;
-    letter-spacing: .17em;
-  }
-
-  .visual-gap__line {
-    height: 1px;
-    flex: 1;
-    background: linear-gradient(90deg, rgba(216,239,104,.85), rgba(216,239,104,.1), rgba(255,255,255,.25));
-  }
-
-  .bridge {
-    background: var(--paper);
-    border-bottom: 1px solid var(--line);
-  }
-
-  .bridge__inner {
-    width: min(1200px, calc(100% - 44px));
-    margin: 0 auto;
-    padding: 100px 0;
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(280px, .7fr);
-    gap: clamp(50px, 10vw, 150px);
-    align-items: start;
-  }
-
-  .bridge h2,
-  .coverage-launch h2,
-  .decision h2,
-  .facts h2,
-  .eligibility h2,
-  .faq-section h2,
-  .close h2 {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-weight: 700;
-    letter-spacing: -.045em;
-    line-height: .98;
-  }
-
-  .bridge h2 {
-    margin: 0;
-    max-width: 16ch;
-    font-size: clamp(42px, 5vw, 72px);
-  }
-
-  .bridge__body {
-    display: grid;
-    gap: 22px;
-    padding-top: 12px;
-  }
-
-  .bridge__body p {
-    margin: 0;
-    font-size: 18px;
-    line-height: 1.55;
-    color: #4d4a43;
-  }
-
-  .coverage-launch {
-    background: var(--black);
-    color: white;
-    border-bottom: 1px solid #2a2926;
-  }
-
-  .coverage-launch__inner {
-    width: min(1200px, calc(100% - 44px));
-    margin: 0 auto;
-    padding: 92px 0 56px;
-    display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(300px, .65fr);
-    gap: 50px;
-    align-items: end;
-  }
-
-  .coverage-launch__heading h2 {
-    margin: 0;
-    max-width: 9ch;
-    font-size: clamp(52px, 5.8vw, 86px);
-    color: white;
-  }
-
-  .coverage-launch__heading p {
-    margin: 22px 0 0;
-    max-width: 58ch;
-    font-size: 17px;
-    line-height: 1.55;
-    color: #bcb8af;
-  }
-
-  .coverage-launch__steps {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    border-top: 1px solid rgba(255,255,255,.16);
-    border-left: 1px solid rgba(255,255,255,.16);
-  }
-
-  .coverage-launch__steps span {
-    min-height: 70px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 0 14px;
-    border-right: 1px solid rgba(255,255,255,.16);
-    border-bottom: 1px solid rgba(255,255,255,.16);
-    font-size: 12px;
-    font-weight: 800;
-    color: #dedad1;
-  }
-
-  .coverage-launch__steps b {
-    color: var(--acid);
-    font-size: 11px;
-    letter-spacing: .06em;
-  }
-
-  .coverage-shell {
-    background: var(--black);
-    padding-bottom: 100px;
-  }
-
-  .coverage-shell :global(.coverage) {
-    width: min(1200px, calc(100% - 44px));
-    margin: 0 auto;
-    background: #f4f1ea;
-    border: 0;
-    padding: 62px clamp(24px, 4vw, 64px);
-  }
-
-  .coverage-shell :global(.coverage__intro) {
-    display: none;
-  }
-
-  .coverage-shell :global(.coverage__shell) {
-    margin-top: 0;
-    padding: 0;
-  }
-
-  .coverage-shell :global(.progress) {
-    max-width: none;
-    margin-bottom: 34px;
-  }
-
-  .coverage-shell :global(.progress__label) {
-    color: #5a574f;
-  }
-
-  .coverage-shell :global(.progress__name) {
-    color: var(--red-dark);
-  }
-
-  .coverage-shell :global(.fstep) {
-    max-width: 760px;
-  }
-
-  .coverage-shell :global(.fstep__q) {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: clamp(34px, 4vw, 56px);
-    line-height: .98;
-    letter-spacing: -.035em;
-    color: var(--black);
-  }
-
-  .coverage-shell :global(.fstep__why) {
-    font-size: 15px;
-    line-height: 1.5;
-    color: #6b675f;
-  }
-
-  .coverage-shell :global(select),
-  .coverage-shell :global(input[type='number']) {
-    background: #fff;
-    border-color: #c7c1b7;
-    border-radius: 0;
-    min-height: 58px;
-  }
-
-  .coverage-shell :global(label) {
-    color: var(--black);
-  }
-
-  .coverage-shell :global(.input-money > span) {
-    border-radius: 0;
-    background: #ece7dc;
-    border-color: #c7c1b7;
-  }
-
-  .coverage-shell :global(.btn) {
-    border-radius: 0;
-    box-shadow: none;
-  }
-
-  .coverage-shell :global(.btn--primary) {
-    background: var(--red);
-    border-color: var(--red);
-  }
-
-  .coverage-shell :global(.btn--primary:hover) {
-    background: var(--red-dark);
-    border-color: var(--red-dark);
-  }
-
-  .coverage-shell :global(.btn--secondary) {
-    background: transparent;
-    border-color: #bfb8ac;
-  }
-
-  .coverage-shell :global(.flow__actions) {
-    gap: 12px;
-  }
-
-  .coverage-shell :global(.check) {
-    border-radius: 0;
-    background: white;
-    border-color: #d0c9be;
-  }
-
-  .coverage-shell :global(.check:has(input:checked)) {
-    background: #f5eadf;
-    border-color: var(--red);
-  }
-
-  .coverage-shell :global(.flow__result) {
-    width: min(1200px, calc(100% - 44px));
-    margin: 0 auto;
-    padding: 0;
-    background: var(--black);
-  }
-
-  .coverage-shell :global(.flow__result > .shell) {
-    padding: 78px clamp(24px, 4vw, 64px);
-  }
-
-  .coverage-shell :global(.result__head h2) {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: clamp(48px, 5vw, 76px);
-    letter-spacing: -.045em;
-  }
-
-  .coverage-shell :global(.result__fact dt) {
-    color: #8e8a80;
-  }
-
-  .coverage-shell :global(.result__fact dd) {
-    color: white;
-  }
-
-  .coverage-shell :global(.result__offer-label) {
-    color: #e5c0b8;
-  }
-
-  .coverage-shell :global(.plan) {
-    border-radius: 0;
-    box-shadow: none;
-  }
-
-  .coverage-shell :global(.plan--recommended) {
-    border-radius: 0;
-    border: 2px solid var(--red);
-    box-shadow: none;
-  }
-
-  .coverage-shell :global(.plan__flag) {
-    border-radius: 0;
-    background: var(--red);
-  }
-
-  .coverage-shell :global(.flow__alt) {
-    margin-bottom: 0;
-  }
-
-  .decision {
-    background: var(--paper-2);
-    border-bottom: 1px solid var(--line);
-  }
-
-  .decision__inner {
-    width: min(1200px, calc(100% - 44px));
-    margin: 0 auto;
-    padding: 100px 0;
-    display: grid;
-    grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
-    gap: 80px;
-  }
-
-  .decision h2 {
-    margin: 0;
-    max-width: 12ch;
-    font-size: clamp(44px, 5vw, 72px);
-  }
-
-  .decision__steps {
-    display: grid;
-    gap: 0;
-    border-top: 1px solid var(--line);
-  }
-
-  .decision-step {
-    display: grid;
-    grid-template-columns: 46px minmax(0, 1fr);
-    gap: 18px;
-    padding: 24px 0;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .decision-step > span {
-    font-size: 11px;
-    font-weight: 900;
-    letter-spacing: .1em;
-    color: var(--red);
-  }
-
-  .decision-step strong {
-    display: block;
-    font-size: 18px;
-  }
-
-  .decision-step p {
-    grid-column: 2;
-    margin: 6px 0 0;
-    font-size: 14px;
-    line-height: 1.5;
-    color: #625f58;
-  }
-
-  .facts {
-    background: var(--paper);
-    border-bottom: 1px solid var(--line);
-  }
-
-  .facts__inner {
-    width: min(1200px, calc(100% - 44px));
-    margin: 0 auto;
-    padding: 100px 0;
-  }
-
-  .facts h2 {
-    margin: 0;
-    max-width: 15ch;
-    font-size: clamp(46px, 5vw, 74px);
-  }
-
-  .facts__grid {
-    margin-top: 58px;
-    border-top: 1px solid var(--line);
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .facts__grid article {
-    min-height: 210px;
-    padding: 26px 28px 26px 0;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .facts__grid article:nth-child(odd) {
-    border-right: 1px solid var(--line);
-    padding-right: 30px;
-  }
-
-  .facts__grid article:nth-child(even) {
-    padding-left: 30px;
-  }
-
-  .facts__grid article span {
-    display: block;
-    margin-bottom: 12px;
-    font-size: 10px;
-    font-weight: 900;
-    letter-spacing: .14em;
-    color: var(--red-dark);
-  }
-
-  .facts__grid article strong {
-    display: block;
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 28px;
-    line-height: 1;
-    letter-spacing: -.03em;
-  }
-
-  .facts__grid article p {
-    margin: 10px 0 0;
-    max-width: 46ch;
-    font-size: 14px;
-    line-height: 1.5;
-    color: #635f56;
-  }
-
-  .eligibility {
-    background: var(--paper-2);
-    border-bottom: 1px solid var(--line);
-  }
-
-  .eligibility__inner {
-    width: min(1200px, calc(100% - 44px));
-    margin: 0 auto;
-    padding: 100px 0;
-    display: grid;
-    grid-template-columns: .7fr 1.3fr;
-    gap: 90px;
-  }
-
-  .eligibility h2 {
-    margin: 0;
-    max-width: 12ch;
-    font-size: clamp(44px, 4.7vw, 68px);
-  }
-
-  .eligibility__heading > p:last-child {
-    margin: 20px 0 0;
-    max-width: 32ch;
-    color: #666258;
-    line-height: 1.5;
-  }
-
-  .eligibility__list {
-    border-top: 1px solid var(--line);
-  }
-
-  .eligibility__item {
-    display: grid;
-    grid-template-columns: 48px minmax(0,1fr);
-    gap: 18px;
-    padding: 24px 0;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .eligibility__num {
-    font-size: 11px;
-    font-weight: 900;
-    letter-spacing: .1em;
-    color: var(--red);
-  }
-
-  .eligibility__item strong {
-    display: block;
-    font-size: 17px;
-    line-height: 1.35;
-  }
-
-  .eligibility__item p {
-    margin: 8px 0 0;
-    font-size: 13px;
-    line-height: 1.5;
-    color: #6a665d;
-  }
-
-  .faq-section {
-    background: var(--paper);
-  }
-
-  .faq-section__inner {
-    width: min(1200px, calc(100% - 44px));
-    margin: 0 auto;
-    padding: 100px 0;
-  }
-
-  .faq-section h2 {
-    margin: 0;
-    max-width: 11ch;
-    font-size: clamp(48px, 5vw, 74px);
-  }
-
-  .faq-section__wrap {
-    margin-top: 54px;
-    max-width: 1000px;
-  }
-
-  .close {
-    background: var(--red);
-    color: white;
-  }
-
-  .close__inner {
-    width: min(1000px, calc(100% - 44px));
-    margin: 0 auto;
-    padding: 110px 0 120px;
-    text-align: center;
-  }
-
-  .close h2 {
-    margin: 0 auto;
-    max-width: 12ch;
-    font-size: clamp(54px, 6.2vw, 88px);
-    color: white;
-  }
-
-  .close__inner > p:not(.section-tag) {
-    max-width: 50ch;
-    margin: 24px auto 0;
-    font-size: 18px;
-    line-height: 1.55;
-    color: #f7ded8;
-  }
-
-  .primary-cta--light {
-    margin-top: 34px;
-    background: white;
-    border-color: white;
-    color: var(--black) !important;
-  }
-
-  .primary-cta--light:hover {
-    background: #f2efe8;
-    border-color: #f2efe8;
-  }
-
-  @media (max-width: 960px) {
-    .hero__inner {
-      grid-template-columns: 1fr;
-      min-height: auto;
-      gap: 0;
-    }
-
-    .hero__copy {
-      padding: 64px 0 46px;
-    }
-
-    .hero__visual {
-      padding: 0 0 30px;
-    }
-
-    .visual-frame {
-      min-height: 470px;
-    }
-
-    .bridge__inner,
-    .coverage-launch__inner,
-    .decision__inner,
-    .eligibility__inner {
-      grid-template-columns: 1fr;
-      gap: 46px;
-    }
-
-    .bridge__inner,
-    .decision__inner,
-    .facts__inner,
-    .eligibility__inner,
-    .faq-section__inner {
-      padding-block: 76px;
-    }
-
-    .coverage-launch__inner {
-      padding-top: 76px;
-    }
-  }
-
-  @media (max-width: 680px) {
-    .site-header__inner,
-    .hero__inner,
-    .bridge__inner,
-    .coverage-launch__inner,
-    .coverage-shell :global(.coverage),
-    .coverage-shell :global(.flow__result),
-    .decision__inner,
-    .facts__inner,
-    .eligibility__inner,
-    .faq-section__inner,
-    .close__inner {
-      width: min(100% - 28px, 1200px);
-    }
-
-    .hero h1 {
-      max-width: 11ch;
-      font-size: clamp(50px, 15vw, 76px);
-    }
-
-    .hero__lead {
-      font-size: 17px;
-    }
-
-    .hero__offer {
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .hero__offer-rule {
-      display: none;
-    }
-
-    .hero__offer-block--right {
-      justify-content: flex-start;
-      text-align: left;
-    }
-
-    .hero__offer-block strong {
-      font-size: 28px;
-    }
-
-    .primary-cta {
-      width: 100%;
-    }
-
-    .hero__microcopy {
-      max-width: none;
-      width: 100%;
-    }
-
-    .hero__proofline {
-      gap: 12px 16px;
-    }
-
-    .visual-frame {
-      min-height: 430px;
-      padding: 20px;
-    }
-
-    .visual-row {
-      padding: 22px;
-    }
-
-    .visual-row strong {
-      font-size: 44px;
-    }
-
-    .visual-row--cover {
-      margin-left: 0;
-    }
-
-    .bridge h2,
-    .coverage-launch h2,
-    .decision h2,
-    .facts h2,
-    .eligibility h2,
-    .faq-section h2,
-    .close h2 {
-      max-width: none;
-    }
-
-    .bridge h2 {
-      font-size: 44px;
-    }
-
-    .coverage-launch__steps {
-      grid-template-columns: 1fr 1fr;
-    }
-
-    .coverage-shell {
-      padding-bottom: 58px;
-    }
-
-    .coverage-shell :global(.coverage) {
-      padding: 42px 18px;
-    }
-
-    .coverage-shell :global(.flow__result > .shell) {
-      padding: 50px 18px;
-    }
-
-    .coverage-shell :global(.result__grid) {
-      gap: 40px;
-    }
-
-    .facts__grid {
-      grid-template-columns: 1fr;
-    }
-
-    .facts__grid article,
-    .facts__grid article:nth-child(odd),
-    .facts__grid article:nth-child(even) {
-      border-right: 0;
-      padding-left: 0;
-      padding-right: 0;
-    }
-
-    .faq-section__wrap {
-      margin-top: 40px;
-    }
-
-    .close__inner {
-      padding-block: 84px 92px;
-    }
-  }
+  .mis{--ink:#0c1730;--ink2:#17243f;--muted:#667085;--line:#d9e0ea;--paper:#fff;--wash:#f4f7fb;--blue:#2859e8;--blue2:#1743bd;--lime:#d8f477;--green:#17804f;--orange:#f4a340;background:var(--paper);color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow-x:clip}.mis *{box-sizing:border-box}.mis a{color:inherit}.header{border-bottom:1px solid var(--line);background:#fff}.header__inner{width:min(1240px,calc(100% - 40px));min-height:72px;margin:auto;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:11px;text-decoration:none}.brand__mark{width:34px;height:34px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:900;font-size:10px}.brand__text b{display:block;font-size:15px;letter-spacing:-.02em}.brand__text small{display:block;color:var(--muted);font-size:10px;margin-top:2px}.header__cta{font-size:13px;font-weight:850;color:var(--blue)!important;text-decoration:none}
+  .hero{background:var(--ink);color:#fff}.hero__inner{width:min(1240px,calc(100% - 40px));min-height:720px;margin:auto;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(390px,.9fr);gap:64px;align-items:center}.hero__copy{padding:80px 0}.eyebrow,.section-kicker{margin:0 0 18px;font-size:11px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}.eyebrow{display:flex;gap:8px;align-items:center;color:var(--lime)}.eyebrow i{width:8px;height:8px;background:var(--lime)}.hero h1{margin:0;max-width:9ch;font-size:clamp(56px,7vw,100px);line-height:.91;letter-spacing:-.06em}.hero__lead{max-width:680px;color:#c8d1df;margin:27px 0 0;font-size:clamp(18px,1.35vw,21px);line-height:1.5}.hero__offer{margin:33px 0 24px;width:min(610px,100%);padding:18px 20px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:20px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.04)}.hero__offer>div:not(.hero__offer-line){display:grid;grid-template-columns:auto auto;align-items:end;gap:0 7px}.hero__offer span{grid-column:1/-1;color:#8996aa;font-size:10px;font-weight:900;letter-spacing:.14em;margin-bottom:5px}.hero__offer strong{font-size:30px;line-height:1;letter-spacing:-.04em}.hero__offer small{color:#9ca8b8;font-size:12px}.hero__offer-line{width:1px;height:42px;background:rgba(255,255,255,.15)}.hero__cta,.close__cta{min-height:58px;display:inline-flex;align-items:center;justify-content:center;gap:15px;padding:0 24px;background:var(--lime);color:var(--ink)!important;text-decoration:none;font-weight:900;font-size:15px}.hero__micro{margin:10px 0 0;color:#7e8b9f;font-size:12px}.hero__bullets{display:flex;flex-wrap:wrap;gap:12px 24px;margin-top:29px;color:#d5dbe5;font-size:12px;font-weight:700}.hero__bullets b{color:var(--lime);margin-right:5px}.hero-visual{background:#151f34;border:1px solid rgba(255,255,255,.12);padding:25px;box-shadow:0 24px 70px rgba(0,0,0,.28)}.visual-header,.visual-footer{display:flex;justify-content:space-between;color:#8693a6;font-size:10px;font-weight:900;letter-spacing:.13em}.visual-header b{color:var(--lime)}.visual-body{padding:54px 0}.visual-line{display:grid;grid-template-columns:100px 1fr 58px;gap:13px;align-items:center}.visual-line span,.visual-line em{font-size:10px;font-style:normal;font-weight:800;color:#9da8b8}.visual-line i{height:12px;background:#2a3448}.visual-line--full i:after{content:'';display:block;width:100%;height:100%;background:#fff}.visual-line--state i:after{content:'';display:block;width:42%;height:100%;background:#8fdbab}.visual-label{margin:8px 0 27px 113px;color:#748196;font-size:10px}.visual-gap{margin-top:28px;padding:22px;background:rgba(216,244,119,.055);border:1px solid rgba(216,244,119,.22);display:flex;align-items:center;justify-content:space-between}.visual-gap span{color:#a7b16f;font-size:10px;font-weight:900;letter-spacing:.14em}.visual-gap strong{font-size:45px;color:var(--lime);line-height:1}.visual-footer{margin-top:10px}
+  .thesis{background:var(--wash);border-bottom:1px solid var(--line)}.thesis__inner{width:min(1240px,calc(100% - 40px));margin:auto;padding:82px 0;display:grid;grid-template-columns:50px 1.15fr .85fr;gap:30px}.thesis__index{color:var(--blue);font-size:11px;font-weight:900;letter-spacing:.13em;padding-top:5px}.section-kicker{color:var(--blue)}.thesis h2{margin:0;max-width:14ch;font-size:clamp(36px,4.5vw,60px);line-height:.98;letter-spacing:-.05em}.thesis__copy{color:var(--muted);font-size:16px;line-height:1.65}.thesis__copy p+p{margin-top:17px}.thesis__copy strong{color:var(--ink)}
+  .coverage{background:#eef2f7;padding:88px 20px 96px}.coverage__head,.flow{width:min(1040px,100%);margin:auto}.coverage__head{display:grid;grid-template-columns:1.15fr .85fr;gap:60px;align-items:end;margin-bottom:34px}.coverage__head h2{margin:0;font-size:clamp(40px,5vw,64px);line-height:.95;letter-spacing:-.055em}.coverage__head p:not(.section-kicker){margin:18px 0 0;color:var(--muted);line-height:1.6;max-width:680px}.coverage__promise{border-left:2px solid var(--blue);padding-left:18px;display:grid;gap:6px;color:#526076;font-size:14px}.coverage__promise b{font-size:10px;letter-spacing:.14em;color:var(--blue)}.flow{background:#fff;border:1px solid #d5dce7;box-shadow:0 20px 55px rgba(16,24,40,.11);padding:34px}.flow__bar{margin-bottom:34px}.flow__track{height:5px;background:#e5e9ef;overflow:hidden}.flow__track i{display:block;width:25%;height:100%;background:var(--blue);transition:width .25s ease}.flow__meta{display:flex;justify-content:space-between;margin-top:8px;color:#7b8798;font-size:10px;font-weight:800;letter-spacing:.12em}.flow__meta strong{color:var(--ink)}fieldset{border:0;margin:0;padding:0;max-width:770px}.step-no{display:block;color:var(--blue);font-size:11px;font-weight:900;letter-spacing:.15em;margin-bottom:10px}legend{color:var(--ink);font-size:clamp(34px,4vw,52px);font-weight:900;line-height:.98;letter-spacing:-.05em;margin-bottom:12px}fieldset>p{color:var(--muted);line-height:1.55;max-width:56ch;margin:0 0 25px}label{display:block;color:#344054;font-size:13px;font-weight:800;margin-bottom:8px}select,input[type=number]{width:100%;min-height:50px;border:1px solid #c9d1dc;border-radius:0;background:#fff;color:var(--ink);font:inherit;padding:0 14px}select:focus,input[type=number]:focus{outline:3px solid rgba(40,89,232,.14);border-color:var(--blue)}.money{display:flex}.money span{width:48px;min-height:50px;display:grid;place-items:center;background:#f1f4f8;border:1px solid #c9d1dc;border-right:0;color:#667085;font-weight:800}.dependants{margin-top:18px}.dependants small{display:block;margin-top:7px;color:#667085;font-size:11px}.expense-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.checks{display:grid;gap:10px}.check{display:flex;gap:12px;align-items:flex-start;padding:14px;background:#f8fafc;border:1px solid #dee4ec;cursor:pointer}.check:has(input:checked){border-color:var(--blue);background:#edf2ff}.check input{accent-color:var(--blue);width:17px;height:17px;margin-top:2px;flex:0 0 auto}.check>span{font-size:13px;line-height:1.45;color:#344054;font-weight:600}.check small{display:block;margin-top:3px;color:#667085;font-weight:400}.flow-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:32px}.next,.back{min-height:50px;padding:0 20px;border:1px solid transparent;font:inherit;font-size:14px;font-weight:900;cursor:pointer}.next{background:var(--blue);color:#fff}.next:hover{background:var(--blue2)}.back{background:#fff;color:#344054;border-color:#c9d1dc}.flow-error{color:#b42318;font-size:13px;font-weight:700;margin:12px 0 0}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+  .result{background:var(--ink);color:#fff;padding:92px 20px 100px}.result__inner{width:min(1100px,100%);margin:auto}.result__head{max-width:690px}.result__head .section-kicker{color:var(--lime)}.result__head h2{margin:0;font-size:clamp(45px,5.5vw,78px);line-height:.92;letter-spacing:-.06em}.result__head>p:last-child{margin-top:17px;color:#9da8b8;line-height:1.55}.result__grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;margin-top:46px}.result__gap{background:#fff;color:var(--ink);padding:32px}.result__label,.result__offer>p{font-size:10px;letter-spacing:.14em;font-weight:900;color:var(--blue)}.result__gap>strong{display:block;font-size:clamp(72px,8vw,112px);line-height:.82;letter-spacing:-.07em;margin-top:18px}.result__gap>p{margin-top:12px;color:#667085;font-size:13px;line-height:1.5;max-width:40ch}.result__rows{margin-top:26px;border-top:1px solid #e5e7eb}.result__rows div{display:flex;justify-content:space-between;gap:15px;padding:13px 0;border-bottom:1px solid #e5e7eb}.result__rows span{color:#667085;font-size:12px}.result__rows b{font-size:14px}.result__meter{height:9px;background:#e9edf2;margin-top:22px;overflow:hidden}.result__meter i{display:block;width:0;height:100%;background:var(--green);transition:width .7s ease}.result__meter-labels{display:flex;justify-content:space-between;margin-top:6px;color:#667085;font-size:10px}.result__offer{background:var(--lime);color:var(--ink);padding:32px;display:flex;flex-direction:column}.result__offer>p{color:#55631d;margin:0}.rec{display:flex;flex-direction:column;flex:1;margin-top:17px}.rec__flag{align-self:flex-start;background:var(--ink);color:#fff;padding:6px 8px;font-size:9px;font-weight:900;letter-spacing:.12em}.rec h3{margin:19px 0 0;font-size:25px;letter-spacing:-.03em}.rec>strong{font-size:48px;line-height:1;margin-top:12px;letter-spacing:-.055em}.rec>small{font-size:11px;color:#59662b}.rec>p{margin:9px 0 0;color:#4c5928;font-size:12px;line-height:1.45}.rec__match{margin-top:19px;background:rgba(255,255,255,.45);padding:12px;font-size:12px;font-weight:800;line-height:1.45}.rec__price{margin-top:auto;padding-top:20px;font-size:28px;font-weight:900;letter-spacing:-.04em}.rec__price small{margin-left:5px;font-size:11px;color:#59662b;letter-spacing:0}.rec__cta{margin-top:14px;min-height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 15px;background:var(--ink);color:#fff!important;text-decoration:none;font-size:13px;font-weight:900}.restart{margin-top:16px;border:0;padding:0;background:none;color:#4f5a2b;font:inherit;font-size:12px;font-weight:800;text-decoration:underline;cursor:pointer;text-align:left}.no-gap strong{display:block;margin-top:18px;font-size:30px;line-height:1.05;letter-spacing:-.04em}.no-gap p{color:#4f5a2b;font-size:13px;line-height:1.5;margin-top:10px}
+  .proof,.details,.eligibility,.faq{padding:88px 20px}.proof{background:#fff}.proof__inner,.details__inner,.eligibility__inner,.faq__inner{width:min(1100px,100%);margin:auto}.proof__intro{max-width:720px}.proof h2,.details h2,.eligibility h2,.faq h2,.close h2{margin:0;font-size:clamp(40px,5vw,62px);line-height:.96;letter-spacing:-.05em}.proof__intro>p:last-child{margin-top:17px;color:#667085;line-height:1.6}.proof__steps{display:grid;grid-template-columns:repeat(3,1fr);margin-top:52px;border-top:1px solid var(--line)}.proof__steps article{padding:23px 24px 0 0;border-right:1px solid var(--line)}.proof__steps article+article{padding-left:24px}.proof__steps article:last-child{border:0}.proof__steps span{color:var(--blue);font-size:11px;font-weight:900}.proof__steps b{display:block;margin-top:25px;font-size:19px}.proof__steps p{color:#667085;font-size:13px;line-height:1.55;margin-top:8px}.details{background:var(--wash);border-block:1px solid var(--line)}.details__grid{display:grid;grid-template-columns:repeat(2,1fr);margin-top:48px;border-top:1px solid var(--line)}.details__grid article{padding:23px 24px 26px 0;border-bottom:1px solid var(--line)}.details__grid article:nth-child(odd){border-right:1px solid var(--line)}.details__grid article:nth-child(even){padding-left:24px}.details__grid span{color:var(--blue);font-size:10px;font-weight:900;letter-spacing:.14em}.details__grid b{display:block;margin-top:13px;font-size:21px;letter-spacing:-.03em}.details__grid p{margin-top:8px;color:#667085;font-size:13px;line-height:1.55}.eligibility{background:#fff}.eligibility__inner{display:grid;grid-template-columns:.88fr 1.12fr;gap:70px}.eligibility__list{border-top:1px solid var(--line)}.eligibility__list>div{display:grid;grid-template-columns:42px 1fr;gap:18px;padding:19px 0;border-bottom:1px solid var(--line)}.eligibility__list>div>span{color:var(--blue);font-size:11px;font-weight:900}.eligibility__list p{margin:0;font-size:13px;line-height:1.45;color:#344054}.eligibility__list small{display:block;color:#667085;margin-top:4px;font-size:11px}.faq{background:var(--paper)}.faq__inner{display:grid;grid-template-columns:.85fr 1.15fr;gap:70px}.faq__list{border-top:1px solid var(--line)}.faq details{border-bottom:1px solid var(--line)}.faq summary{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:20px;list-style:none;cursor:pointer;font-size:15px;font-weight:850}.faq summary::-webkit-details-marker{display:none}.faq summary span{color:var(--blue);font-size:24px;font-weight:300}.faq details>div{padding:0 0 22px;max-width:700px;color:#667085;font-size:13px;line-height:1.65}.faq details a{display:inline-block;margin-top:9px;color:var(--blue);font-weight:800}.close{background:var(--ink);color:#fff;padding:90px 20px 100px}.close__inner{width:min(1100px,100%);margin:auto}.close .section-kicker{color:var(--lime)}.close h2{max-width:15ch}.close p:not(.section-kicker){color:#a6b0c0;max-width:650px;line-height:1.6;margin:17px 0 25px}.close__cta{background:#fff;color:var(--ink)!important}
+  @media(max-width:900px){.hero__inner,.coverage__head,.result__grid,.faq__inner,.eligibility__inner{grid-template-columns:1fr}.hero__inner{min-height:auto;gap:30px}.hero__copy{padding:70px 0 36px}.hero-visual{margin-bottom:58px}.thesis__inner{grid-template-columns:42px 1fr}.thesis__copy{grid-column:2}.coverage__promise{max-width:300px}.proof__steps{grid-template-columns:1fr}.proof__steps article,.proof__steps article+article{padding:22px 0;border-right:0;border-bottom:1px solid var(--line)}.details__grid{grid-template-columns:1fr}.details__grid article,.details__grid article:nth-child(even),.details__grid article:nth-child(odd){border-right:0;padding-left:0;padding-right:0}.faq__inner,.eligibility__inner{gap:45px}}
+  @media(max-width:620px){.header__inner,.hero__inner,.thesis__inner{width:calc(100% - 28px)}.brand__text small{display:none}.header__cta{font-size:12px}.hero h1{font-size:56px}.hero__lead{font-size:17px}.hero__offer{grid-template-columns:1fr;gap:14px}.hero__offer-line{width:100%;height:1px}.hero__offer>div:not(.hero__offer-line){grid-template-columns:auto auto}.hero__cta{width:100%}.visual-line{grid-template-columns:82px 1fr 45px}.visual-label{margin-left:95px}.thesis__inner{padding:58px 0;gap:15px}.thesis h2{font-size:39px}.coverage{padding-inline:14px}.flow{padding:24px 18px}legend{font-size:36px}.expense-grid{grid-template-columns:1fr}.flow-actions{justify-content:stretch}.back,.next{flex:1}.result{padding-inline:14px}.result__gap,.result__offer{padding:22px}.result__gap>strong{font-size:72px}.close__cta{width:100%}}
 </style>
