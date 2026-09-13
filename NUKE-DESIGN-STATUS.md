@@ -1,1 +1,0 @@
-Homepage design was intentionally replaced from scratch on 2026-09-13. The new homepage does not preserve the prior landing-page composition, hero treatment, informational bands, or visual direction. Protected product/legal/calculation logic remains unchanged.
